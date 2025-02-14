@@ -1,5 +1,17 @@
 - 제목
 이모지 작업타입 [#이슈번호] : 제목
+|작업 타입|작업내용 |
+| --- | --- |
+| ✨ feat | 새로운 기능을 추가 |
+| 🐛 bugfix | 버그 수정 |
+| ♻️ refactor | 코드 리팩토링 |
+| 🩹 fix | 코드 수정 |
+| 🚚 move | 파일 옮김/정리 |
+| 🔥 del | 기능/파일을 삭제 |
+| 🍻 test | 테스트 코드를 작성 |
+| 🎨 readme | readme 수정 |
+| 🙈 gitfix | gitignore 수정 |
+| 🔨script | package.json 변경(npm 설치 등) |
 (확인 후 지워주세요)
 
 ---
