@@ -25,7 +25,7 @@ public abstract class BaseEntity {
 
     @CreatedBy
     @ManyToOne
-    @JoinColumn(name = "created_by_id")
+    @JoinColumn(name = "created_by")
     private User createdBy;
 
     @LastModifiedDate
@@ -34,14 +34,14 @@ public abstract class BaseEntity {
 
     @LastModifiedBy
     @ManyToOne
-    @JoinColumn(name = "updated_by_id")
+    @JoinColumn(name = "updated_by")
     private User updatedBy;
 
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     @ManyToOne
-    @JoinColumn(name = "deleted_by_id")
+    @JoinColumn(name = "deleted_by")
     private User deletedBy;
 
     // 소프트 delete를 위한 method 추가

@@ -40,3 +40,7 @@ out/
 .env
 .env-prod
 .env-dev
+
+### Application Setting File ###
+application.properties
+application.yml
