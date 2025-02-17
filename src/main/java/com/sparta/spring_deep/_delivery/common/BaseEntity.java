@@ -40,6 +40,9 @@ public abstract class BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @ManyToOne
     @JoinColumn(name = "deleted_by")
     private User deletedBy;
@@ -48,5 +51,6 @@ public abstract class BaseEntity {
     public void delete(User user) {
         this.deletedAt = LocalDateTime.now();
         this.deletedBy = user;
+        this.isDeleted = true;
     }
 }
