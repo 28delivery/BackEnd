@@ -6,11 +6,11 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class RestaurantAdminRequestDto {
+public class RestaurantAdminCreateRequestDto {
 
-    String name;
-    UUID categoryId;
-    String address;
-    String phone;
-
+    private String ownerId;
+    private String name;
+    private UUID categoryId;
+    private String address;
+    private String phone;
 }

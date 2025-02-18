@@ -3,9 +3,10 @@ package com.sparta.spring_deep._delivery.domain.restaurant.entity;
 
 import com.sparta.spring_deep._delivery.common.BaseEntity;
 import com.sparta.spring_deep._delivery.domain.category.Category;
+import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantAdminCreateRequestDto;
+import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantAdminRequestDto;
 import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.spring_deep._delivery.domain.user.User;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -50,17 +51,16 @@ public class Restaurant extends BaseEntity {
     @NotNull
     private String address;
 
-    @Nullable
     private String phone;
 
-    public Restaurant(RestaurantRequestDto restaurantRequestDto, User ownerId,
-        Category categoryId, User user) {
-        super(user);
-        this.owner = ownerId;
-        this.category = categoryId;
-        this.name = restaurantRequestDto.getName();
-        this.address = restaurantRequestDto.getAddress();
-        this.phone = restaurantRequestDto.getPhone();
+    public Restaurant(RestaurantAdminCreateRequestDto restaurantAdminCreateRequestDto, User owner,
+        Category category, User createUser) {
+        super(createUser);
+        this.owner = owner;
+        this.category = category;
+        this.name = restaurantAdminCreateRequestDto.getName();
+        this.address = restaurantAdminCreateRequestDto.getAddress();
+        this.phone = restaurantAdminCreateRequestDto.getPhone();
     }
 
     public void UpdateRestaurant(RestaurantRequestDto restaurantRequestDto, Category categoryId,
@@ -69,6 +69,16 @@ public class Restaurant extends BaseEntity {
         this.name = restaurantRequestDto.getName();
         this.address = restaurantRequestDto.getAddress();
         this.phone = restaurantRequestDto.getPhone();
+        super.update(user);
+    }
+
+    public void UpdateRestaurant(RestaurantAdminRequestDto restaurantAdminRequestDto,
+        Category categoryId,
+        User user) {
+        this.category = categoryId;
+        this.name = restaurantAdminRequestDto.getName();
+        this.address = restaurantAdminRequestDto.getAddress();
+        this.phone = restaurantAdminRequestDto.getPhone();
         super.update(user);
     }
 
