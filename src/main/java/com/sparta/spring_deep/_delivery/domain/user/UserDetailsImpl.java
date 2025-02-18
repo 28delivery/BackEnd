@@ -2,12 +2,12 @@ package com.sparta.spring_deep._delivery.domain.user;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import org.springframework.boot.autoconfigure.task.TaskSchedulingProperties.Simple;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+@Getter
 public class UserDetailsImpl implements UserDetails {
 
     private final User user;
