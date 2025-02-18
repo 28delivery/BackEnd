@@ -24,12 +24,12 @@ repositories {
 }
 
 dependencies {
-//    // QueryDSL
-//    implementation 'com.querydsl:querydsl-jpa'
-//    // QFile 생성 및 가져오기
-//    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
-//    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-//    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    // QueryDSL
+    implementation 'com.querydsl:querydsl-jpa:5.1.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.1.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
 
     // SpringBoot
     implementation 'org.springframework.boot:spring-boot-starter-web'

@@ -1,17 +1,21 @@
 package com.sparta.spring_deep._delivery.domain.restaurant.service;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.spring_deep._delivery.domain.category.Category;
 import com.sparta.spring_deep._delivery.domain.category.CategoryRepository;
 import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantResponseDto;
+import com.sparta.spring_deep._delivery.domain.restaurant.entity.QRestaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.entity.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.user.User;
 import com.sparta.spring_deep._delivery.domain.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +28,8 @@ public class RestaurantService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
 
+
+
     public RestaurantResponseDto getRestaurant(UUID restaurantId) {
         // id로 restaurant 객체 찾기
         log.info("get restaurant with id" + restaurantId);
@@ -32,40 +38,6 @@ public class RestaurantService {
         );
 
         return new RestaurantResponseDto(restaurant);
-    }
-
-
-    @Transactional
-    public RestaurantResponseDto addRestaurant(String ownerId,
-        RestaurantRequestDto restaurantRequestDto) {
-        // 토큰으로 현재 접속자 정보 찾기
-        // 임시방편
-        User user = userRepository.findById("admin").orElseThrow(
-            () -> new EntityNotFoundException("User with id " + "test" + " not found")
-        );
-
-        // Id로 사용자 정보 찾기
-        log.info("find User by Id " + ownerId);
-        User owner = userRepository.findById(ownerId).orElseThrow(
-            () -> new EntityNotFoundException("User with id " + ownerId + " not found")
-        );
-
-        // Id로 카테고리 찾아내기
-        UUID uuid = restaurantRequestDto.getCategoryId();
-        log.info("find Category by Id " + uuid);
-        Category category = categoryRepository.findById(uuid).orElseThrow(
-            () -> new EntityNotFoundException("Category with id " + uuid + " not found")
-        );
-
-        // 사용자 정보와 category로 Restaurant 객체 생성
-        log.info("add restaurant " + restaurantRequestDto);
-        Restaurant restaurant = new Restaurant(restaurantRequestDto, owner, category, user);
-
-        // 생성된 Restaurant 객체 저장
-        log.info("save restaurant " + restaurantRequestDto);
-        Restaurant savedRestaurant = restaurantRepository.save(restaurant);
-
-        return new RestaurantResponseDto(savedRestaurant);
     }
 
     @Transactional
@@ -132,5 +104,9 @@ public class RestaurantService {
         }
 
         return true;
+    }
+
+    public Page<RestaurantResponseDto> searchRestaurant(UUID id, String restaurantName, String category) {
+        return null;
     }
 }
