@@ -1,5 +1,6 @@
 package com.sparta.spring_deep._delivery.common;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sparta.spring_deep._delivery.domain.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -8,7 +9,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,6 +20,8 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Data
+@Getter
+@Setter
 @RequiredArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
@@ -26,6 +31,7 @@ public class BaseEntity {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @JsonIgnore
     @CreatedBy
     @ManyToOne
     @JoinColumn(name = "created_by")
@@ -35,6 +41,7 @@ public class BaseEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @JsonIgnore
     @LastModifiedBy
     @ManyToOne
     @JoinColumn(name = "updated_by")
@@ -47,6 +54,7 @@ public class BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "deleted_by")
     private User deletedBy;

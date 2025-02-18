@@ -17,12 +17,6 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     public User registerUser(UserDto userDto) {
-        if(userRepository == null){
-            System.out.println("userRepository is null");
-        }
-        if(passwordEncoder == null){
-            System.out.println("passwordEncoder is null");
-        }
         if (userRepository.existsByUsername(userDto.getUsername())) {
             throw new RuntimeException("Username is already taken!");
         }
