@@ -7,9 +7,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,8 +17,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class User extends BaseEntity {
 
     @Id
@@ -39,5 +35,15 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "is_public", nullable = false)
-    private UserVisibility isPublic;
+    private IsPublic isPublic;
+
+    @Builder
+    public User(String username, String password, String email, UserRole role, IsPublic isPublic) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.role = role;
+        this.isPublic = isPublic;
+    }
+
 }

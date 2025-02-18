@@ -1,18 +1,28 @@
 package com.sparta.spring_deep._delivery.domain.user;
 
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired})
+@RequiredArgsConstructor
 public class UserService {
 
+    @Autowired
     private UserRepository userRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     public User registerUser(UserDto userDto) {
+        if(userRepository == null){
+            System.out.println("userRepository is null");
+        }
+        if(passwordEncoder == null){
+            System.out.println("passwordEncoder is null");
+        }
         if (userRepository.existsByUsername(userDto.getUsername())) {
             throw new RuntimeException("Username is already taken!");
         }
@@ -32,7 +42,15 @@ public class UserService {
             .isPublic(userDto.getIsPublic())
             .build();
 
-        return userRepository.save(user);
+        user.setCreatedBy(user);
+        user.setUpdatedBy(user);
+        user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedAt(LocalDateTime.now());
+        user.setIsDeleted(false);
+
+        User saved = userRepository.save(user);
+        System.out.println("created user in service: " + saved);
+        return saved;
     }
 
     public User updateUser(String userName, UserDto userDto) {
@@ -61,7 +79,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User findById(Long id) {
+    public User findById(String id) {
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found!"));
     }
 }

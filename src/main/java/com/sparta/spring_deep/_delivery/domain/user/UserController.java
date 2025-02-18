@@ -7,6 +7,7 @@ import java.nio.file.attribute.UserPrincipal;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,8 +34,9 @@ public class UserController {
     private final UserDetailsServiceImpl userDetailsServiceImpl;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody UserDto userDto) {
+    public ResponseEntity<User> signup(@RequestBody UserDto userDto) {
         User newUser = userService.registerUser(userDto);
+        System.out.println("created user: " + newUser);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 

@@ -10,5 +10,5 @@ public class UserDto {
     private String password;
     private String email;
     private UserRole role;
-    private UserVisibility isPublic;
+    private IsPublic isPublic;
 }
