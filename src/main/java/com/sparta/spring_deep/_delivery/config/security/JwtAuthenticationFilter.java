@@ -2,7 +2,11 @@ package com.sparta.spring_deep._delivery.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.spring_deep._delivery.domain.auth.LoginRequestDto;
+import com.sparta.spring_deep._delivery.domain.user.UserDetailsImpl;
+import com.sparta.spring_deep._delivery.domain.user.UserRole;
 import com.sparta.spring_deep._delivery.util.JwtUtil;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -41,5 +45,26 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             log.error(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request,
+        HttpServletResponse response, FilterChain chain, Authentication authResult)
+        throws IOException, ServletException {
+
+        String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
+        UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getRole();
+
+        String token = jwtUtil.createJwt(username, role);
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
+
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request,
+        HttpServletResponse response, AuthenticationException failed)
+        throws IOException, ServletException {
+
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 }
