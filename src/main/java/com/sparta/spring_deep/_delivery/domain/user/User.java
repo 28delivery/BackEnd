@@ -1,36 +1,59 @@
 package com.sparta.spring_deep._delivery.domain.user;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.sparta.spring_deep._delivery.common.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
-@Getter
 @Entity
-@RequiredArgsConstructor
 @Table(name = "p_user")
-public class User {
+@Getter
+@Setter
+@NoArgsConstructor
+public class User extends BaseEntity {
 
     @Id
+    @Column(name = "username",length = 50, nullable = false, unique = true)
     private String username;
 
-    @NotNull
+    @Column(name = "password", length = 255, nullable = false)
     private String password;
 
-    @NotNull
+    @Column(name = "email", length = 100, nullable = false, unique = true)
     private String email;
 
-    @NotNull
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, columnDefinition = "p_user_role_enum")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    private UserRole role;
 
-    @NotNull
-    @ColumnDefault("FALSE")
-    private boolean is_deleted;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "is_public", nullable = false, columnDefinition = "is_public")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    private IsPublic isPublic;
 
-    public User(String username, String password, String email, String role) {
+    @Builder
+    public User(String username, String password, String email, UserRole role, IsPublic isPublic) {
+        super(username); // BaseEntity 초기화
         this.username = username;
+        this.password = password;
+        this.email = email;
+        this.role = role;
+        this.isPublic = isPublic;
     }
+
 }
