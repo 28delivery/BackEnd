@@ -42,7 +42,7 @@ public class Address extends BaseEntity {
     private String address_name;
 
     public Address(AddressRequestDto requestDto, User user) {
-        super(user);
+        super(user.getUsername());
         this.user = user;
         this.address = requestDto.getAddress();
         this.address_name = requestDto.getAddress_name();

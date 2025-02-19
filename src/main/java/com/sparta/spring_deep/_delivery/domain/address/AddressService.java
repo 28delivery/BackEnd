@@ -89,7 +89,7 @@ public class AddressService {
         Address address = addressRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Address not found: " + id));
 
-        address.delete(user);
+        address.delete(user.getUsername());
 
         return true;
     }
