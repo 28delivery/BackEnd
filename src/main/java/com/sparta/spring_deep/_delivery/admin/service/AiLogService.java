@@ -1,5 +1,8 @@
-package com.sparta.spring_deep._delivery.domain.ai;
+package com.sparta.spring_deep._delivery.admin.service;
 
+import com.sparta.spring_deep._delivery.admin.dto.AiLogResponseDto;
+import com.sparta.spring_deep._delivery.domain.ai.Ai;
+import com.sparta.spring_deep._delivery.admin.repository.AiRepository;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

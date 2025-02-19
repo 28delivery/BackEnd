@@ -1,7 +1,7 @@
 package com.sparta.spring_deep._delivery.domain.menu;
 
 import com.sparta.spring_deep._delivery.domain.ai.Ai;
-import com.sparta.spring_deep._delivery.domain.ai.AiRepository;
+import com.sparta.spring_deep._delivery.admin.repository.AiRepository;
 import com.sparta.spring_deep._delivery.domain.ai.GoogleAiService;
 import com.sparta.spring_deep._delivery.domain.user.User;
 import com.sparta.spring_deep._delivery.domain.user.UserRepository;

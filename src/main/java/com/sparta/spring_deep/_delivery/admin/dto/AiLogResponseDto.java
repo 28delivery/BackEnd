@@ -1,5 +1,6 @@
-package com.sparta.spring_deep._delivery.domain.ai;
+package com.sparta.spring_deep._delivery.admin.dto;
 
+import com.sparta.spring_deep._delivery.domain.ai.Ai;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Data;
