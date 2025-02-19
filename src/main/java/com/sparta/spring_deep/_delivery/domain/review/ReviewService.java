@@ -1,5 +1,6 @@
 package com.sparta.spring_deep._delivery.domain.review;
 
+import com.sparta.spring_deep._delivery.domain.user.User;
 import jakarta.persistence.EntityExistsException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -19,21 +20,21 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
 
     // 리뷰 작성
-    public ReviewResponseDto createReview(ReviewRequestDto requestDto, String userId) {
-        Review review = reviewRepository.save(new Review(requestDto, userId));
+    public ReviewResponseDto createReview(ReviewRequestDto requestDto, User user) {
+        Review review = reviewRepository.save(new Review(requestDto, user));
         return new ReviewResponseDto(review);
     }
 
     // 특정 음식점 리뷰 조회
     @Transactional(readOnly = true)
-    public Page<ReviewResponseDto> getReviewList(UUID restaurantId, int page, int size,
+    public Page<ReviewResponseDto> getReviews(UUID restaurantId, int page, int size,
         String sortBy, boolean isAsc) {
-
-        Sort.Direction direction = isAsc ? Direction.ASC : Direction.DESC;
-        Sort sort = Sort.by(direction, sortBy);
+        
+        Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Review> reviewList = reviewRepository.findAllByRestaurantId(restaurantId, pageable);
+        Page<Review> reviewList = reviewRepository.findAllByRestaurantIdAndIsDeletedFalse(
+            restaurantId, pageable);
 
         return reviewList.map(ReviewResponseDto::new);
     }
@@ -41,34 +42,40 @@ public class ReviewService {
     // 리뷰 조회
     @Transactional(readOnly = true)
     public ReviewResponseDto getReview(UUID reviewId) {
-        Review review = reviewRepository.findById(reviewId)
-            .orElseThrow(() -> new EntityExistsException("review not found"));
+        Review review = reviewRepository.findByIdAndIsDeletedFalse(reviewId);
+        if (review == null) {
+            throw new EntityExistsException("review is not found");
+        }
 
         return new ReviewResponseDto(review);
     }
 
     // 리뷰 수정
     @Transactional
-    public ReviewResponseDto updateReview(UUID reviewId, String comment, int rating) {
+    public ReviewResponseDto updateReview(UUID reviewId, String comment, int rating, User user) {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new EntityExistsException("review not found"));
 
-        review.setComment(comment);
-        review.setRating(rating);
+        if (review.getIsDeleted()) {
+            throw new EntityExistsException("review is deleted");
+        }
+
+        review.updateReview(comment, rating, user);
 
         return new ReviewResponseDto(review);
     }
 
     // 리뷰 삭제
-    public ResponseEntity<String> deleteReview(UUID reviewId) {
-        if (!reviewRepository.existsById(reviewId)) {
-            throw new EntityExistsException("review not found");
-        }
-        reviewRepository.deleteById(reviewId);
+    @Transactional
+    public ResponseEntity<String> deleteReview(UUID reviewId, User user) {
+        Review review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new EntityExistsException("review not found"));
 
-        if (reviewRepository.existsById(reviewId)) {
-            throw new EntityExistsException("review not deleted");
+        if (review.getDeletedBy() != null) {
+            throw new EntityExistsException("review already deleted");
         }
-        return ResponseEntity.ok("Success");
+        review.delete(user);
+
+        return ResponseEntity.ok("Success deleted");
     }
 }

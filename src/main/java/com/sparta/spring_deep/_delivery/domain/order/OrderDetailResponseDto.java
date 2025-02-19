@@ -1,13 +1,10 @@
 package com.sparta.spring_deep._delivery.domain.order;
 
+import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItem;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.List;
 
-@Getter
-@Setter
-public class OrderResponseDto {
+public class OrderDetailResponseDto {
 
     private String id;
     private String customerId;
@@ -16,13 +13,9 @@ public class OrderResponseDto {
     private OrderStatusEnum status;
     private BigDecimal totalPrice;
     private String request;
-    private LocalDateTime createdAt;
-    private String createdBy;
-    private LocalDateTime updatedAt;
-    private String updatedBy;
+    private List<OrderItem> orderItems;
 
-
-    public OrderResponseDto(Order order) {
+    public OrderDetailResponseDto(Order order, List<OrderItem> orderItems) {
         this.id = order.getId().toString();
         this.customerId = order.getCustomer().getUsername();
         this.restaurantId = order.getRestaurant().getId().toString();
@@ -30,9 +23,7 @@ public class OrderResponseDto {
         this.status = order.getStatus();
         this.totalPrice = order.getTotalPrice();
         this.request = order.getRequest();
-        this.createdAt = order.getCreatedAt();
-        this.createdBy = order.getCreatedBy();
-        this.updatedAt = order.getUpdatedAt();
-        this.updatedBy = order.getUpdatedBy();
+        this.orderItems = orderItems;
     }
+
 }

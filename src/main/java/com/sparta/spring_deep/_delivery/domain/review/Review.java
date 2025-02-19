@@ -1,16 +1,21 @@
 package com.sparta.spring_deep._delivery.domain.review;
 
 import com.sparta.spring_deep._delivery.common.BaseEntity;
+import com.sparta.spring_deep._delivery.domain.order.Order;
+import com.sparta.spring_deep._delivery.domain.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Getter
@@ -20,17 +25,18 @@ import org.hibernate.annotations.UuidGenerator;
 public class Review extends BaseEntity {
 
     @Id
-    @GeneratedValue
-    @UuidGenerator
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "order_id", nullable = false)
-    private UUID orderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = false)
+    private Order order;
 
-    @Column(name = "restaurant_id", nullable = false)
-    private UUID restaurantId;
+    ///  restaurantId 삭제
+//    @Column(name = "restaurant_id", nullable = false)
+//    private UUID restaurantId;
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private String userId;
 
     @Column(nullable = false)
@@ -39,11 +45,17 @@ public class Review extends BaseEntity {
     @Column
     private String comment;
 
-    public Review(ReviewRequestDto requestDto, String userId) {
-        this.orderId = requestDto.getOrderId();
-        this.restaurantId = requestDto.getRestaurantId();
-        this.userId = userId;
+    public Review(ReviewRequestDto requestDto, Order order, User user) {
+        super(user.getUsername());
+        this.order = order;
+        this.userId = user.getUsername();
         this.comment = requestDto.getComment();
         this.rating = requestDto.getRating();
+    }
+
+    public void updateReview(String comment, int rating, User user) {
+        this.comment = comment;
+        this.rating = rating;
+        super.update(user.getUsername());
     }
 }

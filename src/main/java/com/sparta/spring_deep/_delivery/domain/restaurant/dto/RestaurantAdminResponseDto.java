@@ -17,12 +17,12 @@ public class RestaurantAdminResponseDto {
     private String address;
     private String phone;
     private LocalDateTime createdAt;
-    private User createdBy;
+    private String createdBy;
     private LocalDateTime updatedAt;
-    private User updatedBy;
+    private String updatedBy;
     private boolean isDeleted;
     private LocalDateTime deletedAt;
-    private User deletedBy;
+    private String deletedBy;
 
     public RestaurantAdminResponseDto(Restaurant restaurant) {
         this.id = restaurant.getId();

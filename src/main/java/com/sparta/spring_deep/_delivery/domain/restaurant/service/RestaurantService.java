@@ -1,21 +1,21 @@
 package com.sparta.spring_deep._delivery.domain.restaurant.service;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.spring_deep._delivery.domain.category.Category;
 import com.sparta.spring_deep._delivery.domain.category.CategoryRepository;
 import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantResponseDto;
-import com.sparta.spring_deep._delivery.domain.restaurant.entity.QRestaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.entity.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.user.User;
 import com.sparta.spring_deep._delivery.domain.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,8 +27,6 @@ public class RestaurantService {
     private final RestaurantRepository restaurantRepository;
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
-
-
 
     public RestaurantResponseDto getRestaurant(UUID restaurantId) {
         // id로 restaurant 객체 찾기
@@ -71,7 +69,7 @@ public class RestaurantService {
                 () -> new EntityNotFoundException("Category with id " + uuid + " not found")
             );
 
-            restaurant.UpdateRestaurant(restaurantRequestDto, category, user);
+            restaurant.UpdateRestaurant(restaurantRequestDto, category, user.getUsername());
         }
 
         return new RestaurantResponseDto(restaurant);
@@ -100,13 +98,24 @@ public class RestaurantService {
                 "Restaurant owner id is not matched with user's id" + owner.getUsername());
         } else {
             // soft delete 수행
-            restaurant.delete(owner);
+            restaurant.delete(owner.getUsername());
         }
 
         return true;
     }
 
-    public Page<RestaurantResponseDto> searchRestaurant(UUID id, String restaurantName, String category) {
-        return null;
+    public Page<Restaurant> searchRestaurant(UUID id, String restaurantName,
+        String categoryName, boolean isAsc, String sortBy) {
+
+        log.info("getCategory by name: {}", categoryName);
+        Category category = categoryRepository.findByName(categoryName).orElse(null);
+
+        log.info("search restaurant by values: {}, {}, {}, {}, {}", id, restaurantName, category,
+            isAsc, sortBy);
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(0, 10, sort);
+
+        return restaurantRepository.searchByOption(pageable, id, restaurantName, category);
     }
 }

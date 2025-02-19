@@ -1,6 +1,7 @@
 package com.sparta.spring_deep._delivery.domain.restaurant.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sparta.spring_deep._delivery.common.BaseEntity;
 import com.sparta.spring_deep._delivery.domain.category.Category;
 import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantAdminCreateRequestDto;
@@ -27,6 +28,7 @@ import org.hibernate.annotations.UuidGenerator;
 @Getter
 @NoArgsConstructor
 @Table(name = "p_restaurant")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Restaurant extends BaseEntity {
 
     @Id
@@ -54,32 +56,34 @@ public class Restaurant extends BaseEntity {
     private String phone;
 
     public Restaurant(RestaurantAdminCreateRequestDto restaurantAdminCreateRequestDto, User owner,
-        Category category, User createUser) {
-        super(createUser);
+        Category category, String username) {
+        super(username);
         this.owner = owner;
         this.category = category;
         this.name = restaurantAdminCreateRequestDto.getName();
+//        this.address = address;
         this.address = restaurantAdminCreateRequestDto.getAddress();
         this.phone = restaurantAdminCreateRequestDto.getPhone();
     }
 
     public void UpdateRestaurant(RestaurantRequestDto restaurantRequestDto, Category categoryId,
-        User user) {
+        String username) {
         this.category = categoryId;
         this.name = restaurantRequestDto.getName();
+//        this.address = address;
         this.address = restaurantRequestDto.getAddress();
         this.phone = restaurantRequestDto.getPhone();
-        super.update(user);
+        super.update(username);
     }
 
     public void UpdateRestaurant(RestaurantAdminRequestDto restaurantAdminRequestDto,
-        Category categoryId,
-        User user) {
+        Category categoryId, String username) {
         this.category = categoryId;
         this.name = restaurantAdminRequestDto.getName();
+//        this.address = address;
         this.address = restaurantAdminRequestDto.getAddress();
         this.phone = restaurantAdminRequestDto.getPhone();
-        super.update(user);
+        super.update(username);
     }
 
 }

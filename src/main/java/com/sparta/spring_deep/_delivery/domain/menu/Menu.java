@@ -49,7 +49,8 @@ public class Menu extends BaseEntity {
 
     @Builder
     public Menu(UUID restaurantId, String name, String description, BigDecimal price,
-        Boolean isHidden, boolean isDeleted) {
+        Boolean isHidden, boolean isDeleted, User user) {
+        super(user.getUsername());
         this.restaurantId = restaurantId;
         this.name = name;
         this.description = description;
@@ -61,8 +62,10 @@ public class Menu extends BaseEntity {
     public void update(String name,
         String description,
         BigDecimal price,
-        Boolean isHidden
+        Boolean isHidden,
+        User user
     ) {
+        super.update(user.getUsername());
         if (name != null) {
             this.name = name;
         }
@@ -78,7 +81,7 @@ public class Menu extends BaseEntity {
     }
 
     public void delete(User user) {
-        super.delete(user);
+        super.delete(user.getUsername());
         this.isDeleted = true;
     }
 

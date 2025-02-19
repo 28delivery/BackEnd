@@ -2,6 +2,7 @@ package com.sparta.spring_deep._delivery.domain.restaurant.controller;
 
 import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantRequestDto;
 import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantResponseDto;
+import com.sparta.spring_deep._delivery.domain.restaurant.entity.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.service.RestaurantService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -67,12 +68,18 @@ public class RestaurantController {
     // 음식점 검색
     //        @PreAuthorize("hasRole('OWNER')")
     @GetMapping("/search")
-    public ResponseEntity<Page<RestaurantResponseDto>> getRestaurant(
+    public ResponseEntity<Page<Restaurant>> getRestaurant(
         @RequestParam(required = false) UUID id,
-        @RequestParam(required = false) String restaurantName,
-        @RequestParam(required = false) String category) {
+        @RequestParam(required = false, defaultValue = "null") String restaurantName,
+        @RequestParam(required = false, defaultValue = "null") String categoryName,
+        @RequestParam(required = false, defaultValue = "true") boolean isAsc,
+        @RequestParam(required = false, defaultValue = "updatedAt") String sortBy) {
 
-        Page<RestaurantResponseDto> restaurantResponseDtoPage = restaurantService.searchRestaurant(id, restaurantName, category);
+        log.info("searchRestaurant by values: {}, {}, {}, {}, {}", id, restaurantName, categoryName,
+            isAsc, sortBy);
+        Page<Restaurant> restaurantResponseDtoPage = restaurantService.searchRestaurant(
+            id, restaurantName, categoryName, isAsc, sortBy);
+
         return ResponseEntity.status(HttpStatus.OK).body(restaurantResponseDtoPage);
     }
 
