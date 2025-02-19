@@ -7,8 +7,8 @@ import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantAdminReq
 import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantAdminResponseDto;
 import com.sparta.spring_deep._delivery.domain.restaurant.entity.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.repository.RestaurantRepository;
-import com.sparta.spring_deep._delivery.domain.user.User;
-import com.sparta.spring_deep._delivery.domain.user.UserRepository;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +67,7 @@ public class RestaurantAdminService {
         // 사용자 정보와 category로 Restaurant 객체 생성
         log.info("add restaurant " + restaurantAdminCreateRequestDto);
         Restaurant restaurant = new Restaurant(restaurantAdminCreateRequestDto, owner, category,
-            createUser);
+            createUser.getUsername());
 
         // 생성된 Restaurant 객체 저장
         log.info("save restaurant " + restaurantAdminCreateRequestDto);
@@ -102,7 +102,9 @@ public class RestaurantAdminService {
             () -> new EntityNotFoundException("Category with id " + uuid + " not found")
         );
 
-        restaurant.UpdateRestaurant(restaurantAdminRequestDto, category, createUser);
+        // Address 값으로 address 찾아내기
+
+        restaurant.UpdateRestaurant(restaurantAdminRequestDto, category, createUser.getUsername());
 
         return new RestaurantAdminResponseDto(restaurant);
     }
@@ -123,7 +125,7 @@ public class RestaurantAdminService {
         );
 
         // soft delete 수행
-        restaurant.delete(deleteUser);
+        restaurant.delete(deleteUser.getUsername());
 
         return true;
     }

@@ -7,5 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
 
-    Page<Review> findAllByRestaurantId(UUID restaurantId, Pageable pageable);
+    Page<Review> findAllByRestaurantIdAndIsDeletedFalse(UUID restaurantId, Pageable pageable);
+
+    Review findByIdAndIsDeletedFalse(UUID reviewId);
+
 }
