@@ -6,8 +6,8 @@ import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantRequestD
 import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantResponseDto;
 import com.sparta.spring_deep._delivery.domain.restaurant.entity.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.repository.RestaurantRepository;
-import com.sparta.spring_deep._delivery.domain.user.User;
-import com.sparta.spring_deep._delivery.domain.user.UserRepository;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

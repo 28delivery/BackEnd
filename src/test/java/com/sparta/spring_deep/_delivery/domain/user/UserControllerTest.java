@@ -10,8 +10,16 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.spring_deep._delivery.domain.auth.LoginRequestDto;
-import com.sparta.spring_deep._delivery.domain.auth.LoginResponseDto;
+import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
+import com.sparta.spring_deep._delivery.domain.user.dto.LoginRequestDto;
+import com.sparta.spring_deep._delivery.domain.user.dto.LoginResponseDto;
+import com.sparta.spring_deep._delivery.domain.user.controller.UserController;
+import com.sparta.spring_deep._delivery.domain.user.dto.UserDto;
+import com.sparta.spring_deep._delivery.domain.user.entity.IsPublic;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
+import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
+import com.sparta.spring_deep._delivery.domain.user.service.UserService;
 import com.sparta.spring_deep._delivery.util.JwtUtil;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;

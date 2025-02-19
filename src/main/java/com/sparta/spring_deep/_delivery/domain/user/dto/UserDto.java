@@ -1,5 +1,7 @@
-package com.sparta.spring_deep._delivery.domain.user;
+package com.sparta.spring_deep._delivery.domain.user.dto;
 
+import com.sparta.spring_deep._delivery.domain.user.entity.IsPublic;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

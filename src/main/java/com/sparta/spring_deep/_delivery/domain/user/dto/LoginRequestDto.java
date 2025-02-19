@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.auth;
+package com.sparta.spring_deep._delivery.domain.user.dto;
 
 import lombok.Getter;
 import lombok.Setter;

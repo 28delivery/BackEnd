@@ -7,7 +7,7 @@ import com.sparta.spring_deep._delivery.domain.category.Category;
 import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantAdminCreateRequestDto;
 import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantAdminRequestDto;
 import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantRequestDto;
-import com.sparta.spring_deep._delivery.domain.user.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

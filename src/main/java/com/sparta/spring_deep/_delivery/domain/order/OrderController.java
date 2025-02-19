@@ -1,6 +1,6 @@
 package com.sparta.spring_deep._delivery.domain.order;
 
-import com.sparta.spring_deep._delivery.domain.user.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

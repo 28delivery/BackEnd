@@ -1,12 +1,16 @@
-package com.sparta.spring_deep._delivery.domain.user;
+package com.sparta.spring_deep._delivery.domain.user.controller;
 
-import com.sparta.spring_deep._delivery.domain.auth.LoginRequestDto;
-import com.sparta.spring_deep._delivery.domain.auth.LoginResponseDto;
+import com.sparta.spring_deep._delivery.domain.user.dto.LoginRequestDto;
+import com.sparta.spring_deep._delivery.domain.user.dto.LoginResponseDto;
+import com.sparta.spring_deep._delivery.domain.user.dto.PasswordChangeDto;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
+import com.sparta.spring_deep._delivery.domain.user.dto.UserDto;
+import com.sparta.spring_deep._delivery.domain.user.service.UserService;
 import com.sparta.spring_deep._delivery.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;

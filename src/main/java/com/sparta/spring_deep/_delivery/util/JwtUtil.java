@@ -1,6 +1,6 @@
 package com.sparta.spring_deep._delivery.util;
 
-import com.sparta.spring_deep._delivery.domain.user.UserRole;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;

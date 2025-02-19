@@ -1,5 +1,6 @@
-package com.sparta.spring_deep._delivery.domain.user;
+package com.sparta.spring_deep._delivery.domain.user.repository;
 
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

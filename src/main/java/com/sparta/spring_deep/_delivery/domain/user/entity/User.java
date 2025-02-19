@@ -1,21 +1,16 @@
-package com.sparta.spring_deep._delivery.domain.user;
+package com.sparta.spring_deep._delivery.domain.user.entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.sparta.spring_deep._delivery.common.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 

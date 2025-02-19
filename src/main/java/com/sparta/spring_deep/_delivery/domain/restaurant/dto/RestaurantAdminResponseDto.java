@@ -2,7 +2,7 @@ package com.sparta.spring_deep._delivery.domain.restaurant.dto;
 
 import com.sparta.spring_deep._delivery.domain.category.Category;
 import com.sparta.spring_deep._delivery.domain.restaurant.entity.Restaurant;
-import com.sparta.spring_deep._delivery.domain.user.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

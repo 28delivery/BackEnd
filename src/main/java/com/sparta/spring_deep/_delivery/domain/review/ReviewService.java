@@ -1,6 +1,6 @@
 package com.sparta.spring_deep._delivery.domain.review;
 
-import com.sparta.spring_deep._delivery.domain.user.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import jakarta.persistence.EntityExistsException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,7 @@
-package com.sparta.spring_deep._delivery.domain.user;
+package com.sparta.spring_deep._delivery.domain.user.details;
 
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import java.util.ArrayList;
 import java.util.Collection;
 import lombok.Getter;
