@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -27,6 +28,9 @@ public class JwtUtil {
     public static final String AUTHORIZATION_KEY = "auth";
     // Token 식별자
     public static final String BEARER_PREFIX = "Bearer ";
+
+    @Autowired
+    private JwtBlacklistRepository jwtBlacklistRepository;
 
     @Value("${jwt.secret.key}") // Base64 Encode 한 SecretKey
     private String secretKey;
@@ -81,6 +85,11 @@ public class JwtUtil {
      * @return
      */
     public boolean validateToken(String token) {
+        if(isTokenBlacklisted(token)) {
+            log.error("JWT token is blacklisted");
+            return false;
+        }
+
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
@@ -103,5 +112,14 @@ public class JwtUtil {
      */
     public Claims getUserInfoFromToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    }
+
+    public void blacklist(String token) {
+        jwtBlacklistRepository.addBlackList(token);
+        log.info("Blacklisted token: " + token);
+    }
+
+    public boolean isTokenBlacklisted(String token) {
+        return jwtBlacklistRepository.isBlacklisted(token);
     }
 }

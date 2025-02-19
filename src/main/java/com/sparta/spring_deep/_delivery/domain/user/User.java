@@ -8,6 +8,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.util.List;
 import lombok.Builder;
@@ -47,6 +48,7 @@ public class User extends BaseEntity {
 
     @Builder
     public User(String username, String password, String email, UserRole role, IsPublic isPublic) {
+        super(username); // BaseEntity 초기화
         this.username = username;
         this.password = password;
         this.email = email;

@@ -120,7 +120,7 @@ public class UserControllerTest {
         loginRequest.setPassword("password123");
 
         String mockToken = "mock-jwt-token";
-        LoginResponseDto responseDto = new LoginResponseDto(mockToken, "testuser", Collections.singletonList("USER"));
+        LoginResponseDto responseDto = new LoginResponseDto(mockToken, "testuser", Collections.singletonList("CUSTOMERS"));
 
         // 가짜 사용자 정보 생성
         UserDetailsImpl mockUserDetails = new UserDetailsImpl(
@@ -137,15 +137,16 @@ public class UserControllerTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(mockAuth);
         when(jwtUtil.createJwt(mockUserDetails.getUsername(), mockUserDetails.getUser().getRole())).thenReturn(mockToken);
 
-        //when(userService.authenticateUser(any(LoginRequestDto.class))).thenReturn(responseDto);
+        when(userService.login(any(LoginRequestDto.class))).thenReturn(responseDto);
 
         // When & Then
         mockMvc.perform(post("/api/users/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(loginRequest)))
+            .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.token").value(mockToken))
-            .andExpect(jsonPath("$.username").value("testuser"));
+            .andExpect(jsonPath("$.user").value("testuser"));
     }
 
     @Test

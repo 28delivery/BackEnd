@@ -64,15 +64,19 @@ public class WebSecurityConfig {
             authorizeHttpRequests
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
                 .requestMatchers("/").permitAll() // 메인 페이지 요청 허가
-                .requestMatchers("/api/users/**").permitAll() // '/api/user/'로 시작하는 요청 모두 접근 허가
+                // 사용자 - 회원 가입/로그인 : 요청 모두 접근 허가
+                .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
+                // 사용자 - 내 정보 조회/로그 아웃/사용자 수정 및 삭제/비번 변경 : 요청 인증처리
+                .requestMatchers("/api/users/me", "/api/users/logout", "/api/users/**", "/api/users/**/password").authenticated()
                 .anyRequest().authenticated() // 그 외 모든 요청 인증처리)
         );
 
         //  로그인 폼 페이지 설정
-        http.formLogin((formLogin) ->
-            formLogin
-                .loginPage("/api/user/login-page").permitAll()
-        );
+        //http.formLogin((formLogin) ->
+        //       formLogin
+        //                .loginPage("/api/users/login-page").permitAll()
+        //                .loginProcessingUrl("/api/users/login")
+        //);
 
         // JWT 인증 & 인가 필터 설정
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);

@@ -1,11 +1,8 @@
 package com.sparta.spring_deep._delivery.common;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.sparta.spring_deep._delivery.domain.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MappedSuperclass;
 import java.time.LocalDateTime;
 import lombok.Data;
@@ -31,21 +28,17 @@ public class BaseEntity {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @JsonIgnore
     @CreatedBy
-    @ManyToOne
     @JoinColumn(name = "created_by")
-    private User createdBy;
+    private String createdBy;
 
     @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @JsonIgnore
     @LastModifiedBy
-    @ManyToOne
     @JoinColumn(name = "updated_by")
-    private User updatedBy;
+    private String updatedBy;
 
     @Column(name = "is_deleted")
     @ColumnDefault("FALSE")
@@ -54,27 +47,26 @@ public class BaseEntity {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
-    @JsonIgnore
-    @ManyToOne
     @JoinColumn(name = "deleted_by")
-    private User deletedBy;
+    private String deletedBy;
 
     // 생성을 위한 method 추가
-    public BaseEntity(User user) {
-        this.createdBy = user;
-        this.updatedBy = user;
+    public BaseEntity(String username) {
+        this.createdBy = username;
+        this.updatedBy = username;
         this.isDeleted = false;
     }
 
     // 소프트 delete를 위한 method 추가
-    public void delete(User user) {
+    public void delete(String username) {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();
-        this.deletedBy = user;
+        this.deletedBy = username;
     }
 
     // 업데이트를 위한 method 추가
-    public void update(User user) {
-        this.updatedBy = user;
+    public void update(String username) {
+        this.updatedBy = username;
+        this.updatedAt = LocalDateTime.now();
     }
 }
