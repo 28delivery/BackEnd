@@ -1,12 +1,11 @@
-package com.sparta.spring_deep._delivery.domain.restaurant.repository;
+package com.sparta.spring_deep._delivery.domain.restaurant;
 
-import static com.sparta.spring_deep._delivery.domain.restaurant.entity.QRestaurant.restaurant;
+import static com.sparta.spring_deep._delivery.domain.restaurant.QRestaurant.restaurant;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.spring_deep._delivery.domain.category.Category;
-import com.sparta.spring_deep._delivery.domain.restaurant.entity.Restaurant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

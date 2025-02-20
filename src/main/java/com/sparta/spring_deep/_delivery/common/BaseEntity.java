@@ -67,6 +67,5 @@ public class BaseEntity {
     // 업데이트를 위한 method 추가
     public void update(String username) {
         this.updatedBy = username;
-        this.updatedAt = LocalDateTime.now();
     }
 }

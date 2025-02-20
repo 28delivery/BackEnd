@@ -1,7 +1,8 @@
 package com.sparta.spring_deep._delivery.domain.review;
 
 
-import com.sparta.spring_deep._delivery.domain.user.User;
+
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

@@ -8,11 +8,11 @@ import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsRe
 import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsResponseDto;
 import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItem;
 import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItemRepository;
-import com.sparta.spring_deep._delivery.domain.restaurant.entity.Restaurant;
-import com.sparta.spring_deep._delivery.domain.restaurant.repository.RestaurantRepository;
-import com.sparta.spring_deep._delivery.domain.user.User;
-import com.sparta.spring_deep._delivery.domain.user.UserRepository;
-import com.sparta.spring_deep._delivery.domain.user.UserRole;
+import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
+import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
+import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
@@ -88,16 +88,21 @@ public class OrderService {
 
 
     // 주문 상태 변경
+    // OWNER만 가능
     @Transactional
-    public OrderResponseDto updateOrderStatus(UUID orderId, OrderStatusEnum status, User customer) {
+    public OrderResponseDto updateOrderStatus(UUID orderId, OrderStatusEnum status, User owner) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new EntityExistsException("order not found"));
 
-        if (order.getStatus() == OrderStatusEnum.CANCELLED) {
-            throw new IllegalStateException("Canceled orders cannot be updated");
+        if (!owner.getRole().equals(UserRole.OWNER)) {
+            throw new IllegalStateException("Only owner can update order status");
         }
 
-        order.updateOrderStatus(customer, status);
+        if (order.getStatus() == OrderStatusEnum.CANCELLED) {
+            throw new IllegalStateException("Already cancelled order");
+        }
+
+        order.updateOrderStatus(owner, status);
 
         return new OrderResponseDto(order);
     }
@@ -105,7 +110,10 @@ public class OrderService {
 
     // 주문 상세 조회
     @Transactional(readOnly = true)
-    public OrderDetailsResponseDto getOrderDetails(UUID orderId) {
+    public OrderDetailsResponseDto getOrderDetails(User user, UUID orderId) {
+        if (!(user.getRole().equals(UserRole.CUSTOMER) || user.getRole().equals(UserRole.OWNER))) {
+            throw new IllegalStateException("Only customer & owner can get order");
+        }
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new EntityExistsException("order not found"));
 
@@ -120,10 +128,14 @@ public class OrderService {
         int page, int size,
         String sortBy, boolean isAsc) {
 
+        if (!user.getRole().equals(UserRole.CUSTOMER)) {
+            throw new IllegalStateException("Only customer can read order");
+        }
+
         Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Order> myOrderList = orderRepository.findAllByCustomerIdAndIsDeletedFalse(
+        Page<Order> myOrderList = orderRepository.findAllByCustomerUsernameAndIsDeletedFalse(
             user.getUsername(),
             pageable);
 
@@ -156,7 +168,7 @@ public class OrderService {
     public List<OrderResponseDto> getUpdatedOrdersSince(User user) {
 
         // 진행 중인 주문 중에서 최근 변경된 주문만 조회
-        List<Order> updatedOrders = orderRepository.findByCustomerIdAndUpdatedAtAfterAndStatusIn(
+        List<Order> updatedOrders = orderRepository.findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(
             user.getUsername(), lastCheckedTime,
             List.of(OrderStatusEnum.PENDING, OrderStatusEnum.CONFIRMED));
 

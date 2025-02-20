@@ -1,12 +1,12 @@
-package com.sparta.spring_deep._delivery.domain.restaurant.entity;
+package com.sparta.spring_deep._delivery.domain.restaurant;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.sparta.spring_deep._delivery.admin.dto.RestaurantAdminCreateRequestDto;
+import com.sparta.spring_deep._delivery.admin.dto.RestaurantAdminRequestDto;
 import com.sparta.spring_deep._delivery.common.BaseEntity;
 import com.sparta.spring_deep._delivery.domain.category.Category;
-import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantAdminCreateRequestDto;
-import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantAdminRequestDto;
-import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantRequestDto;
+import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -51,37 +52,35 @@ public class Restaurant extends BaseEntity {
     private Category category;
 
     @NotNull
-    private String address;
+    @OneToOne
+    private RestaurantAddress restaurantAddress;
 
     private String phone;
 
     public Restaurant(RestaurantAdminCreateRequestDto restaurantAdminCreateRequestDto, User owner,
-        Category category, String username) {
+        Category category, RestaurantAddress restaurantAddress, String username) {
         super(username);
         this.owner = owner;
         this.category = category;
         this.name = restaurantAdminCreateRequestDto.getName();
-//        this.address = address;
-        this.address = restaurantAdminCreateRequestDto.getAddress();
         this.phone = restaurantAdminCreateRequestDto.getPhone();
+        this.restaurantAddress = restaurantAddress;
     }
 
     public void UpdateRestaurant(RestaurantRequestDto restaurantRequestDto, Category categoryId,
-        String username) {
+        RestaurantAddress restaurantAddress, String username) {
         this.category = categoryId;
         this.name = restaurantRequestDto.getName();
-//        this.address = address;
-        this.address = restaurantRequestDto.getAddress();
+        this.restaurantAddress = restaurantAddress;
         this.phone = restaurantRequestDto.getPhone();
         super.update(username);
     }
 
     public void UpdateRestaurant(RestaurantAdminRequestDto restaurantAdminRequestDto,
-        Category categoryId, String username) {
+        Category categoryId, RestaurantAddress restaurantAddress, String username) {
         this.category = categoryId;
         this.name = restaurantAdminRequestDto.getName();
-//        this.address = address;
-        this.address = restaurantAdminRequestDto.getAddress();
+        this.restaurantAddress = restaurantAddress;
         this.phone = restaurantAdminRequestDto.getPhone();
         super.update(username);
     }

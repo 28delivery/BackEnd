@@ -2,9 +2,10 @@ package com.sparta.spring_deep._delivery.domain.order;
 
 import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsRequestDto;
 import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsResponseDto;
-import com.sparta.spring_deep._delivery.domain.user.User;
-import com.sparta.spring_deep._delivery.domain.user.UserDetailsImpl;
+
+import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.List;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,10 +60,13 @@ public class OrderController {
 
     // 주문 상세 조회
     @GetMapping("/orders/{orderId}")
-    public ResponseEntity<OrderDetailsResponseDto> getOrderDetails(@PathVariable UUID orderId) {
+    public ResponseEntity<OrderDetailsResponseDto> getOrderDetails(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable UUID orderId) {
         log.info("주문 상세 조회 요청 - orderId : {}", orderId);
 
-        OrderDetailsResponseDto responseDto = orderService.getOrderDetails(orderId);
+        OrderDetailsResponseDto responseDto = orderService.getOrderDetails(userDetails.getUser(),
+            orderId);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
