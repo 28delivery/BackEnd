@@ -17,9 +17,9 @@ public class OrderResponseDto {
     private BigDecimal totalPrice;
     private String request;
     private LocalDateTime createdAt;
-    private String createdBy;
+    private String createdBy; // String 변환예정
     private LocalDateTime updatedAt;
-    private String updatedBy;
+    private String updatedBy; // String 변환예정
 
 
     public OrderResponseDto(Order order) {
