@@ -3,6 +3,7 @@ package com.sparta.spring_deep._delivery.domain.order;
 import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsRequestDto;
 import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsResponseDto;
 import com.sparta.spring_deep._delivery.domain.user.User;
+import com.sparta.spring_deep._delivery.domain.user.UserDetailsImpl;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -32,10 +33,13 @@ public class OrderController {
     // 주문 생성
     @PostMapping("/orders")
     public ResponseEntity<OrderDetailsResponseDto> createOrder(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody OrderDetailsRequestDto requestDto
     ) {
         log.info("Create Order : {}", requestDto);
-        OrderDetailsResponseDto responseDto = orderService.createOrder(requestDto);
+
+        OrderDetailsResponseDto responseDto = orderService.createOrder(requestDto,
+            userDetails.getUser());
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
@@ -65,14 +69,14 @@ public class OrderController {
     // 나의 주문 내역 조회
     @GetMapping("/orders/me")
     public ResponseEntity<OrderResponseDto> getMyOrders(
-        @AuthenticationPrincipal User user,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PageableDefault(size = 10, page = 0) Pageable pageable,
         @RequestParam(defaultValue = "createdAt") String sortBy,
         @RequestParam(defaultValue = "false") boolean isAsc
     ) {
         log.info("나의 주문 내역 조회 요청 ");
 
-        OrderResponseDto responseDto = orderService.getMyOrders(user.getUsername(),
+        OrderResponseDto responseDto = orderService.getMyOrders(userDetails.getUser(),
             pageable.getPageNumber(), pageable.getPageSize(), sortBy, isAsc);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
@@ -81,23 +85,23 @@ public class OrderController {
     // 주문 취소 (주문 5분 이내)
     @PutMapping("/orders/{orderId}/cancel")
     public ResponseEntity<String> canceledOrder(
-        @AuthenticationPrincipal User user,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable UUID orderId
     ) {
         log.info("주문 취소 요청 - orderId : {}", orderId);
 
-        return orderService.canceledOrder(user, orderId);
+        return orderService.canceledOrder(userDetails.getUser(), orderId);
     }
 
     // 실시간 주문 확인 (프론트 주기적 호출)
     @GetMapping("/orders/polling")
     public ResponseEntity<List<OrderResponseDto>> pollingOrder(
-        @AuthenticationPrincipal User customer
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
 
-        log.info("실시간 주문 확인 - customerId : {}", customer.getUsername());
+        log.info("실시간 주문 확인 - customerId : {}", userDetails.getUsername());
         List<OrderResponseDto> updatedOrdersSince = orderService.getUpdatedOrdersSince(
-            customer.getUsername());
+            userDetails.getUser());
 
         return ResponseEntity.status(HttpStatus.OK).body(updatedOrdersSince);
     }
@@ -105,12 +109,12 @@ public class OrderController {
     // 주문 내역 삭제
     @PutMapping("/orders/{orderId}/delete")
     public ResponseEntity<String> deletedOrder(
-        @AuthenticationPrincipal User user,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable UUID orderId
     ) {
         log.info("주문 내역 삭제 요청 - orderId : {}", orderId);
 
-        return orderService.deletedOrder(user, orderId);
+        return orderService.deletedOrder(userDetails.getUser(), orderId);
     }
 
 
