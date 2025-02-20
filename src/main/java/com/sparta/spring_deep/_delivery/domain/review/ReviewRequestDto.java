@@ -10,14 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReviewRequestDto {
 
-    private String restaurantId;
     private String orderId;
     private String comment;
     private int rating;
-
-    public UUID getRestaurantId() {
-        return UUID.fromString(restaurantId);
-    }
 
     public UUID getOrderId() {
         return UUID.fromString(orderId);

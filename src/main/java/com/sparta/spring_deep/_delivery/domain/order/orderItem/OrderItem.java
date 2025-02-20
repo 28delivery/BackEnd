@@ -14,13 +14,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
+@Setter
 @RequiredArgsConstructor
 @Table(name = "p_order_item")
 public class OrderItem extends BaseEntity {
@@ -47,8 +50,8 @@ public class OrderItem extends BaseEntity {
     private BigDecimal price;
 
 
-    public OrderItem(Order order, Menu menu, int quantity, BigDecimal price) {
-        //super(new User(order.getCustomer().getUsername()));
+    public OrderItem(Order order, Menu menu, int quantity,
+        @NotNull @Digits(integer = 10, fraction = 2) BigDecimal price) {
         super(order.getCustomer().getUsername());
         this.order = order;
         this.menu = menu;
