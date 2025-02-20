@@ -193,12 +193,17 @@ public class OrderService {
 
     // 실시간 주문 확인
     @Transactional(readOnly = true)
-    public List<OrderResponseDto> getUpdatedOrdersSince(User user) {
+    public Page<OrderResponseDto> getUpdatedOrdersSince(User user, int page, int size,
+        String sortBy, boolean isAsc) {
+
+        Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         // 진행 중인 주문 중에서 최근 변경된 주문만 조회
-        List<Order> updatedOrders = orderRepository.findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(
+        Page<Order> updatedOrders = orderRepository.findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(
             user.getUsername(), lastCheckedTime,
-            List.of(OrderStatusEnum.PENDING, OrderStatusEnum.CONFIRMED));
+            List.of(OrderStatusEnum.PENDING, OrderStatusEnum.CONFIRMED),
+            pageable);
 
         if (updatedOrders.isEmpty()) {
             throw new EntityExistsException("현재 진행중인 주문이 없습니다.");
@@ -206,7 +211,7 @@ public class OrderService {
 
         lastCheckedTime = LocalDateTime.now(); // 마지막 조회 시간 갱신
 
-        return updatedOrders.stream().map(OrderResponseDto::new).toList();
+        return updatedOrders.map(OrderResponseDto::new);
     }
 
     // 주문 내역 삭제

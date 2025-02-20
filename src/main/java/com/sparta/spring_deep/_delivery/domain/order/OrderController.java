@@ -3,7 +3,6 @@ package com.sparta.spring_deep._delivery.domain.order;
 import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsRequestDto;
 import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsResponseDto;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -99,13 +98,16 @@ public class OrderController {
 
     // 실시간 주문 확인 (프론트 주기적 호출)
     @GetMapping("/orders/polling")
-    public ResponseEntity<List<OrderResponseDto>> pollingOrder(
-        @AuthenticationPrincipal UserDetailsImpl userDetails
+    public ResponseEntity<Page<OrderResponseDto>> pollingOrder(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PageableDefault(size = 10, page = 0) Pageable pageable,
+        @RequestParam(defaultValue = "createdAt") String sortBy,
+        @RequestParam(defaultValue = "false") boolean isAsc
     ) {
 
         log.info("실시간 주문 확인 - customerId : {}", userDetails.getUsername());
-        List<OrderResponseDto> updatedOrdersSince = orderService.getUpdatedOrdersSince(
-            userDetails.getUser());
+        Page<OrderResponseDto> updatedOrdersSince = orderService.getUpdatedOrdersSince(
+            userDetails.getUser(), pageable.getPageNumber(), pageable.getPageSize(), sortBy, isAsc);
 
         return ResponseEntity.status(HttpStatus.OK).body(updatedOrdersSince);
     }
