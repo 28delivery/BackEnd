@@ -1,6 +1,9 @@
-package com.sparta.spring_deep._delivery.domain.restaurantAddress.admin;
+package com.sparta.spring_deep._delivery.admin.controller;
 
 
+import com.sparta.spring_deep._delivery.admin.dto.RestaurantAddressAdminRequestDto;
+import com.sparta.spring_deep._delivery.admin.dto.RestaurantAddressAdminResponseDto;
+import com.sparta.spring_deep._delivery.admin.service.RestaurantAddressAdminService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

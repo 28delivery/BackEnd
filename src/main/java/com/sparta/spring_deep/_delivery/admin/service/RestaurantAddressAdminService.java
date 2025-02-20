@@ -1,8 +1,12 @@
-package com.sparta.spring_deep._delivery.domain.restaurantAddress.admin;
+package com.sparta.spring_deep._delivery.admin.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.spring_deep._delivery.domain.restaurantAddress.RestaurantAddress;
+import com.sparta.spring_deep._delivery.admin.dto.RestaurantAddressAdminRequestDto;
+import com.sparta.spring_deep._delivery.admin.dto.RestaurantAddressAdminResponseDto;
+import com.sparta.spring_deep._delivery.admin.repository.RestaurantAddressAdminRepository;
+import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
+import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddressRepository;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -25,6 +29,8 @@ public class RestaurantAddressAdminService {
 
     private final RestaurantAddressAdminRepository repository;
     private final RestTemplate restTemplate = new RestTemplate();
+    private final RestaurantAddressRepository restaurantAddressRepository;
+    private final RestaurantAddressAdminRepository restaurantAddressAdminRepository;
 
     @Value("${restaurantAddress.url}")
     private String restaurantAddressUrl;
@@ -198,4 +204,14 @@ public class RestaurantAddressAdminService {
         return ((List<Map<String, Object>>) results.get("juso")).get(0);
     }
 
+    public RestaurantAddressAdminResponseDto findByRoadAddrAndDetailAddr(String roadAddr,
+        String detailAddr) {
+        RestaurantAddress restaurantAddress = restaurantAddressAdminRepository.findByRoadAddrAndDetailAddr(
+            roadAddr, detailAddr).orElseThrow(
+            () -> new RuntimeException(
+                "RestaurantAddress not found with roadAddr : " + roadAddr + ", detailAddr: "
+                    + detailAddr)
+        );
+        return new RestaurantAddressAdminResponseDto(restaurantAddress);
+    }
 }

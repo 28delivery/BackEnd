@@ -1,7 +1,6 @@
-package com.sparta.spring_deep._delivery.domain.restaurant.repository;
+package com.sparta.spring_deep._delivery.domain.restaurant;
 
 import com.sparta.spring_deep._delivery.domain.category.Category;
-import com.sparta.spring_deep._delivery.domain.restaurant.entity.Restaurant;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.restaurantAddress;
+package com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @RequiredArgsConstructor
 public class RestaurantAddressService {
 
-    private final RestaurantAddressRepository repository;
+    private final RestaurantAddressRepository restaurantAddressRepository;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${restaurantAddress.url}")
@@ -48,7 +48,8 @@ public class RestaurantAddressService {
             dto.getDetailAddr(), username);
 
         // DB에 가게 주소 객체 저장
-        RestaurantAddress savedRestaurantAddress = repository.save(restaurantAddress);
+        RestaurantAddress savedRestaurantAddress = restaurantAddressRepository.save(
+            restaurantAddress);
 
         return new RestaurantAddressResponseDto(savedRestaurantAddress);
     }
@@ -64,7 +65,7 @@ public class RestaurantAddressService {
         // 본인확인 필
 
         // id로 가게주소 검색
-        RestaurantAddress restaurantAddress = repository.findById(id)
+        RestaurantAddress restaurantAddress = restaurantAddressRepository.findById(id)
             .orElseThrow(
                 () -> new IllegalArgumentException("해당 Id와 일치하는 가게 주소가 존재하지 않습니다. : " + id));
 
@@ -89,7 +90,8 @@ public class RestaurantAddressService {
     @Transactional(readOnly = true)
     public RestaurantAddressResponseDto getById(UUID id) {
         // id로 가게 주소 검색
-        RestaurantAddress restaurantAddress = repository.findByIdAndIsDeletedFalse(id)
+        RestaurantAddress restaurantAddress = restaurantAddressRepository.findByIdAndIsDeletedFalse(
+                id)
             .orElseThrow(() -> new RuntimeException("RestaurantAddress not found with id: " + id));
 
         return new RestaurantAddressResponseDto(restaurantAddress);
@@ -106,7 +108,7 @@ public class RestaurantAddressService {
         // 본인확인 필
 
         // id로 가게주소 검색
-        RestaurantAddress restaurantAddress = repository.findById(id)
+        RestaurantAddress restaurantAddress = restaurantAddressRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("RestaurantAddress not found with id: " + id));
 
         // 소프트 삭제
@@ -187,4 +189,15 @@ public class RestaurantAddressService {
         return ((List<Map<String, Object>>) results.get("juso")).get(0);
     }
 
+    public RestaurantAddressResponseDto findByRoadAddrAndDetailAddr(String roadAddr,
+        String detailAddr) {
+        RestaurantAddress restaurantAddress = restaurantAddressRepository.findByRoadAddrAndDetailAddr(
+            roadAddr, detailAddr).orElseThrow(
+            () -> new RuntimeException(
+                "RestaurantAddress not found with roadAddr : " + roadAddr + ", detailAddr: "
+                    + detailAddr)
+        );
+
+        return new RestaurantAddressResponseDto(restaurantAddress);
+    }
 }

@@ -1,6 +1,7 @@
-package com.sparta.spring_deep._delivery.domain.restaurantAddress.admin;
+package com.sparta.spring_deep._delivery.admin.dto;
 
-import com.sparta.spring_deep._delivery.domain.restaurantAddress.RestaurantAddress;
+import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -10,6 +11,7 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class RestaurantAddressAdminResponseDto {
 
+    private UUID id;
     private String roadAddr;
     private String roadAddrPart1;
     private String roadAddrPart2;
@@ -27,6 +29,7 @@ public class RestaurantAddressAdminResponseDto {
     private String buldSlno;
 
     public RestaurantAddressAdminResponseDto(RestaurantAddress restaurantAddress) {
+        this.id = restaurantAddress.getId();
         this.roadAddr = restaurantAddress.getRoadAddr();
         this.roadAddrPart1 = restaurantAddress.getRoadAddrPart1();
         this.roadAddrPart2 = restaurantAddress.getRoadAddrPart2();

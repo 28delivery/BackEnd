@@ -1,6 +1,7 @@
-package com.sparta.spring_deep._delivery.domain.restaurantAddress.admin;
+package com.sparta.spring_deep._delivery.admin.repository;
 
-import com.sparta.spring_deep._delivery.domain.restaurantAddress.RestaurantAddress;
+import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,4 +13,6 @@ public interface RestaurantAddressAdminRepository extends JpaRepository<Restaura
 
     // 도로명 주소(roadAddr) 일부 검색
     Page<RestaurantAddress> findByRoadAddrContaining(String roadAddr, Pageable pageable);
+
+    Optional<RestaurantAddress> findByRoadAddrAndDetailAddr(String roadAddr, String detailAddr);
 }

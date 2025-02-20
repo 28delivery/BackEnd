@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.restaurantAddress.admin;
+package com.sparta.spring_deep._delivery.admin.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -12,4 +12,8 @@ public class RestaurantAddressAdminRequestDto {
     private String roadAddr;
     private String detailAddr;
 
+    public RestaurantAddressAdminRequestDto(String roadAddress, String detailAddress) {
+        this.roadAddr = roadAddress;
+        this.detailAddr = detailAddress;
+    }
 }

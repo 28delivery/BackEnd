@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.restaurant.dto;
+package com.sparta.spring_deep._delivery.domain.restaurant;
 
 import java.util.UUID;
 import lombok.Getter;
@@ -8,6 +8,7 @@ public class RestaurantRequestDto {
 
     String name;
     UUID categoryId;
-    String address;
+    String roadAddress;
+    String detailAddress;
     String phone;
 }

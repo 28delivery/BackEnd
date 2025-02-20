@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.restaurantAddress;
+package com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress;
 
 import com.sparta.spring_deep._delivery.common.BaseEntity;
 import jakarta.persistence.Column;

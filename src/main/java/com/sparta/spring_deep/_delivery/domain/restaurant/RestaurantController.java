@@ -1,15 +1,13 @@
-package com.sparta.spring_deep._delivery.domain.restaurant.controller;
+package com.sparta.spring_deep._delivery.domain.restaurant;
 
-import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantRequestDto;
-import com.sparta.spring_deep._delivery.domain.restaurant.dto.RestaurantResponseDto;
-import com.sparta.spring_deep._delivery.domain.restaurant.entity.Restaurant;
-import com.sparta.spring_deep._delivery.domain.restaurant.service.RestaurantService;
+import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,48 +23,46 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j(topic = "Restaurant Controller")
 public class RestaurantController {
 
-    private final RestaurantService restaurantService;
+    private final RestaurantManageService restaurantManageService;
 
     // 음식점 조회
     @GetMapping(value = "/{restaurantId}", produces = "application/json")
     public ResponseEntity<RestaurantResponseDto> getRestaurant(@PathVariable UUID restaurantId) {
         log.info("getRestaurant: {}", restaurantId);
-        RestaurantResponseDto resturantResponseDto = restaurantService.getRestaurant(restaurantId);
+        RestaurantResponseDto response = restaurantManageService.getRestaurant(restaurantId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(resturantResponseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // 음식점 수정
-    //    @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/{restaurantId}")
     public ResponseEntity<RestaurantResponseDto> updateRestaurant(
         @RequestBody RestaurantRequestDto restaurantRequestDto,
-        @PathVariable UUID restaurantId) {
+        @PathVariable UUID restaurantId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         log.info("updateRestaurant: {}, {}", restaurantId, restaurantRequestDto);
 
-        RestaurantResponseDto resturantResponseDto = restaurantService.updateRestaurant(
-            restaurantId, restaurantRequestDto);
-        return ResponseEntity.status(HttpStatus.OK).body(resturantResponseDto);
+        RestaurantResponseDto response = restaurantManageService.updateRestaurant(
+            restaurantId, restaurantRequestDto, userDetails);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     // 음식점 삭제
     //    @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("/{restaurantId}")
-    public ResponseEntity<String> deleteRestaurant(
-        @PathVariable UUID restaurantId) {
+    public ResponseEntity<RestaurantResponseDto> deleteRestaurant(
+        @PathVariable UUID restaurantId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         log.info("deleteRestaurant: {}", restaurantId);
 
-        if (restaurantService.deleteRestaurant(restaurantId)) {
-            return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body("Restaurant deleted successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant not found");
-        }
+        RestaurantResponseDto response = restaurantManageService.deleteRestaurant(restaurantId,
+            userDetails);
+
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
     }
 
     // 음식점 검색
-    //        @PreAuthorize("hasRole('OWNER')")
     @GetMapping("/search")
     public ResponseEntity<Page<Restaurant>> getRestaurant(
         @RequestParam(required = false) UUID id,
@@ -77,10 +73,10 @@ public class RestaurantController {
 
         log.info("searchRestaurant by values: {}, {}, {}, {}, {}", id, restaurantName, categoryName,
             isAsc, sortBy);
-        Page<Restaurant> restaurantResponseDtoPage = restaurantService.searchRestaurant(
+        Page<Restaurant> responses = restaurantManageService.searchRestaurant(
             id, restaurantName, categoryName, isAsc, sortBy);
 
-        return ResponseEntity.status(HttpStatus.OK).body(restaurantResponseDtoPage);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
 }

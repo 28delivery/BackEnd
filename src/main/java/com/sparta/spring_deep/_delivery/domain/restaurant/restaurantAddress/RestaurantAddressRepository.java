@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.restaurantAddress;
+package com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,4 +16,6 @@ public interface RestaurantAddressRepository extends JpaRepository<RestaurantAdd
     Optional<RestaurantAddress> findByIdAndIsDeletedFalse(UUID id);
 
     Optional<RestaurantAddress> findByRoadAddrContainingAndIsDeletedFalse(String roadAddr);
+
+    Optional<RestaurantAddress> findByRoadAddrAndDetailAddr(String roadAddr, String detailAddr);
 }
