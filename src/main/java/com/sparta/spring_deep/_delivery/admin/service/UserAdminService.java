@@ -8,6 +8,7 @@ import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +26,16 @@ public class UserAdminService {
     private final PasswordEncoder passwordEncoder;
 
     // 관리자 권한 체크
-    private void checkAdminRole() {
+    private String checkAdminRole() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        User adminUser = userDetails.getUser();
 
         if (!UserRole.ADMIN.equals(userDetails.getUser().getRole())) {
             throw new IllegalArgumentException("Admin privileges required");
         }
+
+        return adminUser.getUsername();
     }
 
     // 사용자 전체 조회
@@ -62,7 +66,7 @@ public class UserAdminService {
     @Transactional
     public UserAdminResponseDto createUser(UserCreateRequestDto requestDto) {
         // admin 권한 체크
-        checkAdminRole();
+        String adminUsername = checkAdminRole();
 
         // 이메일 중복 검사
         if (userRepository.existsByUsername(requestDto.getUsername())) {
@@ -82,6 +86,9 @@ public class UserAdminService {
             .isPublic(requestDto.getIsPublic())
             .build();
 
+        user.setCreatedBy(adminUsername);
+        user.setCreatedAt(LocalDateTime.now());
+
         User savedUser = userRepository.save(user);
         return new UserAdminResponseDto(savedUser);
     }
@@ -90,7 +97,7 @@ public class UserAdminService {
     @Transactional
     public UserAdminResponseDto updateUser(String username, UserUpdateRequestDto requestDto) {
         // admin 권한 체크
-        checkAdminRole();
+        String adminUsername = checkAdminRole();
 
         // username 체크
         User user = userRepository.findByUsername(username)
@@ -116,6 +123,9 @@ public class UserAdminService {
             user.setIsPublic(requestDto.getIsPublic());
         }
 
+        user.setUpdatedBy(adminUsername);
+        user.setUpdatedAt(LocalDateTime.now());
+
         return new UserAdminResponseDto(user);
     }
 
@@ -123,7 +133,7 @@ public class UserAdminService {
     @Transactional
     public void deleteUser(String username) {
         // admin 권한 체크
-        checkAdminRole();
+        String adminUsername = checkAdminRole();
 
         // username 체크
         User user = userRepository.findByUsername(username)
@@ -131,5 +141,7 @@ public class UserAdminService {
                 () -> new EntityNotFoundException("User not found with username: " + username));
 
         user.setIsDeleted(true);
+        user.setDeletedBy(adminUsername);
+        user.setDeletedAt(LocalDateTime.now());
     }
 }
