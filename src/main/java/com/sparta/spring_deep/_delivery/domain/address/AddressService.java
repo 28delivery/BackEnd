@@ -1,7 +1,7 @@
 package com.sparta.spring_deep._delivery.domain.address;
 
-import com.sparta.spring_deep._delivery.domain.user.User;
-import com.sparta.spring_deep._delivery.domain.user.UserRepository;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.UUID;

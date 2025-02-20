@@ -1,8 +1,8 @@
 package com.sparta.spring_deep._delivery.domain.review;
 
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.order.Order;
 import com.sparta.spring_deep._delivery.domain.order.OrderRepository;
-import com.sparta.spring_deep._delivery.domain.user.User;
 import jakarta.persistence.EntityExistsException;
 import java.util.List;
 import java.util.UUID;

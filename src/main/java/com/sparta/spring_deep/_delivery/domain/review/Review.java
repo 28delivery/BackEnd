@@ -2,7 +2,7 @@ package com.sparta.spring_deep._delivery.domain.review;
 
 import com.sparta.spring_deep._delivery.common.BaseEntity;
 import com.sparta.spring_deep._delivery.domain.order.Order;
-import com.sparta.spring_deep._delivery.domain.user.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

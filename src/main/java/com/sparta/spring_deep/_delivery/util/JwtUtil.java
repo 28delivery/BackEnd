@@ -1,6 +1,6 @@
 package com.sparta.spring_deep._delivery.util;
 
-import com.sparta.spring_deep._delivery.domain.user.UserRole;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -39,7 +39,7 @@ public class JwtUtil {
     private long expirationTime;
 
     private Key key;
-    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
+    private static final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
     @PostConstruct
     public void init() {
