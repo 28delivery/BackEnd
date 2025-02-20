@@ -1,12 +1,14 @@
 package com.sparta.spring_deep._delivery.domain.menu;
 
 import com.sparta.spring_deep._delivery.common.BaseEntity;
+import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -26,11 +28,9 @@ public class Menu extends BaseEntity {
     @UuidGenerator
     private UUID id;
 
-    // 테스트용으로 UUID 값을 사용. 후에 Restaurant 기능이 개발되면 @ManyToOne 및 밑에 코드 주석 해제 후 적용.
-    //    @ManyToOne
+    @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false)
-    private UUID restaurantId;
-//    private Restaurant restaurantId;
+    private Restaurant restaurantId;
 
     @Column(nullable = false)
     private String name;
@@ -48,7 +48,7 @@ public class Menu extends BaseEntity {
     private Boolean isDeleted = false;
 
     @Builder
-    public Menu(UUID restaurantId, String name, String description, BigDecimal price,
+    public Menu(Restaurant restaurantId, String name, String description, BigDecimal price,
         Boolean isHidden, boolean isDeleted, User user) {
         super(user.getUsername());
         this.restaurantId = restaurantId;

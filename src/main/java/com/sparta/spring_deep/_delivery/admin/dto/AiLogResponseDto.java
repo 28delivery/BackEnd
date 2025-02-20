@@ -1,6 +1,7 @@
 package com.sparta.spring_deep._delivery.admin.dto;
 
 import com.sparta.spring_deep._delivery.domain.ai.Ai;
+import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Data;
@@ -9,7 +10,7 @@ import lombok.Data;
 public class AiLogResponseDto {
 
     private UUID aiLogId;
-    private UUID restaurantId;
+    private Restaurant restaurantId;
     private UUID menuId;
     private String request;
     private String response;

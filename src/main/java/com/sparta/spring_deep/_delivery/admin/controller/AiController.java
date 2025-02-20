@@ -19,11 +19,13 @@ public class AiController {
 
     @GetMapping("/admin/logs/ai/search")
     public ResponseEntity<Page<AiLogResponseDto>> searchAiLogs(
-        @RequestParam UUID restaurantId,
+        @RequestParam(required = false) UUID menuId,
+        @RequestParam(required = false) UUID restaurantId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
-        Page<AiLogResponseDto> logs = aiLogService.getAiLogsByRestaurant(restaurantId, page, size);
+        Page<AiLogResponseDto> logs = aiLogService.getAiLogsByRestaurant(menuId, restaurantId, page,
+            size);
         return ResponseEntity.status(HttpStatus.OK).body(logs);
     }
 

@@ -1,5 +1,6 @@
 package com.sparta.spring_deep._delivery.domain.menu;
 
+import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class MenuController {
     // restaurant_id 기반 모든 메뉴 조회
     @GetMapping("/menus/{restaurantId}")
     public ResponseEntity<Page<MenuResponseDto>> getRestaurantAllMenus(
-        @PathVariable(name = "restaurantId") UUID restaurantId,
+        @PathVariable(name = "restaurantId") Restaurant restaurantId,
         @RequestParam(required = false) String name,
         @RequestParam(defaultValue = "createdAt") String sortBy,
         @RequestParam(defaultValue = "0") int page,

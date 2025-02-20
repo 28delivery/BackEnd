@@ -7,6 +7,7 @@ import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.UUID;
@@ -34,6 +35,7 @@ public class MenuService {
     private final RestaurantRepository restaurantRepository;
 
     // 메뉴 추가
+    @Transactional
     public MenuResponseDto addMenu(
         UUID restaurantId,
         MenuRequestDto requestDto,
@@ -47,14 +49,14 @@ public class MenuService {
             .orElseThrow(() -> new EntityNotFoundException(
                 "메뉴 추가 : 해당하는 레스토랑이 없습니다. restaurantId= " + restaurantId));
 
-        if (!restaurant.getOwner().getUsername().equals(userDetails.getUser().getUsername())) {
-            log.error("메뉴 추가 : 메뉴를 추가할 권한이 없습니다. 현재 권한 " + userDetails.getUser().getRole());
+        if (!restaurant.getOwner().getUsername().equals(userDetails.getUser().getUsername())
+            && userDetails.getUser().getRole() != UserRole.ADMIN) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                 "메뉴 추가 : 메뉴를 추가할 권한이 없습니다. 현재 권한 : " + userDetails.getUser().getRole());
         }
 
         Menu menu = Menu.builder()
-            .restaurantId(restaurantId)
+            .restaurantId(restaurant)
             .name(requestDto.getName())
             .description(requestDto.getDescription())
             .price(requestDto.getPrice())
@@ -67,9 +69,8 @@ public class MenuService {
     }
 
     // restaurant_id 기반 모든 메뉴 조회
-    @Transactional
     public Page<MenuResponseDto> getAllMenus(
-        UUID restaurantId,
+        Restaurant restaurantId,
         String name,
         String sortBy,
         int page, int size
@@ -84,6 +85,7 @@ public class MenuService {
     }
 
     // 메뉴 수정
+    @Transactional
     public MenuResponseDto updateMenu(
         UUID menuId,
         MenuRequestDto requestDto,
@@ -96,11 +98,12 @@ public class MenuService {
             .orElseThrow(() -> new EntityNotFoundException(
                 "메뉴 수정 : 해당 유저를 찾을 수 없습니다. username : " + userDetails.getUser().getUsername()));
 
-        Restaurant restaurant = restaurantRepository.findById(menu.getRestaurantId())
+        Restaurant restaurant = restaurantRepository.findById(menu.getRestaurantId().getId())
             .orElseThrow(() -> new EntityNotFoundException(
                 "메뉴 수정 : 해당하는 레스토랑이 없습니다. restaurantId : " + menu.getRestaurantId()));
 
-        if (!restaurant.getOwner().getUsername().equals(userDetails.getUser().getUsername())) {
+        if (!restaurant.getOwner().getUsername().equals(userDetails.getUser().getUsername())
+            && userDetails.getUser().getRole() != UserRole.ADMIN) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                 "메뉴 수정 : 메뉴를 수정할 권한이 없습니다. 현재 권한 : " + userDetails.getUser().getRole());
         }
@@ -116,6 +119,7 @@ public class MenuService {
     }
 
     // 메뉴 삭제
+    @Transactional
     public void deleteMenu(
         UUID menuId,
         UserDetailsImpl userDetails
@@ -123,7 +127,7 @@ public class MenuService {
         Menu menu = menuRepository.findById(menuId)
             .orElseThrow(() -> new EntityNotFoundException("해당 메뉴를 찾을 수 없습니다. 메뉴 id : " + menuId));
 
-        Restaurant restaurant = restaurantRepository.findById(menu.getRestaurantId())
+        Restaurant restaurant = restaurantRepository.findById(menu.getRestaurantId().getId())
             .orElseThrow(() -> new EntityNotFoundException(
                 "메뉴 삭제 : 해당하는 레스토랑이 없습니다. restaurantId= " + menu.getRestaurantId()));
 
@@ -131,15 +135,21 @@ public class MenuService {
             .orElseThrow(() -> new EntityNotFoundException(
                 "메뉴 삭제 : 해당 유저를 찾을 수 없습니다. username : " + userDetails.getUser().getUsername()));
 
-        if (!restaurant.getOwner().equals(userDetails.getUser())) {
+        log.info("메뉴 삭제 : 현재 유저 권한 : " + user.getRole());
+        log.info(restaurant.getOwner() + " = " + userDetails.getUser() + " ?");
+        if (!restaurant.getOwner().getUsername().equals(userDetails.getUser().getUsername())
+            && userDetails.getUser().getRole() != UserRole.ADMIN) {
+            log.error("메뉴 삭제 검증 로직 내부 : 현재 유저 권한 : " + user.getRole());
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                 "메뉴 삭제 : 메뉴를 삭제할 권한이 없습니다. 현재 권한 : " + userDetails.getUser().getRole());
-        } else {
-            menu.delete(user);
         }
+        log.info("메뉴 삭제 됨 : 현재 유저 권한 : " + user.getRole());
+        menu.delete(user);
+
     }
 
     // ai 설명 생성
+    @Transactional
     public MenuAiResponseDto aiDescription(
         UUID menuId,
         UserDetailsImpl userDetails
