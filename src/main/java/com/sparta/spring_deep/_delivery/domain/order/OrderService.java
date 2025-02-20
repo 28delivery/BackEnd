@@ -127,7 +127,7 @@ public class OrderService {
     public OrderResponseDto getMyOrders(User user,
         int page, int size,
         String sortBy, boolean isAsc) {
-        
+
         if (!user.getRole().equals(UserRole.CUSTOMER)) {
             throw new IllegalStateException("Only customer can read order");
         }
@@ -135,7 +135,7 @@ public class OrderService {
         Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Order> myOrderList = orderRepository.findAllByCustomerIdAndIsDeletedFalse(
+        Page<Order> myOrderList = orderRepository.findAllByCustomerUsernameAndIsDeletedFalse(
             user.getUsername(),
             pageable);
 
@@ -168,7 +168,7 @@ public class OrderService {
     public List<OrderResponseDto> getUpdatedOrdersSince(User user) {
 
         // 진행 중인 주문 중에서 최근 변경된 주문만 조회
-        List<Order> updatedOrders = orderRepository.findByCustomerIdAndUpdatedAtAfterAndStatusIn(
+        List<Order> updatedOrders = orderRepository.findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(
             user.getUsername(), lastCheckedTime,
             List.of(OrderStatusEnum.PENDING, OrderStatusEnum.CONFIRMED));
 

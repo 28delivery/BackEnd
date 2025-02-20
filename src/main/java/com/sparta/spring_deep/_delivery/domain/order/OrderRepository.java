@@ -12,10 +12,10 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     List<UUID> findOrderIdsByRestaurantId(UUID restaurantId);
 
-    Page<Order> findAllByCustomerIdAndIsDeletedFalse(String username, Pageable pageable);
+    Page<Order> findAllByCustomerUsernameAndIsDeletedFalse(String username, Pageable pageable);
 
 
-    List<Order> findByCustomerIdAndUpdatedAtAfterAndStatusIn(String customerId,
+    List<Order> findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(String customerId,
         LocalDateTime lastCheckedTime, List<OrderStatusEnum> statusEnumList);
 
 
