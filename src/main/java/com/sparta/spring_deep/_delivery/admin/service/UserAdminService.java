@@ -144,4 +144,5 @@ public class UserAdminService {
         user.setDeletedBy(adminUsername);
         user.setDeletedAt(LocalDateTime.now());
     }
+    
 }
