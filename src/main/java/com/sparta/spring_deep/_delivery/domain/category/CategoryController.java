@@ -1,10 +1,12 @@
 package com.sparta.spring_deep._delivery.domain.category;
 
+import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,11 +42,12 @@ public class CategoryController {
     // 카테고리 추가
     @PostMapping()
     public ResponseEntity<CategoryResponseDto> createCategory(
-        @RequestBody CategoryRequestDto categoryRequestDto
+        @RequestBody CategoryRequestDto categoryRequestDto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
 
         CategoryResponseDto categoryResponseDto = categoryService.createCategory(
-            categoryRequestDto);
+            categoryRequestDto, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryResponseDto);
     }
 
@@ -52,21 +55,24 @@ public class CategoryController {
     @PutMapping("/{categoryId}")
     public ResponseEntity<CategoryResponseDto> updateCategory(
         @PathVariable UUID categoryId,
-        @RequestBody CategoryRequestDto categoryRequestDto
+        @RequestBody CategoryRequestDto categoryRequestDto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
 
         CategoryResponseDto categoryResponseDto = categoryService.updateCategory(
-            categoryId, categoryRequestDto);
+            categoryId, categoryRequestDto, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(categoryResponseDto);
     }
 
     // 카테고리 삭제
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<CategoryResponseDto> deleteCategory(
-        @PathVariable UUID categoryId
+        @PathVariable UUID categoryId,
+        @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
 
-        CategoryResponseDto categoryResponseDto = categoryService.deleteCategory(categoryId);
+        CategoryResponseDto categoryResponseDto = categoryService.deleteCategory(categoryId,
+            userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(categoryResponseDto);
     }
 

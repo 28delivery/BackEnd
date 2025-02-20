@@ -1,6 +1,7 @@
 package com.sparta.spring_deep._delivery.admin.service;
 
 import com.sparta.spring_deep._delivery.admin.repository.OrderAdminRepository;
+import com.sparta.spring_deep._delivery.admin.repository.OrderItemAdminRepository;
 import com.sparta.spring_deep._delivery.domain.order.Order;
 import com.sparta.spring_deep._delivery.domain.order.OrderResponseDto;
 import com.sparta.spring_deep._delivery.domain.order.OrderStatusEnum;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderAdminService {
 
     private final OrderAdminRepository orderAdminRepositoryRepository;
+    private final OrderItemAdminRepository orderItemAdminRepository;
 
     // 주문 내역 검색
     @Transactional(readOnly = true)
@@ -56,7 +58,7 @@ public class OrderAdminService {
         Order order = orderAdminRepositoryRepository.findById(orderId)
             .orElseThrow(() -> new EntityExistsException("order not found"));
 
-        List<OrderItem> orderItemList = orderAdminRepositoryRepository.findAllByOrderId(
+        List<OrderItem> orderItemList = orderItemAdminRepository.findAllByOrderId(
             order.getId());
 
         return new OrderDetailsResponseDto(order, orderItemList);

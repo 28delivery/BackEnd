@@ -1,11 +1,13 @@
 package com.sparta.spring_deep._delivery.domain.category;
 
+import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -16,11 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "카테고리 서비스")
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
-
 
     public Page<CategoryResponseDto> searchCategories(UUID id, String categoryName, boolean isAsc,
         String sortBy) {
@@ -51,48 +53,44 @@ public class CategoryService {
             .map(CategoryResponseDto::new);
     }
 
-    // TODO: 사용자 인증 정보로 User 불러오기
     @Transactional
-    public CategoryResponseDto createCategory(CategoryRequestDto categoryRequestDto) {
-        //임시방편
-        User createUser = userRepository.findById("admin").orElseThrow(
-            () -> new IllegalArgumentException("존재하지 않는 회원입니다.")
-        );
+    public CategoryResponseDto createCategory(CategoryRequestDto categoryRequestDto,
+        UserDetailsImpl userDetails) {
+        // 토큰으로 사용자 정보 불러오기
+        log.info("사용자 정보 토큰으로부터 가져오기");
+        User loggedInUser = userDetails.getUser();
 
-        Category category = new Category(categoryRequestDto, createUser.getUsername());
+        log.info("카테고리 생성{}", categoryRequestDto.getName());
+        Category category = new Category(categoryRequestDto, loggedInUser.getUsername());
+        categoryRepository.save(category);
+
         return new CategoryResponseDto(category);
     }
 
-    // TODO: 사용자 인증 정보로 User 불러오기
     @Transactional
     public CategoryResponseDto updateCategory(UUID categoryId,
-        CategoryRequestDto categoryRequestDto) {
-        //임시방편
-        User updateUser = userRepository.findById("admin").orElseThrow(
-            () -> new IllegalArgumentException("존재하지 않는 회원입니다.")
-        );
+        CategoryRequestDto categoryRequestDto, UserDetailsImpl userDetails) {
+        // 토큰으로 사용자 정보 불러오기
+        User loggedInUser = userDetails.getUser();
 
         Category category = categoryRepository.findById(categoryId).orElseThrow(
             () -> new IllegalArgumentException("존재하지 않는 카테고리 id 입니다.")
         );
 
-        category.updateCategory(categoryRequestDto, updateUser.getUsername());
+        category.updateCategory(categoryRequestDto, loggedInUser.getUsername());
         return new CategoryResponseDto(category);
     }
 
-    // TODO: 사용자 인증 정보로 User 불러오기
     @Transactional
-    public CategoryResponseDto deleteCategory(UUID categoryId) {
-        //임시방편
-        User deleteUser = userRepository.findById("admin").orElseThrow(
-            () -> new IllegalArgumentException("존재하지 않는 회원입니다.")
-        );
+    public CategoryResponseDto deleteCategory(UUID categoryId, UserDetailsImpl userDetails) {
+        // 토큰으로 사용자 정보 불러오기
+        User loggedInUser = userDetails.getUser();
 
         Category category = categoryRepository.findById(categoryId).orElseThrow(
             () -> new IllegalArgumentException("존재하지 않는 카테고리 id 입니다.")
         );
 
-        category.deleteCategory(deleteUser.getUsername());
+        category.deleteCategory(loggedInUser.getUsername());
         return new CategoryResponseDto(category);
     }
 }

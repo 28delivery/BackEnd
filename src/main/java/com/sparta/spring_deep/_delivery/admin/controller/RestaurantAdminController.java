@@ -42,7 +42,7 @@ public class RestaurantAdminController {
     }
 
     // 음식점 생성
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<RestaurantAdminResponseDto> addRestaurant(
         @RequestBody RestaurantAdminCreateRequestDto restaurantAdminCreateRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {

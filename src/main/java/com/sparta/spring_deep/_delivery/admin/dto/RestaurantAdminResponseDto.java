@@ -1,18 +1,20 @@
 package com.sparta.spring_deep._delivery.admin.dto;
 
-import com.sparta.spring_deep._delivery.domain.category.Category;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
-import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
 @RequiredArgsConstructor
 public class RestaurantAdminResponseDto {
 
     private UUID id;
-    private User owner_id;
-    private Category categoryId;
+    private String owner_id;
+    private String categoryName;
     private String name;
     private String roadAddr;
     private String detailAddr;
@@ -27,8 +29,8 @@ public class RestaurantAdminResponseDto {
 
     public RestaurantAdminResponseDto(Restaurant restaurant) {
         this.id = restaurant.getId();
-        this.owner_id = restaurant.getOwner();
-        this.categoryId = restaurant.getCategory();
+        this.owner_id = restaurant.getOwner().getUsername();
+        this.categoryName = restaurant.getCategory().getName();
         this.name = restaurant.getName();
         this.roadAddr = restaurant.getRestaurantAddress().getRoadAddr();
         this.detailAddr = restaurant.getRestaurantAddress().getDetailAddr();

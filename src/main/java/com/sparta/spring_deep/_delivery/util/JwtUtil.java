@@ -22,24 +22,21 @@ import org.springframework.util.StringUtils;
 @Slf4j(topic = "JwtUtil")
 @Component
 public class JwtUtil {
+
     // Header KEY 값
     public static final String AUTHORIZATION_HEADER = "Authorization";
     // 사용자 권한 값의 KEY
     public static final String AUTHORIZATION_KEY = "auth";
     // Token 식별자
     public static final String BEARER_PREFIX = "Bearer ";
-
+    private static final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     @Autowired
     private JwtBlacklistRepository jwtBlacklistRepository;
-
-    @Value("${jwt.secret.key}") // Base64 Encode 한 SecretKey
+    @Value("${jwt.secret.key}")
     private String secretKey;
-
     @Value("${jwt.expiration}")
     private long expirationTime;
-
     private Key key;
-    private static final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
     @PostConstruct
     public void init() {
@@ -48,6 +45,7 @@ public class JwtUtil {
 
     /**
      * Create JWT
+     *
      * @param username
      * @param role
      * @return
@@ -68,6 +66,7 @@ public class JwtUtil {
 
     /**
      * get JWT from header
+     *
      * @param request
      * @return
      */
@@ -81,11 +80,12 @@ public class JwtUtil {
 
     /**
      * Valicate JWT
+     *
      * @param token
      * @return
      */
     public boolean validateToken(String token) {
-        if(isTokenBlacklisted(token)) {
+        if (isTokenBlacklisted(token)) {
             log.error("JWT token is blacklisted");
             return false;
         }
@@ -107,6 +107,7 @@ public class JwtUtil {
 
     /**
      * get User Info from JWT
+     *
      * @param token
      * @return
      */
