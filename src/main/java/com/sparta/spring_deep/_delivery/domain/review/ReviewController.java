@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,15 +29,12 @@ public class ReviewController {
 
     // 리뷰 작성
     @PostMapping("/reviews")
-    public ResponseEntity<ReviewResponseDto> createReview(@RequestBody ReviewRequestDto requestDto,
-        @RequestParam String userId) {
-//         userDetalis 커스텀 클래스 생성 완료시 -> "CUSTOMER" 알때만 실행가능하도록 수정
-//        if () {
-//            throw new RuntimeException("사용자만 리뷰를 남길 수 있습니다.");
-//        }
-
+    public ResponseEntity<ReviewResponseDto> createReview(
+        @AuthenticationPrincipal User user,
+        @RequestBody ReviewRequestDto requestDto) {
+        
         log.info("Create Review : {}", requestDto);
-        User user = new User(); // 임시
+
         ReviewResponseDto responseDto = reviewService.createReview(requestDto, user);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
@@ -72,26 +70,24 @@ public class ReviewController {
     // 리뷰 수정
     @PutMapping("/reviews/{reviewId}")
     public ResponseEntity<ReviewResponseDto> updateReview(
+        @AuthenticationPrincipal User user,
         @PathVariable String reviewId,
-        @RequestParam("comment") String comment,
-        @RequestParam("rating") int rating) {
+        @RequestBody ReviewRequestDto requestDto) {
         log.info("Update Review - reviewId :{}", reviewId);
 
-        // 사용자 인증 예정 : 그 전까지만 User 객체 선언하여 사용
-        User user = new User();
         ReviewResponseDto responseDto = reviewService.updateReview(UUID.fromString(reviewId),
-            comment, rating, user);
+            requestDto.getComment(), requestDto.getRating(), user);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 리뷰 삭제
     @PutMapping("/reviews/{reviewId}/delete")
-    public ResponseEntity<String> deleteReview(@PathVariable String reviewId) {
+    public ResponseEntity<String> deleteReview(
+        @AuthenticationPrincipal User user,
+        @PathVariable String reviewId) {
         log.info("Delete Review - reviewId :{}", reviewId);
 
-        // 사용자 인증 예정 : 그 전까지만 임의의 User 객체 사용 예정
-        User user = new User();
         return reviewService.deleteReview(UUID.fromString(reviewId), user);
     }
 }

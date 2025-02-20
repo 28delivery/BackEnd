@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,8 +30,13 @@ public class ReviewService {
         Order order = orderRepository.findById(requestDto.getOrderId())
             .orElseThrow(() -> new EntityExistsException("주문을 찾을 수 없습니다."));
 
+        if (!order.getCustomer().getUsername().equals(user.getUsername())) {
+            throw new AccessDeniedException("Unauthorized access to create review");
+        }
+
         Review review = reviewRepository.save(
             new Review(order, user, requestDto.getRating(), requestDto.getComment()));
+
         return new ReviewResponseDto(review);
     }
 
@@ -67,6 +73,10 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new EntityExistsException("review not found"));
 
+        if (!review.getUser().getUsername().equals(user.getUsername())) {
+            throw new AccessDeniedException("Unauthorized access to update review");
+        }
+
         if (review.getIsDeleted()) {
             throw new EntityExistsException("review is deleted");
         }
@@ -81,6 +91,10 @@ public class ReviewService {
     public ResponseEntity<String> deleteReview(UUID reviewId, User user) {
         Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new EntityExistsException("review not found"));
+
+        if (!review.getUser().getUsername().equals(user.getUsername())) {
+            throw new AccessDeniedException("Unauthorized access to delete review");
+        }
 
         if (review.getDeletedBy() != null) {
             throw new EntityExistsException("review already deleted");
