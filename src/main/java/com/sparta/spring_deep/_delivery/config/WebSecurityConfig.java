@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -67,19 +68,109 @@ public class WebSecurityConfig {
                 .permitAll() // resources 접근 허용 설정
                 .requestMatchers("/").permitAll() // 메인 페이지 요청 허가
                 // 사용자 - 회원 가입/로그인 : 요청 모두 접근 허가
-                .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
-                // 사용자 - 내 정보 조회/로그 아웃/사용자 수정 및 삭제/비번 변경 : 요청 인증처리
-                .requestMatchers("/api/users/me", "/api/users/logout", "/api/users/**",
-                    "/api/users/{username}/password").authenticated()
+                .requestMatchers(
+                    "/api/users/signup",
+                    "/api/users/login",
+                    "/api/restaurants/{restaurantId}",
+                    "/api/restaurants/search",
+                    "/api/menus/{restaurantId}",
+                    "/api/reviews/{restaurantId}/search?"
+                ).permitAll()
+
+                .requestMatchers(
+                    "/admin/**"
+                ).hasAuthority("ADMIN")
+
+                // restaurant api
+                .requestMatchers(HttpMethod.POST,
+                    "/api/restaurants"
+                ).hasAnyAuthority("OWNER", "ADMIN")
+
+                .requestMatchers(HttpMethod.PUT,
+                    "/api/restaurants/{restaurantsId}"
+                ).hasAnyAuthority("OWNER", "ADMIN")
+
+                .requestMatchers(HttpMethod.DELETE,
+                    "/api/restaurants/{restaurantId}"
+                ).hasAnyAuthority("OWNER", "ADMIN")
+
+                // Menu
+                .requestMatchers(HttpMethod.POST,
+                    "/api/menus/{restaurantId}",
+                    "/api/menus/{menuId}/aiDescription"
+                ).hasAnyAuthority("OWNER", "MANAGER", "ADMIN")
+
+                .requestMatchers(HttpMethod.PUT,
+                    "/api/menus/{menuId}"
+                ).hasAnyAuthority("OWNER", "MANAGER", "ADMIN")
+
+                .requestMatchers(HttpMethod.DELETE,
+                    "/api/menus/{menuId}"
+                ).hasAnyAuthority("OWNER", "MANAGER", "ADMIN")
+
+                // Order
+                .requestMatchers(HttpMethod.POST,
+                    "/api/orders/"
+                ).hasAnyAuthority("CUSTOMER", "ADMIN")
+
+                .requestMatchers(HttpMethod.PUT,
+                    "/api/orders/{orderId}/status"
+                ).hasAnyAuthority("OWNER", "MANAGER", "ADMIN")
+
+                .requestMatchers(HttpMethod.GET,
+                    "/api/orders/me",
+                    "/api/orders/polling"
+                ).hasAnyAuthority("CUSTOMER", "ADMIN")
+
+                // Review
+                .requestMatchers(HttpMethod.POST,
+                    "/api/reviews"
+                ).hasAnyAuthority("CUSTOMER", "ADMIN")
+
+                .requestMatchers(HttpMethod.PUT,
+                    "/api/reviews/{reviewId}"
+                ).hasAnyAuthority("CUSTOMER", "ADMIN")
+
+                .requestMatchers(HttpMethod.DELETE,
+                    "/api/reviews/{reviewId}"
+                ).hasAnyAuthority("CUSTOMER", "ADMIN")
+
+                // Address
+                .requestMatchers(HttpMethod.POST,
+                    "/api/addresses"
+                ).hasAnyAuthority("CUSTOMER", "ADMIN")
+
+                .requestMatchers(HttpMethod.GET,
+                    "/api/addresses"
+                ).hasAnyAuthority("CUSTOMER", "ADMIN")
+
+                .requestMatchers(HttpMethod.PUT,
+                    "/api/addresses/{addressId}"
+                ).hasAnyAuthority("CUSTOMER", "ADMIN")
+
+                .requestMatchers(HttpMethod.DELETE,
+                    "/api/addresses/{addressId}"
+                ).hasAnyAuthority("CUSTOMER", "ADMIN")
+
+                // Restaurant Address
+                .requestMatchers(HttpMethod.POST,
+                    "/api/restaurantAddresses"
+                ).hasAnyAuthority("OWNER", "ADMIN")
+
+                .requestMatchers(HttpMethod.GET,
+                    "/api/restaurantAddresses"
+                ).hasAnyAuthority("OWNER", "ADMIN")
+
+                .requestMatchers(HttpMethod.PUT,
+                    "/api/restaurantAddresses/{addressId}"
+                ).hasAnyAuthority("OWNER", "ADMIN")
+
+                .requestMatchers(HttpMethod.DELETE,
+                    "/api/restaurantAddresses/{addressId}"
+                ).hasAnyAuthority("OWNER", "ADMIN")
+
                 .anyRequest().authenticated() // 그 외 모든 요청 인증처리)
         );
-
-        //  로그인 폼 페이지 설정
-        //http.formLogin((formLogin) ->
-        //       formLogin
-        //                .loginPage("/api/users/login-page").permitAll()
-        //                .loginProcessingUrl("/api/users/login")
-        //);
 
         // JWT 인증 & 인가 필터 설정
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
