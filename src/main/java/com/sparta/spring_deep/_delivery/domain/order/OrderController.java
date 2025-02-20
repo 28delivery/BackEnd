@@ -1,11 +1,17 @@
 package com.sparta.spring_deep._delivery.domain.order;
 
+import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsRequestDto;
+import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsResponseDto;
 import com.sparta.spring_deep._delivery.domain.user.User;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,24 +23,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/orders")
+@RequestMapping("/api")
 @Slf4j
 public class OrderController {
 
     private final OrderService orderService;
 
     // 주문 생성
-    @PostMapping
-    public ResponseEntity<OrderResponseDto> createOrder(
-        @RequestBody OrderRequestDto orderRequestDto
+    @PostMapping("/orders")
+    public ResponseEntity<OrderDetailsResponseDto> createOrder(
+        @RequestBody OrderDetailsRequestDto requestDto
     ) {
-        log.info("Create Order : {}", orderRequestDto);
-        OrderResponseDto orderResponseDto = orderService.createOrder(orderRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderResponseDto);
+        log.info("Create Order : {}", requestDto);
+        OrderDetailsResponseDto responseDto = orderService.createOrder(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     // 주문 상태 변경
-    @PutMapping("/{orderId}/status")
+    @PutMapping("/orders/{orderId}/status")
     public ResponseEntity<OrderResponseDto> updateOrderStatus(
         @PathVariable UUID orderId,
         @RequestParam OrderStatusEnum status
@@ -48,20 +54,64 @@ public class OrderController {
     }
 
     // 주문 상세 조회
-    @GetMapping("/{orderId}")
-    public ResponseEntity<OrderDetailResponseDto> getOrder(@PathVariable UUID orderId) {
-        log.info("주문 조회 요청 - orderId : {}", orderId);
+    @GetMapping("/orders/{orderId}")
+    public ResponseEntity<OrderDetailsResponseDto> getOrderDetails(@PathVariable UUID orderId) {
+        log.info("주문 상세 조회 요청 - orderId : {}", orderId);
 
-        OrderDetailResponseDto orderDetailResponseDto = orderService.getOrderDetail(orderId);
-        return ResponseEntity.status(HttpStatus.OK).body(orderDetailResponseDto);
+        OrderDetailsResponseDto responseDto = orderService.getOrderDetails(orderId);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-//    // 나의 주문 내역 조회
-//    @GetMapping("/{userId}")
-//    public ResponseEntity<OrderResponseDto> getOrderByUserId(@PathVariable UUID userId) {
-//        log.info("나의 주문 내역 조회 - userId : {}", userId);
-//        OrderResponseDto orderResponseDto = orderService.get
-//
-//    }
+    // 나의 주문 내역 조회
+    @GetMapping("/orders/me")
+    public ResponseEntity<OrderResponseDto> getMyOrders(
+        @AuthenticationPrincipal User user,
+        @PageableDefault(size = 10, page = 0) Pageable pageable,
+        @RequestParam(defaultValue = "createdAt") String sortBy,
+        @RequestParam(defaultValue = "false") boolean isAsc
+    ) {
+        log.info("나의 주문 내역 조회 요청 ");
+
+        OrderResponseDto responseDto = orderService.getMyOrders(user.getUsername(),
+            pageable.getPageNumber(), pageable.getPageSize(), sortBy, isAsc);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+    }
+
+    // 주문 취소 (주문 5분 이내)
+    @PutMapping("/orders/{orderId}/cancel")
+    public ResponseEntity<String> canceledOrder(
+        @AuthenticationPrincipal User user,
+        @PathVariable UUID orderId
+    ) {
+        log.info("주문 취소 요청 - orderId : {}", orderId);
+
+        return orderService.canceledOrder(user, orderId);
+    }
+
+    // 실시간 주문 확인 (프론트 주기적 호출)
+    @GetMapping("/orders/polling")
+    public ResponseEntity<List<OrderResponseDto>> pollingOrder(
+        @AuthenticationPrincipal User customer
+    ) {
+
+        log.info("실시간 주문 확인 - customerId : {}", customer.getUsername());
+        List<OrderResponseDto> updatedOrdersSince = orderService.getUpdatedOrdersSince(
+            customer.getUsername());
+
+        return ResponseEntity.status(HttpStatus.OK).body(updatedOrdersSince);
+    }
+
+    // 주문 내역 삭제
+    @PutMapping("/orders/{orderId}/delete")
+    public ResponseEntity<String> deletedOrder(
+        @AuthenticationPrincipal User user,
+        @PathVariable UUID orderId
+    ) {
+        log.info("주문 내역 삭제 요청 - orderId : {}", orderId);
+
+        return orderService.deletedOrder(user, orderId);
+    }
+
 
 }
