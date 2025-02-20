@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 public class ReviewResponseDto {
 
     private String id;
-    private String restaurantId;
     private String orderId;
     private String userId;
     private String comment;
@@ -23,9 +22,8 @@ public class ReviewResponseDto {
 
     public ReviewResponseDto(Review review) {
         this.id = review.getId().toString();
-        this.restaurantId = review.getRestaurantId().toString();
-        this.orderId = review.getOrderId().toString();
-        this.userId = review.getUserId();
+        this.orderId = review.getOrder().getId().toString();
+        this.userId = review.getUser().getUsername();
         this.comment = review.getComment();
         this.rating = review.getRating();
         this.createdAt = review.getCreatedAt();

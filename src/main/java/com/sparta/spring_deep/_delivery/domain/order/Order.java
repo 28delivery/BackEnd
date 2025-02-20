@@ -23,8 +23,6 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter
@@ -39,22 +37,18 @@ public class Order extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
-//    private String customerId;
     private User customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "restaurant_id", nullable = false)
-//    private UUID restaurantId;
     private Restaurant restaurant;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id", nullable = false)
-//    private UUID addressId;
     private Address address;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, columnDefinition = "p_order_status_enum")
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "status", nullable = false)
     private OrderStatusEnum status = OrderStatusEnum.PENDING;
 
     @Column(name = "total_price", nullable = false)
@@ -76,19 +70,9 @@ public class Order extends BaseEntity {
         this.request = request;
     }
 
-//    public Order(String customerId, UUID restaurantId, UUID addressId,
-//        @NotNull @Digits(integer = 10, fraction = 2) BigDecimal totalPrice,
-//        @Size(max = 50) String request) {
-//        super(new User(customerId));
-//        this.customerId = customerId;
-//        this.restaurantId = restaurantId;
-//        this.addressId = addressId;
-//        this.totalPrice = totalPrice;
-//        this.request = request;
-//    }
 
     public void updateOrderStatus(User user, OrderStatusEnum status) {
-        super.update(user.getUsername());
+        super.update(user.getUsername()); // user -> username으로 변경 예정 (*baseEntity)
         this.status = status;
     }
 }

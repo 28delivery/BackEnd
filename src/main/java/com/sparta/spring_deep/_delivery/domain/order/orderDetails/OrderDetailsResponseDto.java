@@ -1,10 +1,12 @@
-package com.sparta.spring_deep._delivery.domain.order;
+package com.sparta.spring_deep._delivery.domain.order.orderDetails;
 
+import com.sparta.spring_deep._delivery.domain.order.Order;
+import com.sparta.spring_deep._delivery.domain.order.OrderStatusEnum;
 import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItem;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class OrderDetailResponseDto {
+public class OrderDetailsResponseDto {
 
     private String id;
     private String customerId;
@@ -15,7 +17,7 @@ public class OrderDetailResponseDto {
     private String request;
     private List<OrderItem> orderItems;
 
-    public OrderDetailResponseDto(Order order, List<OrderItem> orderItems) {
+    public OrderDetailsResponseDto(Order order, List<OrderItem> orderItems) {
         this.id = order.getId().toString();
         this.customerId = order.getCustomer().getUsername();
         this.restaurantId = order.getRestaurant().getId().toString();
