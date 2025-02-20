@@ -1,12 +1,11 @@
 package com.sparta.spring_deep._delivery.config.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sparta.spring_deep._delivery.domain.auth.LoginRequestDto;
-import com.sparta.spring_deep._delivery.domain.user.UserDetailsImpl;
-import com.sparta.spring_deep._delivery.domain.user.UserRole;
+import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
+import com.sparta.spring_deep._delivery.domain.user.dto.LoginRequestDto;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.util.JwtUtil;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -21,18 +20,20 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  */
 @Slf4j(topic = "인증: 로그인 및 JWT 생성")
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
     private final JwtUtil jwtUtil;
 
     public JwtAuthenticationFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
-        setFilterProcessesUrl("/api/user/login");
+        setFilterProcessesUrl("/api/users/login");
     }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
         HttpServletResponse response) throws AuthenticationException {
         try {
-            LoginRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(), LoginRequestDto.class);
+            LoginRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(),
+                LoginRequestDto.class);
 
             return getAuthenticationManager().authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -49,21 +50,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
-        HttpServletResponse response, FilterChain chain, Authentication authResult)
-        throws IOException, ServletException {
+        HttpServletResponse response, FilterChain chain, Authentication authResult) {
 
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getRole();
 
         String token = jwtUtil.createJwt(username, role);
+        System.out.println(token);
         response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
 
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request,
-        HttpServletResponse response, AuthenticationException failed)
-        throws IOException, ServletException {
+        HttpServletResponse response, AuthenticationException failed) {
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
