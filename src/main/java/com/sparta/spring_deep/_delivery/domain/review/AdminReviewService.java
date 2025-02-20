@@ -1,8 +1,9 @@
 package com.sparta.spring_deep._delivery.domain.review;
 
 import com.sparta.spring_deep._delivery.domain.order.OrderRepository;
-import com.sparta.spring_deep._delivery.domain.user.User;
-import com.sparta.spring_deep._delivery.domain.user.UserRole;
+
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

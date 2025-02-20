@@ -11,6 +11,7 @@ import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItemReposito
 import com.sparta.spring_deep._delivery.domain.restaurant.entity.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.repository.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -122,7 +123,7 @@ public class OrderService {
         Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Order> myOrderList = orderRepository.findAllByCustomerIdAndIsDeletedFalse(
+        Page<Order> myOrderList = orderRepository.findAllByCustomerUsernameAndIsDeletedFalse(
             user.getUsername(),
             pageable);
 
@@ -155,7 +156,7 @@ public class OrderService {
     public List<OrderResponseDto> getUpdatedOrdersSince(User user) {
 
         // 진행 중인 주문 중에서 최근 변경된 주문만 조회
-        List<Order> updatedOrders = orderRepository.findByCustomerIdAndUpdatedAtAfterAndStatusIn(
+        List<Order> updatedOrders = orderRepository.findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(
             user.getUsername(), lastCheckedTime,
             List.of(OrderStatusEnum.PENDING, OrderStatusEnum.CONFIRMED));
 

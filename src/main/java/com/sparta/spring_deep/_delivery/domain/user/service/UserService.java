@@ -5,7 +5,9 @@ import com.sparta.spring_deep._delivery.domain.user.dto.LoginRequestDto;
 import com.sparta.spring_deep._delivery.domain.user.dto.LoginResponseDto;
 import com.sparta.spring_deep._delivery.domain.user.dto.PasswordChangeDto;
 import com.sparta.spring_deep._delivery.domain.user.dto.UserDto;
+import com.sparta.spring_deep._delivery.domain.user.entity.IsPublic;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import com.sparta.spring_deep._delivery.util.JwtUtil;
 import java.time.LocalDateTime;
@@ -40,7 +42,10 @@ public class UserService {
     @Transactional
     public User registerUser(UserDto userDto) {
         if (userRepository.existsByUsername(userDto.getUsername())) {
-            throw new RuntimeException("Username is already taken!");
+            User user = userRepository.findByUsername(userDto.getUsername()).get();
+            if(!user.getIsDeleted()){
+                throw new RuntimeException("Username is already taken!");
+            }
         }
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new RuntimeException("Email is already in use!");
@@ -66,7 +71,6 @@ public class UserService {
 
         user = userRepository.save(user);// 첫 번째 저장 (createdBy = null)
 
-        System.out.println("created user in service: " + user);
         return user;
     }
 
@@ -77,11 +81,16 @@ public class UserService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        String jwt = jwtUtil.createJwt(userDetails.getUsername(), userDetails.getUser().getRole());
 
-        List<String> roles = Collections.singletonList(userDetails.getUser().getRole().name());
+        User user = userDetails.getUser();
+        String username = userDetails.getUsername();
+        String email = user.getEmail();
+        IsPublic isPublic = user.getIsPublic();
+        UserRole userRole = user.getRole();
 
-        return new LoginResponseDto(jwt, userDetails.getUsername(), roles);
+        String jwt = jwtUtil.createJwt(username, userRole);
+
+        return new LoginResponseDto(jwt, username, email, userRole, isPublic);
     }
 
     public User updateUser(String userName, UserDto userDto) {
@@ -113,8 +122,5 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User findById(String id) {
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found!"));
-    }
 }
 
