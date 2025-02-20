@@ -7,6 +7,7 @@ import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import jakarta.persistence.EntityExistsException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -53,7 +54,11 @@ public class ReviewService {
         Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        List<UUID> orderIds = orderRepository.findOrderIdsByRestaurantId(restaurantId);
+        List<Order> orders = orderRepository.findAllByRestaurantId(restaurantId).orElseThrow(
+            () -> new IllegalArgumentException("해당 레스토랑의 리뷰가 존재하지 않습니다.")
+        );
+
+        List<UUID> orderIds = orders.stream().map(Order::getId).collect(Collectors.toList());
 
         Page<Review> reviewList = reviewRepository.findByOrderIdInAndIsDeletedFalse(orderIds,
             pageable);

@@ -19,22 +19,25 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "Order Service")
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -47,6 +50,7 @@ public class OrderService {
 
 
     // 주문 생성
+    @Transactional
     public OrderDetailsResponseDto createOrder(OrderDetailsRequestDto requestDto, User user) {
 
         if (!user.getRole().equals(UserRole.CUSTOMER)) {
@@ -56,31 +60,41 @@ public class OrderService {
         Restaurant restaurant = restaurantRepository.findById(requestDto.getRestaurantId())
             .orElseThrow(() -> new IllegalArgumentException("음식점을 찾을 수 없습니다."));
 
+        // ID로 주소 찾기
         Address address = addressRepository.findById(requestDto.getAddressId())
             .orElseThrow(() -> new IllegalArgumentException("주소를 찾을 수 없습니다."));
 
-        Order order = orderRepository.save(new Order(user, restaurant, address,
-            requestDto.getTotalPrice(), requestDto.getRequest()));
+        // 유저 정보와 주소 정보 일치하는지 검사하는 로직 추가
+        if (!user.getUsername().equals(address.getUser().getUsername())) {
+            log.error("주문 생성 검증 로직 내부 : 현재 유저 ID : " + user.getUsername());
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                "주문 생성 : 본인의 주소가 아닙니다. 현재 유저 ID : " + user.getUsername());
+        }
 
-        List<OrderItem> orderItemList = new ArrayList<>();
+        Order order = orderRepository.save(new Order(user, restaurant, address,
+            BigDecimal.ZERO, requestDto.getRequest()));
 
         AtomicReference<BigDecimal> sumPrice = new AtomicReference<>(BigDecimal.ZERO);
+
+        List<OrderItem> orderItemList = new ArrayList<>();
 
         requestDto.getOrderItemDtos().forEach(orderItemDto -> {
             Menu menu = menuRepository.findById(orderItemDto.getMenuId())
                 .orElseThrow(() -> new EntityExistsException("메뉴를 찾을 수 없습니다."));
 
-            BigDecimal itemPrice = Objects.requireNonNullElse(orderItemDto.getPrice(),
-                BigDecimal.ZERO);
+            BigDecimal itemPrice = menu.getPrice();
+            log.info("item price : " + itemPrice);
             sumPrice.updateAndGet(current ->
                 current.add(itemPrice.multiply(BigDecimal.valueOf(orderItemDto.getQuantity())))
             );
 
+            log.info("sum Price : " + sumPrice.get());
             OrderItem orderItem = orderItemRepository.save(
-                new OrderItem(order, menu, orderItemDto.getQuantity(), orderItemDto.getPrice()));
+                new OrderItem(order, menu, orderItemDto.getQuantity(), itemPrice));
 
             orderItemList.add(orderItem);
         });
+
         order.setTotalPrice(sumPrice.get());
 
         return new OrderDetailsResponseDto(order, orderItemList);
@@ -130,7 +144,7 @@ public class OrderService {
 
     // 나의 주문 내역 조회
     @Transactional(readOnly = true)
-    public OrderResponseDto getMyOrders(User user,
+    public Page<OrderResponseDto> getMyOrders(User user,
         int page, int size,
         String sortBy, boolean isAsc) {
 
@@ -145,7 +159,7 @@ public class OrderService {
             user.getUsername(),
             pageable);
 
-        return myOrderList.map(OrderResponseDto::new).stream().findFirst().orElse(null);
+        return myOrderList.map(OrderResponseDto::new);
     }
 
     // 주문 취소 (5분 이내)

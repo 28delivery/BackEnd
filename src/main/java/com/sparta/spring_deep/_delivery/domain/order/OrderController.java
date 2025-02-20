@@ -7,11 +7,13 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -70,7 +72,7 @@ public class OrderController {
 
     // 나의 주문 내역 조회
     @GetMapping("/orders/me")
-    public ResponseEntity<OrderResponseDto> getMyOrders(
+    public ResponseEntity<Page<OrderResponseDto>> getMyOrders(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PageableDefault(size = 10, page = 0) Pageable pageable,
         @RequestParam(defaultValue = "createdAt") String sortBy,
@@ -78,10 +80,10 @@ public class OrderController {
     ) {
         log.info("나의 주문 내역 조회 요청 ");
 
-        OrderResponseDto responseDto = orderService.getMyOrders(userDetails.getUser(),
+        Page<OrderResponseDto> responseDtos = orderService.getMyOrders(userDetails.getUser(),
             pageable.getPageNumber(), pageable.getPageSize(), sortBy, isAsc);
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtos);
     }
 
     // 주문 취소 (주문 5분 이내)
@@ -109,7 +111,7 @@ public class OrderController {
     }
 
     // 주문 내역 삭제
-    @PutMapping("/orders/{orderId}/delete")
+    @DeleteMapping("/orders/{orderId}")
     public ResponseEntity<String> deletedOrder(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable UUID orderId

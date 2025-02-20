@@ -23,6 +23,8 @@ import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter
@@ -49,6 +51,7 @@ public class Order extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private OrderStatusEnum status = OrderStatusEnum.PENDING;
 
     @Column(name = "total_price", nullable = false)

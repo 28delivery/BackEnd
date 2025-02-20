@@ -5,7 +5,11 @@ import com.sparta.spring_deep._delivery.domain.order.OrderStatusEnum;
 import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItem;
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class OrderDetailsResponseDto {
 
     private String id;
