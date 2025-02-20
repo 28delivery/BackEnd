@@ -12,19 +12,16 @@ public class RestaurantAddressResponseDto {
 
     private UUID id;
     private String roadAddr;
-    private String roadAddrPart1;
-    private String roadAddrPart2;
     private String jibunAddr;
     private String detailAddr;
     private String engAddr;
-    private String zipNo;
-    private String siNm;
-    private String sggNm;
-    private String emdNm;
-    private String liNm;
-    private String rn;
-    private String udrtYn;
-    private String buldMnnm;
-    private String buldSlno;
+
+    public RestaurantAddressResponseDto(RestaurantAddress restaurantAddress) {
+        this.id = restaurantAddress.getId();
+        this.roadAddr = restaurantAddress.getRoadAddr();
+        this.jibunAddr = restaurantAddress.getJibunAddr();
+        this.detailAddr = restaurantAddress.getDetailAddr();
+        this.engAddr = restaurantAddress.getEngAddr();
+    }
 
 }

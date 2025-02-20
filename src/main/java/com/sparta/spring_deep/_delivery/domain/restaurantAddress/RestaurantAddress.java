@@ -7,12 +7,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.Map;
 import java.util.UUID;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
 @Entity
 @Getter
+@RequiredArgsConstructor
 @Table(name = "p_restaurant_address")
 public class RestaurantAddress extends BaseEntity {
 
@@ -66,9 +69,46 @@ public class RestaurantAddress extends BaseEntity {
     @Column(name = "buld_slno", length = 50, nullable = false)
     private String buldSlno;
 
-    public RestaurantAddress(RestaurantAddressRequestDto dto) {
+    public RestaurantAddress(Map<String, Object> resultsJuso, String detailAddr, String username) {
+        super(username);
+        this.roadAddr = resultsJuso.get("roadAddr").toString();
+        this.roadAddrPart1 = resultsJuso.get("roadAddrPart1").toString();
+        this.roadAddrPart2 = resultsJuso.get("roadAddrPart2").toString();
+        this.jibunAddr = resultsJuso.get("jibunAddr").toString();
+        this.engAddr = resultsJuso.get("engAddr").toString();
+        this.zipNo = resultsJuso.get("zipNo").toString();
+        this.siNm = resultsJuso.get("siNm").toString();
+        this.sggNm = resultsJuso.get("sggNm").toString();
+        this.emdNm = resultsJuso.get("emdNm").toString();
+        this.liNm = resultsJuso.get("liNm").toString();
+        this.rn = resultsJuso.get("rn").toString();
+        this.udrtYn = resultsJuso.get("udrtYn").toString();
+        this.buldMnnm = resultsJuso.get("buldMnnm").toString();
+        this.buldSlno = resultsJuso.get("buldSlno").toString();
+        this.detailAddr = detailAddr;
+    }
+
+    public void update(Map<String, Object> resultsJuso, String detailAddr,
+        String username) {
+        super.update(username);
+        this.roadAddr = resultsJuso.get("roadAddr").toString();
+        this.roadAddrPart1 = resultsJuso.get("roadAddrPart1").toString();
+        this.roadAddrPart2 = resultsJuso.get("roadAddrPart2").toString();
+        this.jibunAddr = resultsJuso.get("jibunAddr").toString();
+        this.engAddr = resultsJuso.get("engAddr").toString();
+        this.zipNo = resultsJuso.get("zipNo").toString();
+        this.siNm = resultsJuso.get("siNm").toString();
+        this.sggNm = resultsJuso.get("sggNm").toString();
+        this.emdNm = resultsJuso.get("emdNm").toString();
+        this.liNm = resultsJuso.get("liNm").toString();
+        this.rn = resultsJuso.get("rn").toString();
+        this.udrtYn = resultsJuso.get("udrtYn").toString();
+        this.buldMnnm = resultsJuso.get("buldMnnm").toString();
+        this.buldSlno = resultsJuso.get("buldSlno").toString();
+        this.detailAddr = detailAddr;
     }
 }
+
 
 
 

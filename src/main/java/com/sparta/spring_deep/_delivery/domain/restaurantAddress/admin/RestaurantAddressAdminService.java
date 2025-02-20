@@ -1,7 +1,8 @@
-package com.sparta.spring_deep._delivery.domain.restaurantAddress;
+package com.sparta.spring_deep._delivery.domain.restaurantAddress.admin;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.spring_deep._delivery.domain.restaurantAddress.RestaurantAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.InternalException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +21,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @RequiredArgsConstructor
-public class RestaurantAddressService {
+public class RestaurantAddressAdminService {
 
-    private final RestaurantAddressRepository repository;
+    private final RestaurantAddressAdminRepository repository;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${restaurantAddress.url}")
@@ -30,10 +33,9 @@ public class RestaurantAddressService {
     private String restaurantAddressKey;
 
     // TODO: 토큰으로부터 유저 확인
-    // TODO: 수정 유저와 가게 ownerId 확인
     // 가게 주소 생성
     @Transactional
-    public RestaurantAddressResponseDto create(RestaurantAddressCreateRequestDto dto) {
+    public RestaurantAddressAdminResponseDto create(RestaurantAddressAdminRequestDto dto) {
         // 임시방편용
         String username = "admin";
 
@@ -50,28 +52,20 @@ public class RestaurantAddressService {
         // DB에 가게 주소 객체 저장
         RestaurantAddress savedRestaurantAddress = repository.save(restaurantAddress);
 
-        return new RestaurantAddressResponseDto(savedRestaurantAddress);
+        return new RestaurantAddressAdminResponseDto(savedRestaurantAddress);
     }
 
     // TODO: 토큰으로부터 유저 확인
-    // TODO: 수정 유저와 가게 ownerId 확인
     // 가게 주소 업데이트
     @Transactional
-    public RestaurantAddressResponseDto update(UUID id, RestaurantAddressCreateRequestDto dto) {
+    public RestaurantAddressAdminResponseDto update(UUID id, RestaurantAddressAdminRequestDto dto) {
         // 임시방편용
         String username = "admin";
 
-        // 본인확인 필
-
-        // id로 가게주소 검색
+        // id로 주소 객체 검색
         RestaurantAddress restaurantAddress = repository.findById(id)
             .orElseThrow(
                 () -> new IllegalArgumentException("해당 Id와 일치하는 가게 주소가 존재하지 않습니다. : " + id));
-
-        // 삭제된 주소인지 확인 후 오류 발생
-        if (restaurantAddress.getIsDeleted().equals(Boolean.TRUE)) {
-            throw new InternalException("해당 Id와 일치하는 가게 주소가 존재하지 않습니다. :" + id);
-        }
 
         // 주소 검색
         Map<String, Object> searchResultJson = searchAddress(dto.getRoadAddr());
@@ -82,37 +76,54 @@ public class RestaurantAddressService {
         // restaurantAddress 객체 업데이트
         restaurantAddress.update(resultsJuso, dto.getDetailAddr(), username);
 
-        return new RestaurantAddressResponseDto(restaurantAddress);
-    }
-
-    // 특정 주소 조회
-    @Transactional(readOnly = true)
-    public RestaurantAddressResponseDto getById(UUID id) {
-        // id로 가게 주소 검색
-        RestaurantAddress restaurantAddress = repository.findByIdAndIsDeletedFalse(id)
-            .orElseThrow(() -> new RuntimeException("RestaurantAddress not found with id: " + id));
-
-        return new RestaurantAddressResponseDto(restaurantAddress);
+        return new RestaurantAddressAdminResponseDto(restaurantAddress);
     }
 
     // TODO: 토큰으로부터 유저 확인
-    // TODO: 수정 유저와 가게 ownerId 확인
+    // 특정 주소 조회
+    @Transactional(readOnly = true)
+    public RestaurantAddressAdminResponseDto getById(UUID id) {
+
+        // id로 가게 주소 검색
+        RestaurantAddress restaurantAddress = repository.findById(id)
+            .orElseThrow(
+                () -> new IllegalArgumentException("해당 Id와 일치하는 가게 주소가 존재하지 않습니다. : " + id));
+
+        return new RestaurantAddressAdminResponseDto(restaurantAddress);
+    }
+
+    // TODO: 토큰으로부터 유저 확인
     // 가게 주소 삭제 - 소프트 삭제
     @Transactional
-    public RestaurantAddressResponseDto delete(UUID id) {
+    public RestaurantAddressAdminResponseDto delete(UUID id) {
         // 임시방편용
         String username = "admin";
 
-        // 본인확인 필
-
         // id로 가게주소 검색
         RestaurantAddress restaurantAddress = repository.findById(id)
-            .orElseThrow(() -> new RuntimeException("RestaurantAddress not found with id: " + id));
+            .orElseThrow(
+                () -> new IllegalArgumentException("해당 Id와 일치하는 가게 주소가 존재하지 않습니다. : " + id));
 
         // 소프트 삭제
         restaurantAddress.delete(username);
 
-        return new RestaurantAddressResponseDto(restaurantAddress);
+        return new RestaurantAddressAdminResponseDto(restaurantAddress);
+    }
+
+    // TODO: 토큰으로부터 유저 확인
+    // 전체 가게 주소 목록 조회 (페이징 적용)
+    @Transactional(readOnly = true)
+    public Page<RestaurantAddressAdminResponseDto> getAll(Pageable pageable) {
+        return repository.findAll(pageable)
+            .map(RestaurantAddressAdminResponseDto::new);
+    }
+
+    // 도로명 주소로 가게 주소 검색 (페이징 적용)
+    @Transactional(readOnly = true)
+    public Page<RestaurantAddressAdminResponseDto> searchByRoadAddr(String roadAddr,
+        Pageable pageable) {
+        return repository.findByRoadAddrContaining(roadAddr, pageable)
+            .map(RestaurantAddressAdminResponseDto::new);
     }
 
     /**
