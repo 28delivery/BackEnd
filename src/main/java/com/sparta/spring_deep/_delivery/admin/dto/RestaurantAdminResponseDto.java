@@ -14,7 +14,8 @@ public class RestaurantAdminResponseDto {
     private User owner_id;
     private Category categoryId;
     private String name;
-    private String address;
+    private String roadAddr;
+    private String detailAddr;
     private String phone;
     private LocalDateTime createdAt;
     private String createdBy;
@@ -29,7 +30,8 @@ public class RestaurantAdminResponseDto {
         this.owner_id = restaurant.getOwner();
         this.categoryId = restaurant.getCategory();
         this.name = restaurant.getName();
-        this.address = restaurant.getAddress();
+        this.roadAddr = restaurant.getRestaurantAddress().getRoadAddr();
+        this.detailAddr = restaurant.getRestaurantAddress().getDetailAddr();
         this.phone = restaurant.getPhone();
         this.createdAt = restaurant.getCreatedAt();
         this.createdBy = restaurant.getCreatedBy();

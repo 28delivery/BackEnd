@@ -28,6 +28,7 @@ public class WebSecurityConfig {
 
     /**
      * 비밀번호 암호화
+     *
      * @return
      */
     @Bean
@@ -44,6 +45,7 @@ public class WebSecurityConfig {
 
     /**
      * Spring Security Filtering
+     *
      * @param http
      * @return
      * @throws Exception
@@ -61,12 +63,14 @@ public class WebSecurityConfig {
         // URL 접근 범위
         http.authorizeHttpRequests(authorizeHttpRequests ->
             authorizeHttpRequests
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+                .permitAll() // resources 접근 허용 설정
                 .requestMatchers("/").permitAll() // 메인 페이지 요청 허가
                 // 사용자 - 회원 가입/로그인 : 요청 모두 접근 허가
                 .requestMatchers("/api/users/signup", "/api/users/login").permitAll()
                 // 사용자 - 내 정보 조회/로그 아웃/사용자 수정 및 삭제/비번 변경 : 요청 인증처리
-                .requestMatchers("/api/users/me", "/api/users/logout", "/api/users/**", "/api/users/**/password").authenticated()
+                .requestMatchers("/api/users/me", "/api/users/logout", "/api/users/**",
+                    "/api/users/{username}/password").authenticated()
                 .anyRequest().authenticated() // 그 외 모든 요청 인증처리)
         );
 
@@ -86,6 +90,7 @@ public class WebSecurityConfig {
 
     /**
      * JPA 인증 필터
+     *
      * @return
      * @throws Exception
      */
@@ -98,6 +103,7 @@ public class WebSecurityConfig {
 
     /**
      * JWT 인가 필터
+     *
      * @return
      */
     @Bean

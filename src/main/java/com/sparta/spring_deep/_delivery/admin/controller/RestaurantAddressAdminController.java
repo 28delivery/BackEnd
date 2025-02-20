@@ -28,7 +28,7 @@ public class RestaurantAddressAdminController {
     private final RestaurantAddressAdminService service;
 
     // 생성
-    @PostMapping("/addresses")
+    @PostMapping("/restaurantAddresses")
     public ResponseEntity<RestaurantAddressAdminResponseDto> createAddress(
         @RequestBody RestaurantAddressAdminRequestDto dto) {
         RestaurantAddressAdminResponseDto response = service.create(dto);
@@ -36,7 +36,7 @@ public class RestaurantAddressAdminController {
     }
 
     // 단건 조회
-    @GetMapping("/addresses/{id}")
+    @GetMapping("/restaurantAddresses/{id}")
     public ResponseEntity<RestaurantAddressAdminResponseDto> getAddressById(@PathVariable UUID id) {
         RestaurantAddressAdminResponseDto response = service.getById(id);
         return ResponseEntity.ok(response);
@@ -51,7 +51,7 @@ public class RestaurantAddressAdminController {
     }
 
     // 수정
-    @PutMapping("/addresses/{id}")
+    @PutMapping("/restaurantAddresses/{id}")
     public ResponseEntity<RestaurantAddressAdminResponseDto> updateAddress(@PathVariable UUID id,
         @RequestBody RestaurantAddressAdminRequestDto dto) {
         RestaurantAddressAdminResponseDto response = service.update(id, dto);
@@ -59,14 +59,14 @@ public class RestaurantAddressAdminController {
     }
 
     // 삭제
-    @DeleteMapping("/addresses/{id}")
+    @DeleteMapping("/restaurantAddresses/{id}")
     public ResponseEntity<RestaurantAddressAdminResponseDto> deleteAddress(@PathVariable UUID id) {
         RestaurantAddressAdminResponseDto response = service.delete(id);
         return ResponseEntity.ok(response);
     }
 
     // 검색 (예: 도로명 주소에 포함된 문자열)
-    @GetMapping("/addresses/search")
+    @GetMapping("/restaurantAddresses/search")
     public ResponseEntity<Page<RestaurantAddressAdminResponseDto>> searchAddresses(
         @RequestParam("roadAddr") String roadAddr,
         Pageable pageable) {

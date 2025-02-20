@@ -22,7 +22,7 @@ public class RestaurantAddressController {
     private final RestaurantAddressService service;
 
     // 생성
-    @PostMapping("/addresses")
+    @PostMapping("/restaurantAddresses")
     public ResponseEntity<RestaurantAddressResponseDto> createAddress(
         @RequestBody RestaurantAddressCreateRequestDto dto) {
         RestaurantAddressResponseDto response = service.create(dto);
@@ -30,14 +30,14 @@ public class RestaurantAddressController {
     }
 
     // 단건 조회
-    @GetMapping("/addresses/{id}")
+    @GetMapping("/restaurantAddresses/{id}")
     public ResponseEntity<RestaurantAddressResponseDto> getAddressById(@PathVariable UUID id) {
         RestaurantAddressResponseDto response = service.getById(id);
         return ResponseEntity.ok(response);
     }
 
     // 수정
-    @PutMapping("/addresses/{id}")
+    @PutMapping("/restaurantAddresses/{id}")
     public ResponseEntity<RestaurantAddressResponseDto> updateAddress(@PathVariable UUID id,
         @RequestBody RestaurantAddressCreateRequestDto dto) {
         RestaurantAddressResponseDto response = service.update(id, dto);
@@ -45,7 +45,7 @@ public class RestaurantAddressController {
     }
 
     // 삭제
-    @DeleteMapping("/addresses/{id}")
+    @DeleteMapping("/restaurantAddresses/{id}")
     public ResponseEntity<RestaurantAddressResponseDto> deleteAddress(@PathVariable UUID id) {
         RestaurantAddressResponseDto response = service.delete(id);
         return ResponseEntity.ok(response);

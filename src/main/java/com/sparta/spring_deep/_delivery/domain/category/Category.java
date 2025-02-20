@@ -31,13 +31,11 @@ public class Category extends BaseEntity {
 
     public Category(CategoryRequestDto categoryRequestDto, String username) {
         super(username);
-        this.id = categoryRequestDto.getId();
         this.name = categoryRequestDto.getName();
     }
 
     public void updateCategory(CategoryRequestDto categoryRequestDto, String username) {
         super.update(username);
-        this.id = categoryRequestDto.getId();
         this.name = categoryRequestDto.getName();
     }
 

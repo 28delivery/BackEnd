@@ -69,17 +69,14 @@ public class RestaurantAdminController {
 
     // 음식점 삭제
     @DeleteMapping("/{restaurantId}")
-    public ResponseEntity<String> deleteRestaurant(
+    public ResponseEntity<RestaurantAdminResponseDto> deleteRestaurant(
         @PathVariable UUID restaurantId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         log.info("deleteRestaurant: {}", restaurantId);
-        if (restaurantManageAdminService.deleteRestaurant(restaurantId, userDetails)) {
-            return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body("Restaurant deleted successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Restaurant not found");
-        }
+        RestaurantAdminResponseDto restaurantAdminResponseDto = restaurantManageAdminService.deleteRestaurant(
+            restaurantId, userDetails);
+        return ResponseEntity.status(HttpStatus.OK).body(restaurantAdminResponseDto);
     }
 
     //    @PreAuthorize("hasRole('OWNER')")
