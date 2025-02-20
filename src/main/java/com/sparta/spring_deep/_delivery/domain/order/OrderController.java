@@ -59,10 +59,13 @@ public class OrderController {
 
     // 주문 상세 조회
     @GetMapping("/orders/{orderId}")
-    public ResponseEntity<OrderDetailsResponseDto> getOrderDetails(@PathVariable UUID orderId) {
+    public ResponseEntity<OrderDetailsResponseDto> getOrderDetails(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @PathVariable UUID orderId) {
         log.info("주문 상세 조회 요청 - orderId : {}", orderId);
 
-        OrderDetailsResponseDto responseDto = orderService.getOrderDetails(orderId);
+        OrderDetailsResponseDto responseDto = orderService.getOrderDetails(userDetails.getUser(),
+            orderId);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 

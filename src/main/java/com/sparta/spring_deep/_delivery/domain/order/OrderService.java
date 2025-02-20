@@ -88,16 +88,21 @@ public class OrderService {
 
 
     // 주문 상태 변경
+    // OWNER만 가능
     @Transactional
-    public OrderResponseDto updateOrderStatus(UUID orderId, OrderStatusEnum status, User customer) {
+    public OrderResponseDto updateOrderStatus(UUID orderId, OrderStatusEnum status, User owner) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new EntityExistsException("order not found"));
 
-        if (order.getStatus() == OrderStatusEnum.CANCELLED) {
-            throw new IllegalStateException("Canceled orders cannot be updated");
+        if (!owner.getRole().equals(UserRole.OWNER)) {
+            throw new IllegalStateException("Only owner can update order status");
         }
 
-        order.updateOrderStatus(customer, status);
+        if (order.getStatus() == OrderStatusEnum.CANCELLED) {
+            throw new IllegalStateException("Already cancelled order");
+        }
+
+        order.updateOrderStatus(owner, status);
 
         return new OrderResponseDto(order);
     }
@@ -105,7 +110,10 @@ public class OrderService {
 
     // 주문 상세 조회
     @Transactional(readOnly = true)
-    public OrderDetailsResponseDto getOrderDetails(UUID orderId) {
+    public OrderDetailsResponseDto getOrderDetails(User user, UUID orderId) {
+        if (!(user.getRole().equals(UserRole.CUSTOMER) || user.getRole().equals(UserRole.OWNER))) {
+            throw new IllegalStateException("Only customer & owner can get order");
+        }
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new EntityExistsException("order not found"));
 
@@ -119,6 +127,10 @@ public class OrderService {
     public OrderResponseDto getMyOrders(User user,
         int page, int size,
         String sortBy, boolean isAsc) {
+        
+        if (!user.getRole().equals(UserRole.CUSTOMER)) {
+            throw new IllegalStateException("Only customer can read order");
+        }
 
         Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
