@@ -1,8 +1,9 @@
 package com.sparta.spring_deep._delivery.domain.review;
 
-import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.order.Order;
 import com.sparta.spring_deep._delivery.domain.order.OrderRepository;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import jakarta.persistence.EntityExistsException;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +27,10 @@ public class ReviewService {
 
     // 리뷰 작성
     public ReviewResponseDto createReview(ReviewRequestDto requestDto, User user) {
+        if (!user.getRole().equals(UserRole.CUSTOMER)) {
+            throw new AccessDeniedException(
+                "create review only for customer. your role is " + user.getRole());
+        }
 
         Order order = orderRepository.findById(requestDto.getOrderId())
             .orElseThrow(() -> new EntityExistsException("주문을 찾을 수 없습니다."));
