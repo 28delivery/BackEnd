@@ -32,12 +32,9 @@ public class Review extends BaseEntity {
     @JoinColumn(nullable = false)
     private Order order;
 
-    ///  restaurantId 삭제
-//    @Column(name = "restaurant_id", nullable = false)
-//    private UUID restaurantId;
-
-    @Column(name = "user_id", nullable = false)
-    private String userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false)
     private int rating;
@@ -45,12 +42,12 @@ public class Review extends BaseEntity {
     @Column
     private String comment;
 
-    public Review(ReviewRequestDto requestDto, Order order, User user) {
+    public Review(Order order, User user, int rating, String comment) {
         super(user.getUsername());
         this.order = order;
-        this.userId = user.getUsername();
-        this.comment = requestDto.getComment();
-        this.rating = requestDto.getRating();
+        this.user = user;
+        this.comment = comment;
+        this.rating = rating;
     }
 
     public void updateReview(String comment, int rating, User user) {
