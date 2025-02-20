@@ -1,7 +1,7 @@
 package com.sparta.spring_deep._delivery.domain.order;
 
-import com.sparta.spring_deep._delivery.domain.address.Address;
-import com.sparta.spring_deep._delivery.domain.address.AddressRepository;
+import com.sparta.spring_deep._delivery.domain.address.entity.Address;
+import com.sparta.spring_deep._delivery.domain.address.repository.AddressRepository;
 import com.sparta.spring_deep._delivery.domain.menu.Menu;
 import com.sparta.spring_deep._delivery.domain.menu.MenuRepository;
 import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsRequestDto;
@@ -168,9 +168,10 @@ public class OrderService {
     public List<OrderResponseDto> getUpdatedOrdersSince(User user) {
 
         // 진행 중인 주문 중에서 최근 변경된 주문만 조회
-        List<Order> updatedOrders = orderRepository.findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(
-            user.getUsername(), lastCheckedTime,
-            List.of(OrderStatusEnum.PENDING, OrderStatusEnum.CONFIRMED));
+        List<Order> updatedOrders = orderRepository
+            .findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(
+                user.getUsername(), lastCheckedTime,
+                List.of(OrderStatusEnum.PENDING, OrderStatusEnum.CONFIRMED));
 
         if (updatedOrders.isEmpty()) {
             throw new EntityExistsException("현재 진행중인 주문이 없습니다.");

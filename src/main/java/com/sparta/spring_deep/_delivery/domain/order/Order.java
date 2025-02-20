@@ -1,7 +1,7 @@
 package com.sparta.spring_deep._delivery.domain.order;
 
 import com.sparta.spring_deep._delivery.common.BaseEntity;
-import com.sparta.spring_deep._delivery.domain.address.Address;
+import com.sparta.spring_deep._delivery.domain.address.entity.Address;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import jakarta.persistence.Column;
