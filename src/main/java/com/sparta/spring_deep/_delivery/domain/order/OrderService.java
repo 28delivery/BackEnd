@@ -87,18 +87,17 @@ public class OrderService {
     }
 
 
-    // 주문 상태 변경
-    // OWNER만 가능
+    // 주문 상태 변경 - OWNER & MANAGER
     @Transactional
     public OrderResponseDto updateOrderStatus(UUID orderId, OrderStatusEnum status, User owner) {
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new EntityExistsException("order not found"));
 
-        if (!owner.getRole().equals(UserRole.OWNER)) {
+        if (!(owner.getRole().equals(UserRole.OWNER) || owner.getRole().equals(UserRole.MANAGER))) {
             throw new IllegalStateException("Only owner can update order status");
         }
 
-        if (order.getStatus() == OrderStatusEnum.CANCELLED) {
+        if (order.getStatus().equals(OrderStatusEnum.CANCELLED)) {
             throw new IllegalStateException("Already cancelled order");
         }
 
@@ -111,11 +110,18 @@ public class OrderService {
     // 주문 상세 조회
     @Transactional(readOnly = true)
     public OrderDetailsResponseDto getOrderDetails(User user, UUID orderId) {
-        if (!(user.getRole().equals(UserRole.CUSTOMER) || user.getRole().equals(UserRole.OWNER))) {
+        if (!(user.getRole().equals(UserRole.CUSTOMER)
+            || user.getRole().equals(UserRole.OWNER)
+            || user.getRole().equals(UserRole.MANAGER))) {
             throw new IllegalStateException("Only customer & owner can get order");
         }
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new EntityExistsException("order not found"));
+
+        if (user.getRole().equals(UserRole.CUSTOMER)
+            && !order.getCustomer().getUsername().equals(user.getUsername())) {
+            throw new AccessDeniedException("Unauthorized access to order");
+        }
 
         List<OrderItem> orderItemList = orderItemRepository.findAllByOrderId(order.getId());
 
@@ -145,14 +151,21 @@ public class OrderService {
     // 주문 취소 (5분 이내)
     @Transactional
     public ResponseEntity<String> canceledOrder(User user, UUID orderId) {
-        if (!user.getUsername().equals("CUSTOMER")) {
-            throw new IllegalStateException("only customer can cancel order");
+        if (!(user.getRole().equals(UserRole.CUSTOMER)
+            || user.getRole().equals(UserRole.OWNER)
+            || user.getRole().equals(UserRole.MANAGER))) {
+            throw new AccessDeniedException("Unauthorized access to canceled order");
         }
         Order order = orderRepository.findById(orderId)
             .orElseThrow(() -> new EntityExistsException("order not found"));
 
-        if (!order.getCustomer().getUsername().equals(user.getUsername())) {
+        if (user.getRole().equals(UserRole.CUSTOMER)
+            && !order.getCustomer().getUsername().equals(user.getUsername())) {
             throw new AccessDeniedException("Unauthorized access to canceled order");
+        }
+
+        if (order.getStatus().equals(OrderStatusEnum.CANCELLED)) {
+            throw new IllegalStateException("Already cancelled order");
         }
 
         if (order.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(5))) {
@@ -163,15 +176,15 @@ public class OrderService {
         return ResponseEntity.ok("Success canceled");
     }
 
+
     // 실시간 주문 확인
     @Transactional(readOnly = true)
     public List<OrderResponseDto> getUpdatedOrdersSince(User user) {
 
         // 진행 중인 주문 중에서 최근 변경된 주문만 조회
-        List<Order> updatedOrders = orderRepository
-            .findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(
-                user.getUsername(), lastCheckedTime,
-                List.of(OrderStatusEnum.PENDING, OrderStatusEnum.CONFIRMED));
+        List<Order> updatedOrders = orderRepository.findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(
+            user.getUsername(), lastCheckedTime,
+            List.of(OrderStatusEnum.PENDING, OrderStatusEnum.CONFIRMED));
 
         if (updatedOrders.isEmpty()) {
             throw new EntityExistsException("현재 진행중인 주문이 없습니다.");

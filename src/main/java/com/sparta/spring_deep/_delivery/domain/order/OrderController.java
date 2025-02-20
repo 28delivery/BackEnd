@@ -2,10 +2,8 @@ package com.sparta.spring_deep._delivery.domain.order;
 
 import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsRequestDto;
 import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsResponseDto;
-
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.List;
-import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,17 +42,17 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
-    // 주문 상태 변경
+    // 주문 상태 변경 - OWNER & Manager
     @PutMapping("/orders/{orderId}/status")
     public ResponseEntity<OrderResponseDto> updateOrderStatus(
+        @AuthenticationPrincipal UserDetailsImpl owner,
         @PathVariable UUID orderId,
         @RequestParam OrderStatusEnum status
     ) {
         log.info("Update Order Status : {}", orderId);
 
-        User customer = new User(); //임시
         OrderResponseDto orderResponseDto = orderService.updateOrderStatus(orderId, status,
-            customer);
+            owner.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(orderResponseDto);
     }
 
