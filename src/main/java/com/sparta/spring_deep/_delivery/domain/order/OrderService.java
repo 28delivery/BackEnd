@@ -46,9 +46,11 @@ public class OrderService {
 
 
     // 주문 생성
-    public OrderDetailsResponseDto createOrder(OrderDetailsRequestDto requestDto) {
-        User customer = userRepository.findById(requestDto.getCustomerId())
-            .orElseThrow(() -> new IllegalArgumentException("로그인 해주세요."));
+    public OrderDetailsResponseDto createOrder(OrderDetailsRequestDto requestDto, User user) {
+
+        if (!user.getRole().equals(UserRole.CUSTOMER)) {
+            throw new IllegalStateException("Only customer can create order");
+        }
 
         Restaurant restaurant = restaurantRepository.findById(requestDto.getRestaurantId())
             .orElseThrow(() -> new IllegalArgumentException("음식점을 찾을 수 없습니다."));
@@ -56,7 +58,7 @@ public class OrderService {
         Address address = addressRepository.findById(requestDto.getAddressId())
             .orElseThrow(() -> new IllegalArgumentException("주소를 찾을 수 없습니다."));
 
-        Order order = orderRepository.save(new Order(customer, restaurant, address,
+        Order order = orderRepository.save(new Order(user, restaurant, address,
             requestDto.getTotalPrice(), requestDto.getRequest()));
 
         List<OrderItem> orderItemList = new ArrayList<>();
@@ -113,14 +115,15 @@ public class OrderService {
 
     // 나의 주문 내역 조회
     @Transactional(readOnly = true)
-    public OrderResponseDto getMyOrders(String username,
+    public OrderResponseDto getMyOrders(User user,
         int page, int size,
         String sortBy, boolean isAsc) {
 
         Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Order> myOrderList = orderRepository.findAllByCustomerIdAndIsDeletedFalse(username,
+        Page<Order> myOrderList = orderRepository.findAllByCustomerIdAndIsDeletedFalse(
+            user.getUsername(),
             pageable);
 
         return myOrderList.map(OrderResponseDto::new).stream().findFirst().orElse(null);
@@ -149,11 +152,11 @@ public class OrderService {
 
     // 실시간 주문 확인
     @Transactional(readOnly = true)
-    public List<OrderResponseDto> getUpdatedOrdersSince(String customerId) {
+    public List<OrderResponseDto> getUpdatedOrdersSince(User user) {
 
         // 진행 중인 주문 중에서 최근 변경된 주문만 조회
         List<Order> updatedOrders = orderRepository.findByCustomerIdAndUpdatedAtAfterAndStatusIn(
-            customerId, lastCheckedTime,
+            user.getUsername(), lastCheckedTime,
             List.of(OrderStatusEnum.PENDING, OrderStatusEnum.CONFIRMED));
 
         if (updatedOrders.isEmpty()) {

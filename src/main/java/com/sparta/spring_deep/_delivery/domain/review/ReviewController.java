@@ -1,6 +1,6 @@
 package com.sparta.spring_deep._delivery.domain.review;
 
-import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.UserDetailsImpl;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,12 +30,13 @@ public class ReviewController {
     // 리뷰 작성
     @PostMapping("/reviews")
     public ResponseEntity<ReviewResponseDto> createReview(
-        @AuthenticationPrincipal User user,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody ReviewRequestDto requestDto) {
-        
+
         log.info("Create Review : {}", requestDto);
 
-        ReviewResponseDto responseDto = reviewService.createReview(requestDto, user);
+        ReviewResponseDto responseDto = reviewService.createReview(requestDto,
+            userDetails.getUser());
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
@@ -70,13 +71,13 @@ public class ReviewController {
     // 리뷰 수정
     @PutMapping("/reviews/{reviewId}")
     public ResponseEntity<ReviewResponseDto> updateReview(
-        @AuthenticationPrincipal User user,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable String reviewId,
         @RequestBody ReviewRequestDto requestDto) {
         log.info("Update Review - reviewId :{}", reviewId);
 
         ReviewResponseDto responseDto = reviewService.updateReview(UUID.fromString(reviewId),
-            requestDto.getComment(), requestDto.getRating(), user);
+            requestDto.getComment(), requestDto.getRating(), userDetails.getUser());
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -84,10 +85,10 @@ public class ReviewController {
     // 리뷰 삭제
     @PutMapping("/reviews/{reviewId}/delete")
     public ResponseEntity<String> deleteReview(
-        @AuthenticationPrincipal User user,
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable String reviewId) {
         log.info("Delete Review - reviewId :{}", reviewId);
 
-        return reviewService.deleteReview(UUID.fromString(reviewId), user);
+        return reviewService.deleteReview(UUID.fromString(reviewId), userDetails.getUser());
     }
 }
