@@ -2,6 +2,7 @@ package com.sparta.spring_deep._delivery.admin.service;
 
 import com.sparta.spring_deep._delivery.admin.dto.UserAdminResponseDto;
 import com.sparta.spring_deep._delivery.admin.dto.UserCreateRequestDto;
+import com.sparta.spring_deep._delivery.admin.dto.UserSearchDto;
 import com.sparta.spring_deep._delivery.admin.dto.UserUpdateRequestDto;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
@@ -9,9 +10,9 @@ import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,14 +40,12 @@ public class UserAdminService {
     }
 
     // 사용자 전체 조회
-    public List<UserAdminResponseDto> getAllUsers() {
+    public Page<UserAdminResponseDto> getAllUsers(UserSearchDto searchDto, Pageable pageable) {
         // admin 권한 체크
         checkAdminRole();
 
-        List<User> users = userRepository.findAll();
-        return users.stream()
-            .map(UserAdminResponseDto::new)
-            .collect(Collectors.toList());
+        Page<User> userPage = userRepository.findAll(pageable);
+        return userPage.map(UserAdminResponseDto::new);
     }
 
     // 사용자 상세 조회
@@ -88,6 +87,8 @@ public class UserAdminService {
 
         user.setCreatedBy(adminUsername);
         user.setCreatedAt(LocalDateTime.now());
+        user.setUpdatedBy(adminUsername);
+        user.setUpdatedAt(LocalDateTime.now());
 
         User savedUser = userRepository.save(user);
         return new UserAdminResponseDto(savedUser);
@@ -144,5 +145,5 @@ public class UserAdminService {
         user.setDeletedBy(adminUsername);
         user.setDeletedAt(LocalDateTime.now());
     }
-    
+
 }

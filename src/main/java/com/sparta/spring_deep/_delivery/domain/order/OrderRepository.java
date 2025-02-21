@@ -15,7 +15,9 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
 
     Page<Order> findAllByCustomerUsernameAndIsDeletedFalse(String username, Pageable pageable);
 
-    List<Order> findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(String customerId,
-        LocalDateTime lastCheckedTime, List<OrderStatusEnum> statusEnumList);
+    Page<Order> findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(String customerId,
+        LocalDateTime lastCheckedTime,
+        List<OrderStatusEnum> statusEnumList,
+        Pageable pageable);
 
 }

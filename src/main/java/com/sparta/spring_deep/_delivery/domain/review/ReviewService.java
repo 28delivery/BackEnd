@@ -2,6 +2,7 @@ package com.sparta.spring_deep._delivery.domain.review;
 
 import com.sparta.spring_deep._delivery.domain.order.Order;
 import com.sparta.spring_deep._delivery.domain.order.OrderRepository;
+import com.sparta.spring_deep._delivery.domain.order.OrderStatusEnum;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import jakarta.persistence.EntityExistsException;
@@ -37,7 +38,15 @@ public class ReviewService {
             .orElseThrow(() -> new EntityExistsException("주문을 찾을 수 없습니다."));
 
         if (!order.getCustomer().getUsername().equals(user.getUsername())) {
-            throw new AccessDeniedException("Unauthorized access to create review");
+            throw new AccessDeniedException("주문자만 리뷰를 쓰실 수 있습니다.");
+        }
+
+        if (order.getIsDeleted()) {
+            throw new EntityExistsException("삭제된 주문입니다.");
+        }
+
+        if (!order.getStatus().equals(OrderStatusEnum.DELIVERED)) {
+            throw new IllegalStateException("완료된 주문만 리뷰를 쓰실 수 있습니다.");
         }
 
         Review review = reviewRepository.save(
