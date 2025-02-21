@@ -15,9 +15,6 @@ public class UserSearchDto {
     private UserRole role;
     private IsPublic isPublic;
 
-    // 페이징
-    private int page = 0;
-    private int size = 10;
 
 }
 

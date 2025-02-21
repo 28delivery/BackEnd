@@ -2,10 +2,14 @@ package com.sparta.spring_deep._delivery.admin.controller;
 
 import com.sparta.spring_deep._delivery.admin.dto.UserAdminResponseDto;
 import com.sparta.spring_deep._delivery.admin.dto.UserCreateRequestDto;
+import com.sparta.spring_deep._delivery.admin.dto.UserSearchDto;
 import com.sparta.spring_deep._delivery.admin.dto.UserUpdateRequestDto;
 import com.sparta.spring_deep._delivery.admin.service.UserAdminService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,9 +30,12 @@ public class UserAdminController {
     private final UserAdminService userAdminService;
 
     // 사용자 전체 조회
-    @GetMapping
-    public List<UserAdminResponseDto> getAllUsers() {
-        return userAdminService.getAllUsers();
+    @GetMapping("/search") // search?page=0&size=2로 요청하면 2개만 조회
+    public ResponseEntity<Page<UserAdminResponseDto>> getAllUsers(
+        @RequestBody(required = false) UserSearchDto searchDto,
+        @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<UserAdminResponseDto> users = userAdminService.getAllUsers(searchDto, pageable);
+        return ResponseEntity.ok(users);
     }
 
     // 사용자 상세 조회
