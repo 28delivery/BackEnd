@@ -71,9 +71,7 @@ public class WebSecurityConfig {
                 .requestMatchers(
                     "/api/users/signup",
                     "/api/users/login",
-                    "/api/restaurants/{restaurantId}",
                     "/api/restaurants/search",
-                    "/api/menus/{restaurantId}",
                     "/api/reviews/{restaurantId}/search?"
                 ).permitAll()
 
@@ -85,6 +83,10 @@ public class WebSecurityConfig {
                 .requestMatchers(HttpMethod.POST,
                     "/api/restaurants"
                 ).hasAnyAuthority("OWNER", "ADMIN")
+
+                .requestMatchers(HttpMethod.GET,
+                    "/api/restaurants/{restaurantId}"
+                ).permitAll()
 
                 .requestMatchers(HttpMethod.PUT,
                     "/api/restaurants/{restaurantsId}"
@@ -99,6 +101,10 @@ public class WebSecurityConfig {
                     "/api/menus/{restaurantId}",
                     "/api/menus/{menuId}/aiDescription"
                 ).hasAnyAuthority("OWNER", "MANAGER", "ADMIN")
+
+                .requestMatchers(HttpMethod.GET,
+                    "/api/menus/{restaurantId}"
+                ).permitAll()
 
                 .requestMatchers(HttpMethod.PUT,
                     "/api/menus/{menuId}"
