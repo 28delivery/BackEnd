@@ -128,7 +128,8 @@ public class UserControllerTest {
         loginRequest.setPassword("password123");
 
         String mockToken = "mock-jwt-token";
-        LoginResponseDto responseDto = new LoginResponseDto(mockToken, "testuser", Collections.singletonList("CUSTOMERS"));
+        LoginResponseDto responseDto = new LoginResponseDto(mockToken, "testuser",
+            "test@test.com", UserRole.CUSTOMER, IsPublic.PUBLIC);
 
         // 가짜 사용자 정보 생성
         UserDetailsImpl mockUserDetails = new UserDetailsImpl(

@@ -1,6 +1,5 @@
 package com.sparta.spring_deep._delivery.config;
 
-import com.sparta.spring_deep._delivery.domain.user.jwt.JwtAuthenticationFilter;
 import com.sparta.spring_deep._delivery.domain.user.jwt.JwtAuthorizationFilter;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsServiceImpl;
 import com.sparta.spring_deep._delivery.domain.user.jwt.JwtUtil;
@@ -82,29 +81,18 @@ public class WebSecurityConfig {
         //);
 
         // JWT 인증 & 인가 필터 설정
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
-        // controller-service login과정에서 인증처리 된거면 안 집어넣어도 될것 같다?.....?.?.?
-
+        // jwtAuthenticationFilter가 UserService login과정에서 인증처리 된거면
+        // jwtAuthenticationFilter 없어도 되나?
+        // => jwtAuthenticationFilter의 attemp메소드랑 UserService login이랑 기능이 같음
+        // => 그래서 jwtAuthenticationFilter 미사용
+        // http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     /**
-     * JPA 인증 필터
-     *
-     * @return
-     * @throws Exception
-     */
-    @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtUtil);
-        filter.setAuthenticationManager(authenticationConfiguration.getAuthenticationManager());
-        return filter;
-    }
-
-    /**
-     * JWT 인가 필터
+     * JWT 필터
      *
      * @return
      */
