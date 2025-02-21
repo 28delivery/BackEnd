@@ -10,7 +10,7 @@ public class RestaurantResponseDto {
 
     private UUID id;
     private String ownerId;
-    private String categoryName;
+    private String category;
     private String name;
     private String phone;
     private String roadAddr;
@@ -21,7 +21,7 @@ public class RestaurantResponseDto {
     public RestaurantResponseDto(Restaurant restaurant) {
         this.id = restaurant.getId();
         this.ownerId = restaurant.getOwner().getUsername();
-        this.categoryName = restaurant.getCategory().getName();
+        this.category = restaurant.getCategory().getLabel();
         this.name = restaurant.getName();
         this.phone = restaurant.getPhone();
         this.roadAddr = restaurant.getRestaurantAddress().getRoadAddr();

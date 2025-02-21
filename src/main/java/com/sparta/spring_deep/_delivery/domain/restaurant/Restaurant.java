@@ -5,11 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sparta.spring_deep._delivery.admin.dto.RestaurantAdminCreateRequestDto;
 import com.sparta.spring_deep._delivery.admin.dto.RestaurantAdminRequestDto;
 import com.sparta.spring_deep._delivery.common.BaseEntity;
-import com.sparta.spring_deep._delivery.domain.category.Category;
 import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,7 +24,9 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter
@@ -46,10 +49,10 @@ public class Restaurant extends BaseEntity {
     @Size(max = 100)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    @NotNull
-    private Category category;
+    @Enumerated(EnumType.STRING)
+    @JoinColumn(name = "category", nullable = false, columnDefinition = "p_restaurant_category_enum")
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    private CategoryEnum category;
 
     @NotNull
     @OneToOne
@@ -58,18 +61,18 @@ public class Restaurant extends BaseEntity {
     private String phone;
 
     public Restaurant(RestaurantAdminCreateRequestDto restaurantAdminCreateRequestDto, User owner,
-        Category category, RestaurantAddress restaurantAddress, String username) {
+        RestaurantAddress restaurantAddress, String username) {
         super(username);
         this.owner = owner;
-        this.category = category;
+        this.category = restaurantAdminCreateRequestDto.getCategory();
         this.name = restaurantAdminCreateRequestDto.getName();
         this.phone = restaurantAdminCreateRequestDto.getPhone();
         this.restaurantAddress = restaurantAddress;
     }
 
-    public void UpdateRestaurant(RestaurantRequestDto restaurantRequestDto, Category categoryId,
+    public void UpdateRestaurant(RestaurantRequestDto restaurantRequestDto,
         RestaurantAddress restaurantAddress, String username) {
-        this.category = categoryId;
+        this.category = restaurantRequestDto.getCategory();
         this.name = restaurantRequestDto.getName();
         this.restaurantAddress = restaurantAddress;
         this.phone = restaurantRequestDto.getPhone();
@@ -77,12 +80,29 @@ public class Restaurant extends BaseEntity {
     }
 
     public void UpdateRestaurant(RestaurantAdminRequestDto restaurantAdminRequestDto,
-        Category categoryId, RestaurantAddress restaurantAddress, String username) {
-        this.category = categoryId;
+        RestaurantAddress restaurantAddress, String username) {
+        this.category = restaurantAdminRequestDto.getCategory();
         this.name = restaurantAdminRequestDto.getName();
         this.restaurantAddress = restaurantAddress;
         this.phone = restaurantAdminRequestDto.getPhone();
         super.update(username);
+    }
+
+    public enum CategoryEnum {
+        HANSIK("한식"),
+        YANGSIK("양식"),
+        JUNGSIK("중식"),
+        ILSIK("일식");
+
+        private final String label;
+
+        CategoryEnum(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
     }
 
 }

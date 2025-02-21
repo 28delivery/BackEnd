@@ -7,8 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReviewRepository extends JpaRepository<Review, UUID> {
-    
+
     Review findByIdAndIsDeletedFalse(UUID reviewId);
 
     Page<Review> findByOrderIdInAndIsDeletedFalse(List<UUID> orderIds, Pageable pageable);
+
+    int countByOrderId(UUID orderId);
+
+    List<Review> findAllByOrderId(UUID orderId);
 }

@@ -1,6 +1,6 @@
 package com.sparta.spring_deep._delivery.admin.dto;
 
-import java.util.UUID;
+import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant.CategoryEnum;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -10,7 +10,7 @@ public class RestaurantAdminCreateRequestDto {
 
     private String ownerId;
     private String name;
-    private UUID categoryId;
+    private CategoryEnum category;
     private String roadAddr;
     private String detailAddr;
     private String phone;

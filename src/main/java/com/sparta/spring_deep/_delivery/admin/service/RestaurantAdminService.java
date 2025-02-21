@@ -3,8 +3,6 @@ package com.sparta.spring_deep._delivery.admin.service;
 import com.sparta.spring_deep._delivery.admin.dto.RestaurantAdminCreateRequestDto;
 import com.sparta.spring_deep._delivery.admin.dto.RestaurantAdminRequestDto;
 import com.sparta.spring_deep._delivery.admin.dto.RestaurantAdminResponseDto;
-import com.sparta.spring_deep._delivery.domain.category.Category;
-import com.sparta.spring_deep._delivery.domain.category.CategoryRepository;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
@@ -26,7 +24,6 @@ public class RestaurantAdminService {
 
     private final RestaurantRepository restaurantRepository;
     private final RestaurantAddressRepository restaurantAddressRepository;
-    private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
 
     // 음식점 상세 조회
@@ -60,13 +57,6 @@ public class RestaurantAdminService {
             () -> new EntityNotFoundException("User with id " + ownerId + " not found")
         );
 
-        // Id로 카테고리 찾아내기
-        UUID uuid = restaurantAdminCreateRequestDto.getCategoryId();
-        log.info("find Category by Id " + uuid);
-        Category category = categoryRepository.findById(uuid).orElseThrow(
-            () -> new EntityNotFoundException("Category with id " + uuid + " not found")
-        );
-
         // Id로 음식점 주소 찾아내기
         RestaurantAddress restaurantAddress = restaurantAddressRepository.findById(
             restaurantAddressId).orElseThrow(
@@ -76,7 +66,7 @@ public class RestaurantAdminService {
 
         // 사용자 정보와 category로 Restaurant 객체 생성
         log.info("add restaurant " + restaurantAdminCreateRequestDto);
-        Restaurant restaurant = new Restaurant(restaurantAdminCreateRequestDto, owner, category,
+        Restaurant restaurant = new Restaurant(restaurantAdminCreateRequestDto, owner,
             restaurantAddress, loggenInUser.getUsername());
 
         // 생성된 Restaurant 객체 저장
@@ -100,13 +90,6 @@ public class RestaurantAdminService {
             () -> new EntityNotFoundException("Restaurant with id " + restaurantId + " not found")
         );
 
-        // Id로 카테고리 찾아내기
-        UUID uuid = restaurantAdminRequestDto.getCategoryId();
-        log.info("find Category by Id " + uuid);
-        Category category = categoryRepository.findById(uuid).orElseThrow(
-            () -> new EntityNotFoundException("Category with id " + uuid + " not found")
-        );
-
         // Address 값으로 address 찾아내기
         RestaurantAddress restaurantAddress = restaurantAddressRepository.findById(
             restaurantAddressId).orElseThrow(
@@ -114,7 +97,7 @@ public class RestaurantAdminService {
                 "Restaurant address with id " + restaurantAddressId + " not found")
         );
 
-        restaurant.UpdateRestaurant(restaurantAdminRequestDto, category, restaurantAddress,
+        restaurant.UpdateRestaurant(restaurantAdminRequestDto, restaurantAddress,
             loggenInUser.getUsername());
 
         return new RestaurantAdminResponseDto(restaurant);

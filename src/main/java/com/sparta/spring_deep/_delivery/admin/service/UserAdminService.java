@@ -54,7 +54,7 @@ public class UserAdminService {
         checkAdminRole();
 
         // username 체크
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username)
             .orElseThrow(
                 () -> new EntityNotFoundException("User not found with username: " + username));
 
@@ -101,7 +101,7 @@ public class UserAdminService {
         String adminUsername = checkAdminRole();
 
         // username 체크
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username)
             .orElseThrow(
                 () -> new EntityNotFoundException("User not found with username: " + username));
 
@@ -137,7 +137,7 @@ public class UserAdminService {
         String adminUsername = checkAdminRole();
 
         // username 체크
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsernameAndIsDeletedFalse(username)
             .orElseThrow(
                 () -> new EntityNotFoundException("User not found with username: " + username));
 
