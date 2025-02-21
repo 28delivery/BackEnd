@@ -20,7 +20,7 @@ import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import com.sparta.spring_deep._delivery.domain.user.service.UserService;
-import com.sparta.spring_deep._delivery.util.JwtUtil;
+import com.sparta.spring_deep._delivery.domain.user.jwt.JwtUtil;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -9,10 +9,8 @@ import com.sparta.spring_deep._delivery.domain.user.entity.IsPublic;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
-import com.sparta.spring_deep._delivery.util.JwtUtil;
+import com.sparta.spring_deep._delivery.domain.user.jwt.JwtUtil;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -75,6 +73,7 @@ public class UserService {
     }
 
     public LoginResponseDto login(LoginRequestDto loginRequestDto){
+
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword())
         );
@@ -83,6 +82,7 @@ public class UserService {
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         User user = userDetails.getUser();
+
         String username = userDetails.getUsername();
         String email = user.getEmail();
         IsPublic isPublic = user.getIsPublic();
@@ -122,5 +122,11 @@ public class UserService {
         userRepository.save(user);
     }
 
+    public boolean isDeletedUser(String userName) {
+        // 소프트 삭제된 유저가 검색될때에는 오류처리
+        return userRepository.findByUsername(userName)
+            .map(User::getIsDeleted)
+            .orElse(false);
+    }
 }
 

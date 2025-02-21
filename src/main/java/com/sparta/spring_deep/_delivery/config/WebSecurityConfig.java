@@ -1,9 +1,9 @@
 package com.sparta.spring_deep._delivery.config;
 
-import com.sparta.spring_deep._delivery.config.security.JwtAuthenticationFilter;
-import com.sparta.spring_deep._delivery.config.security.JwtAuthorizationFilter;
+import com.sparta.spring_deep._delivery.domain.user.jwt.JwtAuthenticationFilter;
+import com.sparta.spring_deep._delivery.domain.user.jwt.JwtAuthorizationFilter;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsServiceImpl;
-import com.sparta.spring_deep._delivery.util.JwtUtil;
+import com.sparta.spring_deep._delivery.domain.user.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -82,8 +82,10 @@ public class WebSecurityConfig {
         //);
 
         // JWT 인증 & 인가 필터 설정
-        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
+        // controller-service login과정에서 인증처리 된거면 안 집어넣어도 될것 같다?.....?.?.?
+
 
         return http.build();
     }

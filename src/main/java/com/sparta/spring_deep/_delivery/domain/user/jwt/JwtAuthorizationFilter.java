@@ -1,7 +1,6 @@
-package com.sparta.spring_deep._delivery.config.security;
+package com.sparta.spring_deep._delivery.domain.user.jwt;
 
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsServiceImpl;
-import com.sparta.spring_deep._delivery.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

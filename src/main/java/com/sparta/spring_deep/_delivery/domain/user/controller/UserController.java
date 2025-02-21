@@ -7,7 +7,7 @@ import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.dto.UserDto;
 import com.sparta.spring_deep._delivery.domain.user.service.UserService;
-import com.sparta.spring_deep._delivery.util.JwtUtil;
+import com.sparta.spring_deep._delivery.domain.user.jwt.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -52,6 +52,8 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto loginRequestDto, BindingResult bindingResult) {
+
+
         if(bindingResult.hasErrors()){
             String errorMsg = bindingResult.getFieldError("username") != null ?
                 bindingResult.getFieldError("username").getDefaultMessage() : "Invalid input";
@@ -59,9 +61,17 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMsg);
         }
 
+        if(userService.isDeletedUser(loginRequestDto.getUsername())){
+            String errorMsg = "User does not exist.";
+            logger.error("Login validation failed: {}", errorMsg);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMsg);
+        }
+
         LoginResponseDto loginResponseDto = userService.login(loginRequestDto);
         logger.info("User logged in successfully: {}", loginResponseDto.getUsername());
-        return ResponseEntity.ok(loginResponseDto);
+        return ResponseEntity.ok()
+            .header(JwtUtil.AUTHORIZATION_HEADER, loginResponseDto.getToken())
+            .body(loginResponseDto);
     }
 
     @PostMapping("/logout")
