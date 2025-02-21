@@ -24,13 +24,10 @@ public class AiLogService {
         Page<Ai> aiLogs;
 
         if (menuId != null) {
-            // 메뉴 아이디가 제공되면, 해당 메뉴의 AI 로그 조회
             aiLogs = aiRepository.findByMenuId(menuId, pageable);
         } else if (restaurantId != null) {
-            // 메뉴 아이디가 없고, 레스토랑 아이디가 제공되면, 해당 레스토랑의 모든 AI 로그 조회
             aiLogs = aiRepository.findByMenu_RestaurantId_Id(restaurantId, pageable);
         } else {
-            // 둘 다 제공되지 않으면 전체 AI 로그 조회
             aiLogs = aiRepository.findAll(pageable);
         }
 
