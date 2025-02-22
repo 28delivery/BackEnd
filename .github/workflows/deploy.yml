@@ -31,7 +31,7 @@ jobs:
         run: ls -R build/libs
 
       - name: upload jar # build 한 .jar 파일을 artifact 에 보관하여 다음 job 으로 넘겨줌
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jar-artifact
           path: build/libs/Eleven-Book-shelf-0.0.1-SNAPSHOT.jar
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest # 여기서 아키텍쳐와 버전을 지정했기 때문에 도커 빌드할때 플랫폼 지정하지 않아도 자동으로 AMD 아키텍쳐로 이미지 파일 빌드를 수행함
     steps:
       - name: Download jar # 아티팩트에 업로드한 jar 파일을 다운로드
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: jar-artifact
 
