@@ -44,3 +44,8 @@ out/
 ### Application Setting File ###
 application.properties
 application.yml
+application-deploy.yml
+application-local.yml
+
+### Docker ###
+docker-compose.yml
