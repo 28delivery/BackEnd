@@ -66,6 +66,7 @@ jobs:
         run: |
           pwd
           ls -al
+          find . -name Dockerfile
 
       - name: Build and push Docker images
         run: |
