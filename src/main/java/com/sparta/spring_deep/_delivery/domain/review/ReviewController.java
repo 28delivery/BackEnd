@@ -1,6 +1,7 @@
 package com.sparta.spring_deep._delivery.domain.review;
 
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,8 +47,9 @@ public class ReviewController {
     public ResponseEntity<Page<ReviewResponseDto>> searchReview(
         @PathVariable String restaurantId,
         @PageableDefault(size = 10, page = 0) Pageable pageable,
-        @RequestParam(defaultValue = "createdAt") String sortBy,
-        @RequestParam(defaultValue = "false") boolean isAsc) {
+        @RequestParam(defaultValue = "false") boolean isAsc,
+        @RequestParam(required = false, defaultValue = "null") int rating,
+        @RequestParam(required = false, defaultValue = "null") LocalDateTime createDate) {
 
         log.info("특정 음식점 리뷰 조회 - restaurantId :{}", restaurantId);
 

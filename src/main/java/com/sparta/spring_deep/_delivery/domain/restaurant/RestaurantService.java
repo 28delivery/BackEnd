@@ -11,6 +11,8 @@ import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,26 +86,13 @@ public class RestaurantService {
         return new RestaurantResponseDto(restaurant);
     }
 
-//    // 음식점 검색
-//    public Page<Restaurant> searchRestaurant(UUID id, String restaurantName,
-//        String categoryName, boolean isAsc, String sortBy) {
-//        log.info("음식점 검색");
-//
-//        // Category를 이름으로 찾기
-//        log.info("getCategory by name: {}", categoryName);
-//        Category category = categoryRepository.findByNameAndIsDeletedFalse(categoryName)
-//            .orElseThrow(
-//                () -> new ResourceNotFoundException("존재하지 않는 카테고리 입니다.")
-//            );
-//
-//        // Pageable 객체와 함께 검색
-//        log.info("search restaurant by values: {}, {}, {}, {}, {}", id, restaurantName, category,
-//            isAsc, sortBy);
-//        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
-//        Sort sort = Sort.by(direction, sortBy);
-//        Pageable pageable = PageRequest.of(0, 10, sort);
-//
-//        return restaurantRepository.searchByOptionAndIsDeletedFalse(pageable, id, restaurantName,
-//            category);
-//    }
+    // 음식점 검색
+    public Page<Restaurant> searchRestaurant(RestaurantSearchDto restaurantSearchDto,
+        Pageable pageable) {
+        log.info("음식점 검색");
+
+        // Pageable 객체와 함께 검색
+        return restaurantRepository.searchByOptionAndIsDeletedFalse(restaurantSearchDto,
+            pageable);
+    }
 }

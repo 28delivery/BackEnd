@@ -151,17 +151,12 @@ public class OrderService {
 
     // 나의 주문 내역 조회
     @Transactional(readOnly = true)
-    public Page<OrderResponseDto> getMyOrders(User user,
-        int page, int size,
-        String sortBy, boolean isAsc) {
+    public Page<OrderResponseDto> getMyOrders(User user, String restaurantName,
+        String menuName, String status, Pageable pageable) {
         log.info("나의 주문 내역 조회");
 
-        Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
-
         Page<Order> myOrderList = orderRepository.findAllByCustomerUsernameAndIsDeletedFalse(
-            user.getUsername(),
-            pageable);
+            user.getUsername(), restaurantName, menuName, status, pageable);
 
         if (myOrderList.isEmpty()) {
             throw new ResourceNotFoundException();
@@ -203,11 +198,10 @@ public class OrderService {
 
     // 실시간 주문 확인
     @Transactional(readOnly = true)
-    public Page<OrderResponseDto> getUpdatedOrdersSince(User user, int page, int size,
-        String sortBy, boolean isAsc) {
+    public Page<OrderResponseDto> getUpdatedOrdersSince(User user, int page, int size) {
         log.info("실시간 주문 확인");
 
-        Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
+        Sort sort = Sort.by(Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(page, size, sort);
 
         // 진행 중인 주문 중에서 최근 변경된 주문만 조회
@@ -236,7 +230,7 @@ public class OrderService {
         if (!user.getRole().equals(UserRole.ADMIN)) {
             ownerCheck(user, order.getCustomer());
         }
-        
+
         order.delete(user.getUsername());
 
         List<OrderItem> orderItemList = orderItemRepository.findAllByOrderId(order.getId());

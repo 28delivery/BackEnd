@@ -2,8 +2,8 @@ package com.sparta.spring_deep._delivery.domain.restaurant;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.sparta.spring_deep._delivery.admin.dto.RestaurantAdminCreateRequestDto;
-import com.sparta.spring_deep._delivery.admin.dto.RestaurantAdminRequestDto;
+import com.sparta.spring_deep._delivery.admin.restaurant.RestaurantAdminCreateRequestDto;
+import com.sparta.spring_deep._delivery.admin.restaurant.RestaurantAdminRequestDto;
 import com.sparta.spring_deep._delivery.common.BaseEntity;
 import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;

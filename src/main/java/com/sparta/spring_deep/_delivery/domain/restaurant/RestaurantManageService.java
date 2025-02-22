@@ -8,6 +8,8 @@ import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,6 +33,7 @@ public class RestaurantManageService {
         log.info("음식점 수정");
 
         RestaurantAddressResponseDto restaurantAddressResponseDto;
+
         // Restaurant Address Service에서 도로명과 상세주소로 Restaurant Address 찾기
         try {
             restaurantAddressResponseDto = restaurantAddressService.findByRoadAddrAndDetailAddr(
@@ -59,8 +62,8 @@ public class RestaurantManageService {
     }
 
     // 음식점 검색
-//    public Page<Restaurant> searchRestaurant(UUID id, String restaurantName, String categoryName,
-//        boolean isAsc, String sortBy) {
-//        return restaurantService.searchRestaurant(id, restaurantName, categoryName, isAsc, sortBy);
-//    }
+    public Page<Restaurant> searchRestaurant(RestaurantSearchDto restaurantSearchDto,
+        Pageable pageable) {
+        return restaurantService.searchRestaurant(restaurantSearchDto, pageable);
+    }
 }

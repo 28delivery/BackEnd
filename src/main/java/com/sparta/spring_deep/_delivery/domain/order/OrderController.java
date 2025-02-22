@@ -73,14 +73,15 @@ public class OrderController {
     @GetMapping("/orders/me")
     public ResponseEntity<Page<OrderResponseDto>> getMyOrders(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @PageableDefault(size = 10, page = 0) Pageable pageable,
-        @RequestParam(defaultValue = "createdAt") String sortBy,
-        @RequestParam(defaultValue = "false") boolean isAsc
+        @RequestParam(required = false, defaultValue = "null") String restaurantName,
+        @RequestParam(required = false, defaultValue = "null") String menuName,
+        @RequestParam(required = false, defaultValue = "null") String status,
+        @PageableDefault(size = 10, page = 0) Pageable pageable
     ) {
         log.info("나의 주문 내역 조회 요청 ");
 
         Page<OrderResponseDto> responseDtos = orderService.getMyOrders(userDetails.getUser(),
-            pageable.getPageNumber(), pageable.getPageSize(), sortBy, isAsc);
+            restaurantName, menuName, status, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDtos);
     }
@@ -100,14 +101,12 @@ public class OrderController {
     @GetMapping("/orders/polling")
     public ResponseEntity<Page<OrderResponseDto>> pollingOrder(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @PageableDefault(size = 10, page = 0) Pageable pageable,
-        @RequestParam(defaultValue = "createdAt") String sortBy,
-        @RequestParam(defaultValue = "false") boolean isAsc
+        @PageableDefault(size = 10, page = 0) Pageable pageable
     ) {
 
         log.info("실시간 주문 확인 - customerId : {}", userDetails.getUsername());
         Page<OrderResponseDto> updatedOrdersSince = orderService.getUpdatedOrdersSince(
-            userDetails.getUser(), pageable.getPageNumber(), pageable.getPageSize(), sortBy, isAsc);
+            userDetails.getUser(), pageable.getPageNumber(), pageable.getPageSize());
 
         return ResponseEntity.status(HttpStatus.OK).body(updatedOrdersSince);
     }
