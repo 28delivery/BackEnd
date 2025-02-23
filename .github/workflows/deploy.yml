@@ -24,15 +24,16 @@ jobs:
       - name: Grant execute permission for gradlew # 권한으로 인해 넣었던 걸로 기억. 테스트 필요
         run: chmod +x gradlew
 
-      - name: add application-yml # yml 경로 및 파일 추가
+      - name: add application-yml
         run: |
           mkdir -p ./src/main/resources
-          touch ./src/main/resources/application.properties
-          echo "${{ secrets.APP_PROPERTIES }}" > ./src/main/resources/application.properties
+          cat << 'EOF' > ./src/main/resources/application.yml
+          $(echo "${{ secrets.APP_YML }}")
+          EOF
           find src
 
       - name: Build with Gradle # 체크아웃한 코드들을 기반으로 그래들 빌드
-        run: ./gradlew build -x test
+        run: ./gradlew build
 
       - name: Check resources
         run: |
