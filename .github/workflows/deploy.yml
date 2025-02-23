@@ -28,7 +28,8 @@ jobs:
         run: |
           mkdir -p ./src/main/resources
           touch ./src/main/resources/application.yml
-          echo "${{ secrets.APP_YML }}" > ./src/main/resources/application.yml
+          echo "${{ secrets.APP_YML_BASE64 }}" | base64 --decode > ./src/main/resources/application.yml
+          find src
 
       - name: add application-yml
         run: |
