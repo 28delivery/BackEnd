@@ -24,11 +24,10 @@ jobs:
       - name: Grant execute permission for gradlew # 권한으로 인해 넣었던 걸로 기억. 테스트 필요
         run: chmod +x gradlew
 
-      - name: Create resource directory # 디렉토리 루트 생성
-        run: mkdir -p src/main/resources
-
       - name: add application-yml # yml파일 추가
         run: |
+          mkdir -p ./src/main/resources
+          touch ./src/main/resources/application.yml
           echo "${{ secrets.APP_YML }}" > ./src/main/resources/application.yml
 
       - name: add application-yml
