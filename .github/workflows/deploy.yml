@@ -28,7 +28,7 @@ jobs:
         run: |
           mkdir -p ./src/main/resources
           cat << EOF > ./src/main/resources/application.yml
-          $(echo "${{ secrets.APP_YML }}")
+          ${{ secrets.APP_YML }}
           EOF
           find src
 
