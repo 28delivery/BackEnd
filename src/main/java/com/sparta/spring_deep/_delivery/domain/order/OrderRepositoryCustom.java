@@ -5,6 +5,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface OrderRepositoryCustom {
 
-    Page<OrderResponseDto> searchMyOrdersByOptionAndIsDeletedFalse(String username,
-        OrderSearchDto searchDto, Pageable pageable);
+    Page<Order> searchOrders(String username, Pageable pageable, String menu, String restaurant);
+
 }

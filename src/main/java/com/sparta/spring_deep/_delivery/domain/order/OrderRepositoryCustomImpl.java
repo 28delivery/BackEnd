@@ -1,72 +1,74 @@
 package com.sparta.spring_deep._delivery.domain.order;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Projections;
+import static com.sparta.spring_deep._delivery.domain.menu.QMenu.menu;
+import static com.sparta.spring_deep._delivery.domain.order.QOrder.order;
+import static com.sparta.spring_deep._delivery.domain.order.orderItem.QOrderItem.orderItem;
+import static com.sparta.spring_deep._delivery.domain.restaurant.QRestaurant.restaurant;
+
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-@RequiredArgsConstructor
-@Slf4j(topic = "OrderRepositoryQueryDSL")
 public class OrderRepositoryCustomImpl implements OrderRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
+    public OrderRepositoryCustomImpl(JPAQueryFactory queryFactory) {
+        this.queryFactory = queryFactory;
+    }
+
     @Override
-    public Page<OrderResponseDto> searchMyOrdersByOptionAndIsDeletedFalse(String username,
-        OrderSearchDto searchDto, Pageable pageable) {
-        log.info("searchMyOrdersByOptionAndIsDeletedFalse");
+    public Page<Order> searchOrders(String username,
+        Pageable pageable, String menuName, String restaurantName) {
 
-        QOrder order = QOrder.order;
+        // 기본 : 사용자명과 isDeleted = false 만 필터링
+        BooleanExpression baseCondition = customerUsernameEq(username).and(order.isDeleted)
+            .eq(false);
 
-        // 동적 조건 생성
-        BooleanBuilder builder = new BooleanBuilder();
-        // 삭제되지 않은 주문만 조회
-        builder.and(order.isDeleted.eq(false));
-        // 내 주문만 조회
-        builder.and(order.customer.username.eq(username));
+        // QueryBuilder 생성
+        JPAQuery<Order> query = queryFactory
+            .selectFrom(order)
+            .join(order.orderItems, orderItem)
+            .join(orderItem.menu, menu)
+            .join(order.restaurant, restaurant)
+            .where(baseCondition);
 
-        // 음식점 이름 (부분 일치, 대소문자 무시)
-        if (searchDto.getRestaurantName() != null && !searchDto.getRestaurantName().isEmpty()) {
-            builder.and(order.restaurant.name.eq(searchDto.getRestaurantName()));
+        // 메뉴 이름이 들어온 경우 menu name 필터링 추가
+        if (menuName != null) {
+            query.where(menu.name.eq(menuName));
         }
 
-        // 주문 상태별 조회
-        if (searchDto.getStatus() != null) {
-            builder.and(order.status.eq(searchDto.getStatus()));
+        if (restaurantName != null) {
+            query.where(restaurant.name.eq(restaurantName));
         }
 
-        // 주문 정보 DTO로 매핑해서 페이징 처리된 결과 조회
-        List<OrderResponseDto> content = queryFactory
-            .select(Projections.constructor(
-                OrderResponseDto.class,
-                order.id,
-                order.customer.username,
-                order.restaurant.id,
-                order.address.id,
-                order.status,
-                order.totalPrice,
-                order.request,
-                order.createdAt,
-                order.updatedAt
-            ))
-            .from(order)
-            .where(builder)
+        //
+
+        // 주문 내역 조회 쿼리
+        List<Order> orders = query
+            .distinct()
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
 
-        // 총 결과 수 조회
-        long total = queryFactory
-            .select(order.id)
+        // 전체 건수 조회
+        Long total = queryFactory
+            .select(order.id.countDistinct())
             .from(order)
-            .where(builder)
-            .fetchCount();
+            .join(order.orderItems, orderItem)
+            .join(orderItem.menu, menu)
+            .join(order.restaurant, restaurant)
+            .where(baseCondition)
+            .fetchOne();
 
-        return new PageImpl<>(content, pageable, total);
+        return new PageImpl<>(orders, pageable, total != null ? total : 0);
+    }
+
+    private BooleanExpression customerUsernameEq(String username) {
+        return username != null ? order.customer.username.eq(username) : null;
     }
 }

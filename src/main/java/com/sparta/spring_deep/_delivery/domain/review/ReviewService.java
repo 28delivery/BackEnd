@@ -56,23 +56,16 @@ public class ReviewService {
 
     // 특정 음식점 리뷰 조회
     @Transactional(readOnly = true)
-    public Page<ReviewResponseDto> searchReviews(UUID restaurantId, ReviewSearchDto searchDto,
-        Pageable pageable) {
+    public Page<ReviewResponseDto> getReviews(UUID restaurantId, Pageable pageable) {
         log.info("특정 음식점 리뷰 조회");
 
-        // 음식점 ID가 존재하지 않으면 Exception 발생
         restaurantRepository.findByIdAndIsDeletedFalse(restaurantId)
-            .orElseThrow(ResourceNotFoundException::new);
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "음식점 리뷰 조회 : 해당 음식점 존재하지 않음. restaurant_id=" + restaurantId));
 
-        Page<ReviewResponseDto> reviewResponseDtos = reviewRepository.searchByOptionAndIsDeletedFalse(
-            restaurantId, searchDto, pageable);
+        Page<Review> reviews = reviewRepository.searchReviews(restaurantId, pageable);
 
-        // 검색 결과가 하나도 없으면 Exception 발생
-        if (reviewResponseDtos.isEmpty()) {
-            throw new ResourceNotFoundException();
-        }
-
-        return reviewResponseDtos;
+        return reviews.map(ReviewResponseDto::new);
     }
 
     // 리뷰 조회

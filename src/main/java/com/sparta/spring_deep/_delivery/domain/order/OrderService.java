@@ -149,22 +149,21 @@ public class OrderService {
         return new OrderDetailsResponseDto(order, orderItemList);
     }
 
+
     // 나의 주문 내역 조회
     @Transactional(readOnly = true)
-    public Page<OrderResponseDto> searchMyOrders(User user, OrderSearchDto searchDto,
-        Pageable pageable) {
+    public Page<OrderResponseDto> getMyOrders(User user, Pageable pageable,
+        String menu, String restaurant) {
         log.info("나의 주문 내역 조회");
 
-        // 내 주문 내역만 조회
-        Page<OrderResponseDto> myOrderResponseDto = orderRepository.searchMyOrdersByOptionAndIsDeletedFalse(
-            user.getUsername(), searchDto, pageable);
+        Page<Order> myOrderList = orderRepository.searchOrders(
+            user.getUsername(), pageable, menu, restaurant);
 
-        // 주문 내역이 비어있다면, Exception 발생
-        if (myOrderResponseDto.isEmpty()) {
+        if (myOrderList.isEmpty()) {
             throw new ResourceNotFoundException();
         }
 
-        return myOrderResponseDto;
+        return myOrderList.map(OrderResponseDto::new);
     }
 
     // 주문 취소 (5분 이내)

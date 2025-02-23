@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface ReviewRepositoryCustom {
 
-    Page<ReviewResponseDto> searchByOptionAndIsDeletedFalse(UUID restaurantId,
-        ReviewSearchDto searchDto, Pageable pageable);
+    Page<Review> searchReviews(UUID restaurantId, Pageable pageable);
 
 }
