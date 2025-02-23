@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -73,15 +74,14 @@ public class OrderController {
     @GetMapping("/orders/me")
     public ResponseEntity<Page<OrderResponseDto>> getMyOrders(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @RequestParam(required = false, defaultValue = "null") String restaurantName,
-        @RequestParam(required = false, defaultValue = "null") String menuName,
-        @RequestParam(required = false, defaultValue = "null") String status,
-        @PageableDefault(size = 10, page = 0) Pageable pageable
+        @PageableDefault(size = 10, page = 0, direction = Direction.DESC, sort = "createdAt") Pageable pageable,
+        @RequestParam(required = false, defaultValue = "null") String menu,
+        @RequestParam(required = false, defaultValue = "null") String restaurant
     ) {
         log.info("나의 주문 내역 조회 요청 ");
 
         Page<OrderResponseDto> responseDtos = orderService.getMyOrders(userDetails.getUser(),
-            restaurantName, menuName, status, pageable);
+            pageable, menu, restaurant);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDtos);
     }

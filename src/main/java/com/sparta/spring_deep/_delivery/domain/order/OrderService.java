@@ -149,14 +149,15 @@ public class OrderService {
         return new OrderDetailsResponseDto(order, orderItemList);
     }
 
+
     // 나의 주문 내역 조회
     @Transactional(readOnly = true)
-    public Page<OrderResponseDto> getMyOrders(User user, String restaurantName,
-        String menuName, String status, Pageable pageable) {
+    public Page<OrderResponseDto> getMyOrders(User user, Pageable pageable,
+        String menu, String restaurant) {
         log.info("나의 주문 내역 조회");
 
-        Page<Order> myOrderList = orderRepository.findAllByCustomerUsernameAndIsDeletedFalse(
-            user.getUsername(), restaurantName, menuName, status, pageable);
+        Page<Order> myOrderList = orderRepository.searchOrders(
+            user.getUsername(), pageable, menu, restaurant);
 
         if (myOrderList.isEmpty()) {
             throw new ResourceNotFoundException();
