@@ -30,7 +30,7 @@ jobs:
           touch ./src/main/resources/application.yml
           echo "${{ secrets.APP_YML_BASE64 }}" | base64 --decode > ./src/main/resources/application.yml
           find src
-
+          
       - name:
           Debug: check placeholders in APP_YML_BASE64
         run: |
