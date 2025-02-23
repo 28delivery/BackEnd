@@ -1,10 +1,12 @@
 package com.sparta.spring_deep._delivery.domain.menu;
 
-import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,14 +41,12 @@ public class MenuController {
     // restaurant_id 기반 모든 메뉴 조회
     @GetMapping("/menus/{restaurantId}")
     public ResponseEntity<Page<MenuResponseDto>> getRestaurantAllMenus(
-        @PathVariable(name = "restaurantId") Restaurant restaurantId,
-        @RequestParam(required = false) String name,
-        @RequestParam(defaultValue = "createdAt") String sortBy,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size
+        @PathVariable(name = "restaurantId") UUID restaurantId,
+        @RequestParam(required = false) String menuName,
+        @PageableDefault(size = 10, page = 0, direction = Direction.DESC, sort = "createdAt") Pageable pageable
     ) {
-        Page<MenuResponseDto> responseDtoPage = menuService.getAllMenus(restaurantId, name, sortBy,
-            page, size);
+        Page<MenuResponseDto> responseDtoPage = menuService.getAllMenus(restaurantId, menuName,
+            pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoPage);
     }
 

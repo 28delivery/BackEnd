@@ -16,10 +16,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,18 +65,15 @@ public class MenuService {
 
     // restaurant_id 기반 모든 메뉴 조회
     public Page<MenuResponseDto> getAllMenus(
-        Restaurant restaurantId,
-        String name,
-        String sortBy,
-        int page, int size
+        UUID restaurantId,
+        String menuName,
+        Pageable pageable
     ) {
         log.info("restaurant_id 기반 모든 메뉴 조회");
 
-        int pageSize = (size == 10 || size == 30 || size == 50) ? size : 10;
-
-        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Direction.DESC, sortBy));
-
-        Page<Menu> menus = menuRepository.findAllByRestaurantIdAndIsDeletedFalse(restaurantId,
+        // Query DSL 로 처리
+        Page<Menu> menus = menuRepository.searchMenusByRestaurantId(restaurantId,
+            menuName,
             pageable);
 
         return menus.map(MenuResponseDto::new);
