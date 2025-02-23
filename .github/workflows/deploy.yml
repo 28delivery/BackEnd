@@ -24,21 +24,33 @@ jobs:
       - name: Grant execute permission for gradlew # 권한으로 인해 넣었던 걸로 기억. 테스트 필요
         run: chmod +x gradlew
 
-      - name: add application-yml # yml파일 추가
+      - name: add application-yml # yml 경로 및 파일 추가
         run: |
           mkdir -p ./src/main/resources
           touch ./src/main/resources/application.yml
           echo "${{ secrets.APP_YML_BASE64 }}" | base64 --decode > ./src/main/resources/application.yml
           find src
 
-      - name: add application-yml
+      - name:
+          Debug: check placeholders in APP_YML_BASE64
+        run: |
+          echo "${{ secrets.APP_YML }}" > checkfile.yml
+
+          echo "===== Checking whether JWT_EXP, JWT_KEY 등이 들어있는지 ====="
+          grep -n 'jwt:' checkfile.yml || true
+          grep -n 'expiration: ${JWT_EXP}' checkfile.yml || true
+          grep -n 'secret:' checkfile.yml || true
+
+          echo "===== Checking done. ====="
+
+      - name: check application-yml # yml 내용 확인
         run: |
           echo "${{ secrets.APP_YML }}" > ./src/main/resources/application.yml
           echo "==== application.yml 내용 확인 ===="
           cat src/main/resources/application.yml
 
       - name: Build with Gradle # 체크아웃한 코드들을 기반으로 그래들 빌드
-        run: ./gradlew build -x test
+        run: ./gradlew build
 
       - name: Check resources
         run: |
