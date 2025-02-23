@@ -1,12 +1,12 @@
 package com.sparta.spring_deep._delivery.domain.review;
 
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
-import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -46,17 +45,13 @@ public class ReviewController {
     @GetMapping("/reviews/{restaurantId}/search")
     public ResponseEntity<Page<ReviewResponseDto>> searchReview(
         @PathVariable String restaurantId,
-        @PageableDefault(size = 10, page = 0) Pageable pageable,
-        @RequestParam(defaultValue = "false") boolean isAsc,
-        @RequestParam(required = false, defaultValue = "null") int rating,
-        @RequestParam(required = false, defaultValue = "null") LocalDateTime createDate) {
+        @PageableDefault(sort = "createdAt", size = 10, page = 0, direction = Direction.DESC) Pageable pageable
+    ) {
 
         log.info("특정 음식점 리뷰 조회 - restaurantId :{}", restaurantId);
 
         Page<ReviewResponseDto> responseDtos = reviewService.getReviews(
-            UUID.fromString(restaurantId), pageable.getPageNumber(),
-            pageable.getPageSize(), sortBy,
-            isAsc);
+            UUID.fromString(restaurantId), pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDtos);
     }
