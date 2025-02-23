@@ -6,7 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface OrderAdminRepository extends JpaRepository<Order, UUID> {
+public interface OrderAdminRepository extends JpaRepository<Order, UUID>,
+    OrderAdminRepositoryCustom {
 
     // /admin/orders
     Page<Order> findAllByCustomerUsername(String username, Pageable pageable);

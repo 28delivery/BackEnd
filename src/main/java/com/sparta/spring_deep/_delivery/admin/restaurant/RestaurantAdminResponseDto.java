@@ -14,11 +14,13 @@ import lombok.Setter;
 public class RestaurantAdminResponseDto {
 
     private UUID id;
-    private String owner_id;
+    private String ownerId;
     private CategoryEnum category;
     private String name;
     private String roadAddr;
+    private String jibunAddr;
     private String detailAddr;
+    private String engAddr;
     private String phone;
     private LocalDateTime createdAt;
     private String createdBy;
@@ -30,7 +32,7 @@ public class RestaurantAdminResponseDto {
 
     public RestaurantAdminResponseDto(Restaurant restaurant) {
         this.id = restaurant.getId();
-        this.owner_id = restaurant.getOwner().getUsername();
+        this.ownerId = restaurant.getOwner().getUsername();
         this.category = restaurant.getCategory();
         this.name = restaurant.getName();
         this.roadAddr = restaurant.getRestaurantAddress().getRoadAddr();

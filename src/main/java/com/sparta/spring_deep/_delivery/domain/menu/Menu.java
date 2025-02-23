@@ -30,7 +30,7 @@ public class Menu extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "restaurant_id", nullable = false)
-    private Restaurant restaurantId;
+    private Restaurant restaurant;
 
     @Column(nullable = false)
     private String name;
@@ -48,10 +48,10 @@ public class Menu extends BaseEntity {
     private Boolean isDeleted = false;
 
     @Builder
-    public Menu(Restaurant restaurantId, String name, String description, BigDecimal price,
+    public Menu(Restaurant restaurant, String name, String description, BigDecimal price,
         Boolean isHidden, boolean isDeleted, User user) {
         super(user.getUsername());
-        this.restaurantId = restaurantId;
+        this.restaurant = restaurant;
         this.name = name;
         this.description = description;
         this.price = price;

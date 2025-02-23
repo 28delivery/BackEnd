@@ -40,18 +40,18 @@ public class Address extends BaseEntity {
 
     @NotNull
     @Column(name = "address_name")
-    private String address_name;
+    private String addressName;
 
     public Address(AddressRequestDto requestDto, User user) {
         super(user.getUsername());
         this.user = user;
         this.address = requestDto.getAddress();
-        this.address_name = requestDto.getAddress_name();
+        this.addressName = requestDto.getAddressName();
     }
 
     public void updateAddress(AddressRequestDto requestDto) {
         this.address = requestDto.getAddress();
-        this.address_name = requestDto.getAddress_name();
+        this.addressName = requestDto.getAddressName();
     }
 
 }

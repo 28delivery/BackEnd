@@ -7,6 +7,7 @@ import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsRe
 import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItem;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
+import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import jakarta.persistence.EntityExistsException;
 import java.util.List;
 import java.util.UUID;
@@ -23,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class OrderAdminService {
 
-    private final OrderAdminRepository orderAdminRepositoryRepository;
+    private final OrderAdminRepository orderAdminRepository;
     private final OrderItemAdminRepository orderItemAdminRepository;
 
     // 주문 내역 검색
@@ -38,7 +39,7 @@ public class OrderAdminService {
         Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        Page<Order> ownerOrderList = orderAdminRepositoryRepository.findAllByCustomerUsername(
+        Page<Order> ownerOrderList = orderAdminRepository.findAllByCustomerUsername(
             user.getUsername(),
             pageable);
 
@@ -52,13 +53,25 @@ public class OrderAdminService {
         if (!(user.getRole().equals(UserRole.ADMIN))) {
             throw new IllegalStateException("Only admin can get order details");
         }
-        Order order = orderAdminRepositoryRepository.findById(orderId)
+        Order order = orderAdminRepository.findById(orderId)
             .orElseThrow(() -> new EntityExistsException("order not found"));
 
         List<OrderItem> orderItemList = orderItemAdminRepository.findAllByOrderId(
             order.getId());
 
         return new OrderDetailsResponseDto(order, orderItemList);
+    }
+
+    public Page<OrderResponseDto> searchOrders(OrderAdminSearchDto searchDto, Pageable pageable) {
+        Page<OrderResponseDto> responseDtos = orderAdminRepository.searchByOption(searchDto,
+            pageable);
+
+        // 검색 결과 비었으면 Exception 반환
+        if (responseDtos.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+
+        return responseDtos;
     }
 
 //    // 주문 상태 변경

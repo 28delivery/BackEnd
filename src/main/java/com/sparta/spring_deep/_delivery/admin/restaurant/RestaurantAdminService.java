@@ -125,7 +125,14 @@ public class RestaurantAdminService {
         RestaurantAdminSearchDto restaurantAdminSearchDto, Pageable pageable) {
         log.info("음식점 검색");
 
-        restaurantAdminRepository.findBySearchOptionAndIsDeletedFalse(restaurantAdminSearchDto,
-            pageable);
+        Page<RestaurantAdminResponseDto> responseDtos = restaurantAdminRepository.searchByOption(
+            restaurantAdminSearchDto, pageable);
+
+        // 검색 결과가 비어있으면 Exception 출력
+        if (responseDtos.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+
+        return null;
     }
 }

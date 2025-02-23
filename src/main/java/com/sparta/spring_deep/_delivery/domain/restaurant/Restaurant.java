@@ -8,9 +8,8 @@ import com.sparta.spring_deep._delivery.common.BaseEntity;
 import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,9 +23,7 @@ import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UuidGenerator;
-import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter
@@ -49,9 +46,8 @@ public class Restaurant extends BaseEntity {
     @Size(max = 100)
     private String name;
 
-    @Enumerated(EnumType.STRING)
-    @JoinColumn(name = "category", nullable = false, columnDefinition = "p_restaurant_category_enum")
-    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Convert(converter = CategoryEnumConverter.class)
+    @Column(name = "category", nullable = false, columnDefinition = "p_restaurant_category_enum")
     private CategoryEnum category;
 
     @NotNull

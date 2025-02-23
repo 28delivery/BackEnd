@@ -87,12 +87,19 @@ public class RestaurantService {
     }
 
     // 음식점 검색
-    public Page<Restaurant> searchRestaurant(RestaurantSearchDto restaurantSearchDto,
+    public Page<RestaurantResponseDto> searchRestaurant(RestaurantSearchDto restaurantSearchDto,
         Pageable pageable) {
         log.info("음식점 검색");
 
         // Pageable 객체와 함께 검색
-        return restaurantRepository.searchByOptionAndIsDeletedFalse(restaurantSearchDto,
-            pageable);
+        Page<RestaurantResponseDto> restaurantResponseDto = restaurantRepository.searchByOptionAndIsDeletedFalse(
+            restaurantSearchDto, pageable);
+
+        // 검색 결과가 하나도 없으면 Exception 발생
+        if (restaurantResponseDto.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+
+        return restaurantResponseDto;
     }
 }

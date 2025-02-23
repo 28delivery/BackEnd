@@ -2,6 +2,7 @@ package com.sparta.spring_deep._delivery.admin.review;
 
 import com.sparta.spring_deep._delivery.domain.review.Review;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -9,21 +10,23 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReviewAdminResponseDto {
 
-    private String id;
-    private String orderId;
+    private UUID id;
+    private UUID orderId;
+    private UUID restaurantId;
     private String userId;
     private String comment;
-    private int rating;
+    private Integer rating;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
     private String createdBy;
     private String updatedBy;
     private String deletedBy;
+    private Boolean isDeleted;
 
     public ReviewAdminResponseDto(Review review) {
-        this.id = review.getId().toString();
-        this.orderId = review.getOrder().getId().toString();
+        this.id = review.getId();
+        this.orderId = review.getOrder().getId();
         this.userId = review.getUser().getUsername();
         this.comment = review.getComment();
         this.rating = review.getRating();

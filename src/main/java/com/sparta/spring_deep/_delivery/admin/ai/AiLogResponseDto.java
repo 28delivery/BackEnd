@@ -10,7 +10,7 @@ import lombok.Data;
 public class AiLogResponseDto {
 
     private UUID aiLogId;
-    private Restaurant restaurantId;
+    private Restaurant restaurant;
     private UUID menuId;
     private String request;
     private String response;
@@ -24,7 +24,7 @@ public class AiLogResponseDto {
 
     public AiLogResponseDto(Ai aiLog) {
         this.aiLogId = aiLog.getId();
-        this.restaurantId = aiLog.getMenu().getRestaurantId();
+        this.restaurant = aiLog.getMenu().getRestaurant();
         this.menuId = aiLog.getMenu().getId();
         this.request = aiLog.getRequest();
         this.response = aiLog.getResponse();

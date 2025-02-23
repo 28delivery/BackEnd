@@ -7,7 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ReviewAdminRepository extends JpaRepository<Review, UUID> {
+public interface ReviewAdminRepository extends JpaRepository<Review, UUID>,
+    ReviewAdminRepositoryCustom {
 
     Page<Review> findByOrderIdInAndIsDeletedFalse(List<UUID> orderIds, Pageable pageable);
 }

@@ -4,7 +4,9 @@ import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.sparta.spring_deep._delivery.exception.DuplicateResourceException;
+import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
+import com.sparta.spring_deep._delivery.exception.UnauthorizedAccessException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,19 +31,27 @@ public class UserAdminService {
         User adminUser = userDetails.getUser();
 
         if (!UserRole.ADMIN.equals(userDetails.getUser().getRole())) {
-            throw new IllegalArgumentException("Admin privileges required");
+            throw new UnauthorizedAccessException(
+                "You do not have permission to access this resource");
         }
 
         return adminUser.getUsername();
     }
 
-    // 사용자 전체 조회
-    public Page<UserAdminResponseDto> getAllUsers(UserSearchDto searchDto, Pageable pageable) {
+    // 사용자 검색 및 조회
+    public Page<UserAdminResponseDto> searchUsers(UserAdminSearchDto searchDto, Pageable pageable) {
         // admin 권한 체크
         checkAdminRole();
 
-        Page<User> userPage = userRepository.findAll(pageable);
-        return userPage.map(UserAdminResponseDto::new);
+        Page<UserAdminResponseDto> responseDtos = userRepository.searchByOption(searchDto,
+            pageable);
+
+        // 검색 결과가 비어있을 경우 Exception 발생
+        if (responseDtos.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+
+        return responseDtos;
     }
 
     // 사용자 상세 조회
@@ -51,8 +61,7 @@ public class UserAdminService {
 
         // username 체크
         User user = userRepository.findByUsernameAndIsDeletedFalse(username)
-            .orElseThrow(
-                () -> new EntityNotFoundException("User not found with username: " + username));
+            .orElseThrow(ResourceNotFoundException::new);
 
         return new UserAdminResponseDto(user);
     }
@@ -63,12 +72,13 @@ public class UserAdminService {
         // admin 권한 체크
         String adminUsername = checkAdminRole();
 
-        // 이메일 중복 검사
+        // 유저네임 중복 검사
         if (userRepository.existsByUsername(requestDto.getUsername())) {
-            throw new IllegalArgumentException("Username already exists");
+            throw new DuplicateResourceException("Username already exists");
         }
+        // 이메일 중복 검사
         if (userRepository.existsByEmail(requestDto.getEmail())) {
-            throw new IllegalArgumentException("Email already exists");
+            throw new DuplicateResourceException("Email already exists");
         }
 
         String encodedPassword = passwordEncoder.encode("defaultPassword");
@@ -98,14 +108,13 @@ public class UserAdminService {
 
         // username 체크
         User user = userRepository.findByUsernameAndIsDeletedFalse(username)
-            .orElseThrow(
-                () -> new EntityNotFoundException("User not found with username: " + username));
+            .orElseThrow(ResourceNotFoundException::new);
 
         // 이메일 중복 체크 및 업데이트
         if (requestDto.getEmail() != null) {
             if (!user.getEmail().equals(requestDto.getEmail()) && userRepository
                 .existsByEmail(requestDto.getEmail())) {
-                throw new IllegalArgumentException("Email already exists");
+                throw new DuplicateResourceException("Email already exists");
             }
             user.setEmail(requestDto.getEmail());
         }
@@ -134,8 +143,7 @@ public class UserAdminService {
 
         // username 체크
         User user = userRepository.findByUsernameAndIsDeletedFalse(username)
-            .orElseThrow(
-                () -> new EntityNotFoundException("User not found with username: " + username));
+            .orElseThrow(ResourceNotFoundException::new);
 
         user.setIsDeleted(true);
         user.setDeletedBy(adminUsername);

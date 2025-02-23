@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RestaurantAdminRepository extends JpaRepository<Restaurant, UUID> {
+public interface RestaurantAdminRepository extends JpaRepository<Restaurant, UUID>,
+    RestaurantAdminRepositoryCustom {
 
     Optional<Restaurant> findByIdAndIsDeletedFalse(UUID id);
 

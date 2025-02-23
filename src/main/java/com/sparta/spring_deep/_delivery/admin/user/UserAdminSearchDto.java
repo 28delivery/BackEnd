@@ -1,16 +1,18 @@
 package com.sparta.spring_deep._delivery.admin.user;
 
+import com.sparta.spring_deep._delivery.common.AdminSearchDto;
 import com.sparta.spring_deep._delivery.domain.user.entity.IsPublic;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
-import lombok.Getter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@Getter
+@EqualsAndHashCode(callSuper = true)
+@Data
 @NoArgsConstructor
-public class UserSearchDto {
+public class UserAdminSearchDto extends AdminSearchDto {
 
     private String username;
-    private String password;
     private String email;
     private UserRole role;
     private IsPublic isPublic;

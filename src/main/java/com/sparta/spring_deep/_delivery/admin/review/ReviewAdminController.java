@@ -8,11 +8,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,7 +30,7 @@ public class ReviewAdminController {
 
     // 음식점 내 모든 리뷰 조회
     @GetMapping("/reviews/{restaurantId}/search")
-    public ResponseEntity<Page<ReviewResponseDto>> searchReview(
+    public ResponseEntity<Page<ReviewResponseDto>> searchRestaurantReview(
         @AuthenticationPrincipal User admin,
         @PathVariable String restaurantId,
         @PageableDefault(size = 10, page = 0) Pageable pageable,
@@ -43,6 +45,19 @@ public class ReviewAdminController {
             pageable.getPageNumber(),
             pageable.getPageSize(), sortBy,
             isAsc);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtos);
+    }
+
+    // 모든 리뷰 조회
+    @GetMapping("/reviews/search")
+    public ResponseEntity<Page<ReviewAdminResponseDto>> searchReview(
+        @ModelAttribute ReviewAdminSearchDto searchDto,
+        @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        log.info("Get All Reviews");
+
+        Page<ReviewAdminResponseDto> responseDtos = reviewAdminService.searchReviews(
+            searchDto, pageable);
+
         return ResponseEntity.status(HttpStatus.OK).body(responseDtos);
     }
 

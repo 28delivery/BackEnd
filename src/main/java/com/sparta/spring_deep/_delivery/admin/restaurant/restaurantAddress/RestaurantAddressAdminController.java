@@ -1,12 +1,14 @@
 package com.sparta.spring_deep._delivery.admin.restaurant.restaurantAddress;
 
 
+import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,8 +29,9 @@ public class RestaurantAddressAdminController {
     // 생성
     @PostMapping("/restaurantAddresses")
     public ResponseEntity<RestaurantAddressAdminResponseDto> createAddress(
-        @RequestBody RestaurantAddressAdminRequestDto dto) {
-        RestaurantAddressAdminResponseDto response = service.create(dto);
+        @RequestBody RestaurantAddressAdminRequestDto dto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        RestaurantAddressAdminResponseDto response = service.create(dto, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -50,15 +53,17 @@ public class RestaurantAddressAdminController {
     // 수정
     @PutMapping("/restaurantAddresses/{id}")
     public ResponseEntity<RestaurantAddressAdminResponseDto> updateAddress(@PathVariable UUID id,
-        @RequestBody RestaurantAddressAdminRequestDto dto) {
-        RestaurantAddressAdminResponseDto response = service.update(id, dto);
+        @RequestBody RestaurantAddressAdminRequestDto dto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        RestaurantAddressAdminResponseDto response = service.update(id, dto, userDetails);
         return ResponseEntity.ok(response);
     }
 
     // 삭제
     @DeleteMapping("/restaurantAddresses/{id}")
-    public ResponseEntity<RestaurantAddressAdminResponseDto> deleteAddress(@PathVariable UUID id) {
-        RestaurantAddressAdminResponseDto response = service.delete(id);
+    public ResponseEntity<RestaurantAddressAdminResponseDto> deleteAddress(@PathVariable UUID id,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        RestaurantAddressAdminResponseDto response = service.delete(id, userDetails);
         return ResponseEntity.ok(response);
     }
 

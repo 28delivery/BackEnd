@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface AddressRepository extends JpaRepository<Address, UUID> {
+public interface AddressRepository extends JpaRepository<Address, UUID>, AddressRepositoryCustom {
 
     // 특정 주소 ID로 조회 (단건 조회)
     Optional<Address> findById(UUID id);

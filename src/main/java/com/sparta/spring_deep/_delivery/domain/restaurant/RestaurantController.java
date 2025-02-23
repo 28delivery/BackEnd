@@ -64,12 +64,12 @@ public class RestaurantController {
 
     // 음식점 검색
     @GetMapping("/search")
-    public ResponseEntity<Page<Restaurant>> searchRestaurant(
+    public ResponseEntity<Page<RestaurantResponseDto>> searchRestaurant(
         @ModelAttribute RestaurantSearchDto searchDto,
         @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
         log.info("음식점 검색");
 
-        Page<Restaurant> responses = restaurantManageService.searchRestaurant(
+        Page<RestaurantResponseDto> responses = restaurantManageService.searchRestaurant(
             searchDto, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(responses);

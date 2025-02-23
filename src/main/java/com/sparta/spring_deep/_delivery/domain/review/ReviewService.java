@@ -12,16 +12,11 @@ import com.sparta.spring_deep._delivery.exception.DeletedDataAccessException;
 import com.sparta.spring_deep._delivery.exception.OperationNotAllowedException;
 import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import com.sparta.spring_deep._delivery.exception.UnauthorizedAccessException;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -61,29 +56,23 @@ public class ReviewService {
 
     // 특정 음식점 리뷰 조회
     @Transactional(readOnly = true)
-    public Page<ReviewResponseDto> getReviews(UUID restaurantId, int page, int size,
-        String sortBy, boolean isAsc) {
+    public Page<ReviewResponseDto> searchReviews(UUID restaurantId, ReviewSearchDto searchDto,
+        Pageable pageable) {
         log.info("특정 음식점 리뷰 조회");
 
+        // 음식점 ID가 존재하지 않으면 Exception 발생
         restaurantRepository.findByIdAndIsDeletedFalse(restaurantId)
-            .orElseThrow(() -> new ResourceNotFoundException(
-                "음식점 리뷰 조회 : 해당 음식점 존재하지 않음. restaurant_id=" + restaurantId));
+            .orElseThrow(ResourceNotFoundException::new);
 
-        Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<ReviewResponseDto> reviewResponseDtos = reviewRepository.searchByOptionAndIsDeletedFalse(
+            restaurantId, searchDto, pageable);
 
-        List<Order> orders = orderRepository.findAllByRestaurantIdAndIsDeletedFalse(restaurantId);
-
-        if (orders.isEmpty()) {
+        // 검색 결과가 하나도 없으면 Exception 발생
+        if (reviewResponseDtos.isEmpty()) {
             throw new ResourceNotFoundException();
         }
 
-        List<UUID> orderIds = orders.stream().map(Order::getId).collect(Collectors.toList());
-
-        Page<Review> reviewList = reviewRepository.findByOrderIdInAndIsDeletedFalse(orderIds,
-            pageable);
-
-        return reviewList.map(ReviewResponseDto::new);
+        return reviewResponseDtos;
     }
 
     // 리뷰 조회

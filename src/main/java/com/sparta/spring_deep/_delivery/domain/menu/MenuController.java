@@ -1,21 +1,23 @@
 package com.sparta.spring_deep._delivery.domain.menu;
 
-import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,17 +38,29 @@ public class MenuController {
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
-    // restaurant_id 기반 모든 메뉴 조회
-    @GetMapping("/menus/{restaurantId}")
-    public ResponseEntity<Page<MenuResponseDto>> getRestaurantAllMenus(
-        @PathVariable(name = "restaurantId") Restaurant restaurantId,
-        @RequestParam(required = false) String name,
-        @RequestParam(defaultValue = "createdAt") String sortBy,
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size
+//    // restaurant_id 기반 모든 메뉴 조회
+//    @GetMapping("/menus/{restaurantId}")
+//    public ResponseEntity<Page<MenuResponseDto>> getRestaurantAllMenus(
+//        @PathVariable(name = "restaurantId") Restaurant restaurantId,
+//        @RequestParam(required = false) String name,
+//        @RequestParam(defaultValue = "createdAt") String sortBy,
+//        @RequestParam(defaultValue = "0") int page,
+//        @RequestParam(defaultValue = "10") int size
+//    ) {
+//        Page<MenuResponseDto> responseDtoPage = menuService.getAllMenus(restaurantId, name, sortBy,
+//            page, size);
+//        return ResponseEntity.status(HttpStatus.OK).body(responseDtoPage);
+//    }
+
+    // restaurant_id 기반 메뉴 검색 및 조회
+    @GetMapping("/menus/{restaurantId}/search")
+    public ResponseEntity<Page<MenuResponseDto>> searchMenus(
+        @PathVariable UUID restaurantId,
+        @ModelAttribute MenuSearchDto searchDto,
+        @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
     ) {
-        Page<MenuResponseDto> responseDtoPage = menuService.getAllMenus(restaurantId, name, sortBy,
-            page, size);
+        Page<MenuResponseDto> responseDtoPage = menuService.searchMenus(restaurantId, searchDto,
+            pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoPage);
     }
 
@@ -80,4 +94,5 @@ public class MenuController {
         MenuAiResponseDto responseDto = menuService.aiDescription(menuId, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
+
 }

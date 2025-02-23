@@ -16,10 +16,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,7 +51,7 @@ public class MenuService {
         AuthTools.roleCheck(userDetails, restaurant, "메뉴 추가");
 
         Menu menu = Menu.builder()
-            .restaurantId(restaurant)
+            .restaurant(restaurant)
             .name(requestDto.getName())
             .description(requestDto.getDescription())
             .price(requestDto.getPrice())
@@ -66,23 +63,38 @@ public class MenuService {
         return new MenuResponseDto(menu);
     }
 
-    // restaurant_id 기반 모든 메뉴 조회
-    public Page<MenuResponseDto> getAllMenus(
-        Restaurant restaurantId,
-        String name,
-        String sortBy,
-        int page, int size
-    ) {
-        log.info("restaurant_id 기반 모든 메뉴 조회");
+//    // restaurant_id 기반 모든 메뉴 조회
+//    public Page<MenuResponseDto> getAllMenus(
+//        Restaurant restaurantId,
+//        String name,
+//        String sortBy,
+//        int page, int size
+//    ) {
+//        log.info("restaurant_id 기반 모든 메뉴 조회");
+//
+//        int pageSize = (size == 10 || size == 30 || size == 50) ? size : 10;
+//
+//        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Direction.DESC, sortBy));
+//
+//        Page<Menu> menus = menuRepository.findAllByRestaurantIdAndIsDeletedFalse(restaurantId,
+//            pageable);
+//
+//        return menus.map(MenuResponseDto::new);
+//    }
 
-        int pageSize = (size == 10 || size == 30 || size == 50) ? size : 10;
+    public Page<MenuResponseDto> searchMenus(UUID restaurantId, MenuSearchDto searchDto,
+        Pageable pageable) {
+        log.info("restaurant_id 기반 모든 메뉴 검색 및 조회");
 
-        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Direction.DESC, sortBy));
+        Page<MenuResponseDto> responseDto = menuRepository.searchByOptionAndIsDeletedFalse(
+            restaurantId, searchDto, pageable);
 
-        Page<Menu> menus = menuRepository.findAllByRestaurantIdAndIsDeletedFalse(restaurantId,
-            pageable);
+        // 검색 및 조회 결과가 비어있다면 Exception 발생
+        if (responseDto.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
 
-        return menus.map(MenuResponseDto::new);
+        return responseDto;
     }
 
     // 메뉴 수정
@@ -100,7 +112,7 @@ public class MenuService {
         User user = userDetails.getUser();
 
         Restaurant restaurant = restaurantRepository.findByIdAndIsDeletedFalse(
-                menu.getRestaurantId().getId())
+                menu.getRestaurant().getId())
             .orElseThrow(ResourceNotFoundException::new);
 
         // 사장님으로 로그인 했는지 확인
@@ -131,7 +143,7 @@ public class MenuService {
             .orElseThrow(ResourceNotFoundException::new);
 
         Restaurant restaurant = restaurantRepository.findByIdAndIsDeletedFalse(
-                menu.getRestaurantId().getId())
+                menu.getRestaurant().getId())
             .orElseThrow(ResourceNotFoundException::new);
 
         User user = userDetails.getUser();
@@ -160,7 +172,7 @@ public class MenuService {
         User user = userDetails.getUser();
 
         Restaurant restaurant = restaurantRepository.findByIdAndIsDeletedFalse(
-                menu.getRestaurantId().getId())
+                menu.getRestaurant().getId())
             .orElseThrow(ResourceNotFoundException::new);
 
         // 사장님으로 로그인 했는지 확인

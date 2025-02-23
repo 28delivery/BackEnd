@@ -6,6 +6,7 @@ import com.sparta.spring_deep._delivery.domain.review.Review;
 import com.sparta.spring_deep._delivery.domain.review.ReviewResponseDto;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
+import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -50,6 +51,19 @@ public class ReviewAdminService {
             pageable);
 
         return reviewList.map(ReviewResponseDto::new);
+    }
+
+    public Page<ReviewAdminResponseDto> searchReviews(ReviewAdminSearchDto searchDto,
+        Pageable pageable) {
+        Page<ReviewAdminResponseDto> responseDtos = reviewAdminRepository.searchByOption(searchDto,
+            pageable);
+
+        // 리뷰 검색 및 조회 값이 비어있다면 Exception 발생
+        if (responseDtos.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+
+        return responseDtos;
     }
 
 //    // 리뷰 삭제

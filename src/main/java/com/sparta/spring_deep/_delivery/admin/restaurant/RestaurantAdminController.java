@@ -81,7 +81,7 @@ public class RestaurantAdminController {
     @GetMapping("/search")
     public ResponseEntity<Page<RestaurantAdminResponseDto>> searchRestaurant(
         @ModelAttribute RestaurantAdminSearchDto restaurantAdminSearchDto,
-        @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+        @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
 
         Page<RestaurantAdminResponseDto> responseDtos = restaurantAdminService.searchRestaurant(
             restaurantAdminSearchDto, pageable);

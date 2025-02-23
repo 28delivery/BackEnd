@@ -62,7 +62,7 @@ public class RestaurantManageService {
     }
 
     // 음식점 검색
-    public Page<Restaurant> searchRestaurant(RestaurantSearchDto restaurantSearchDto,
+    public Page<RestaurantResponseDto> searchRestaurant(RestaurantSearchDto restaurantSearchDto,
         Pageable pageable) {
         return restaurantService.searchRestaurant(restaurantSearchDto, pageable);
     }
