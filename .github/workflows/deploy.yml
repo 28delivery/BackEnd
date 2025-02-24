@@ -1,15 +1,14 @@
 name: backend
 
 on:
-  push:
-    branches:
-      - release
   pull_request:
+    types: [ closed ]
     branches:
       - dev
 
 jobs:
   build-and-test:
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
