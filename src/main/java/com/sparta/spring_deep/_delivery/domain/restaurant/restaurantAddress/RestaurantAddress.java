@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.util.Map;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
@@ -69,6 +70,7 @@ public class RestaurantAddress extends BaseEntity {
     @Column(name = "buld_slno", length = 50, nullable = false)
     private String buldSlno;
 
+    @Builder
     public RestaurantAddress(Map<String, Object> resultsJuso, String detailAddr, String username) {
         super(username);
         this.roadAddr = resultsJuso.get("roadAddr").toString();

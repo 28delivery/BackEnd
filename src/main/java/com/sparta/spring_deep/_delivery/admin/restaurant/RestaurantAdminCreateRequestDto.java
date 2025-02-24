@@ -1,10 +1,10 @@
 package com.sparta.spring_deep._delivery.admin.restaurant;
 
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant.CategoryEnum;
-import lombok.Getter;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-@Getter
+@Data
 @RequiredArgsConstructor
 public class RestaurantAdminCreateRequestDto {
 

@@ -21,6 +21,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
@@ -66,6 +67,17 @@ public class Restaurant extends BaseEntity {
         this.restaurantAddress = restaurantAddress;
     }
 
+    @Builder
+    public Restaurant(User owner, String name, CategoryEnum category,
+        RestaurantAddress restaurantAddress, String phone) {
+        super(owner.getUsername());
+        this.owner = owner;
+        this.name = name;
+        this.category = category;
+        this.restaurantAddress = restaurantAddress;
+        this.phone = phone;
+    }
+
     public void UpdateRestaurant(RestaurantRequestDto restaurantRequestDto,
         RestaurantAddress restaurantAddress, String username) {
         this.category = restaurantRequestDto.getCategory();
@@ -100,5 +112,4 @@ public class Restaurant extends BaseEntity {
             return label;
         }
     }
-
 }
