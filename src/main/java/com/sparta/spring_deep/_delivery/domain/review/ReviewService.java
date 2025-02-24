@@ -1,52 +1,45 @@
 package com.sparta.spring_deep._delivery.domain.review;
 
+import static com.sparta.spring_deep._delivery.util.AuthTools.ownerCheck;
+
 import com.sparta.spring_deep._delivery.domain.order.Order;
 import com.sparta.spring_deep._delivery.domain.order.OrderRepository;
 import com.sparta.spring_deep._delivery.domain.order.OrderStatusEnum;
+import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
-import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
-import jakarta.persistence.EntityExistsException;
-import java.util.List;
+import com.sparta.spring_deep._delivery.exception.DeletedDataAccessException;
+import com.sparta.spring_deep._delivery.exception.OperationNotAllowedException;
+import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "ReviewService")
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final OrderRepository orderRepository;
+    private final RestaurantRepository restaurantRepository;
 
     // 리뷰 작성
     public ReviewResponseDto createReview(ReviewRequestDto requestDto, User user) {
-        if (!user.getRole().equals(UserRole.CUSTOMER)) {
-            throw new AccessDeniedException(
-                "create review only for customer. your role is " + user.getRole());
-        }
+        log.info("리뷰 작성");
 
-        Order order = orderRepository.findById(requestDto.getOrderId())
-            .orElseThrow(() -> new EntityExistsException("주문을 찾을 수 없습니다."));
+        Order order = orderRepository.findByIdAndIsDeletedFalse(requestDto.getOrderId())
+            .orElseThrow(ResourceNotFoundException::new);
 
-        if (!order.getCustomer().getUsername().equals(user.getUsername())) {
-            throw new AccessDeniedException("주문자만 리뷰를 쓰실 수 있습니다.");
-        }
-
-        if (order.getIsDeleted()) {
-            throw new EntityExistsException("삭제된 주문입니다.");
-        }
+        ownerCheck(order.getCustomer(), user);
 
         if (!order.getStatus().equals(OrderStatusEnum.DELIVERED)) {
-            throw new IllegalStateException("완료된 주문만 리뷰를 쓰실 수 있습니다.");
+            log.error("배송 완료만 리뷰작성 가능");
+            throw new OperationNotAllowedException();
         }
 
         Review review = reviewRepository.save(
@@ -57,30 +50,27 @@ public class ReviewService {
 
     // 특정 음식점 리뷰 조회
     @Transactional(readOnly = true)
-    public Page<ReviewResponseDto> getReviews(UUID restaurantId, int page, int size,
-        String sortBy, boolean isAsc) {
+    public Page<ReviewResponseDto> getReviews(UUID restaurantId, Pageable pageable) {
+        log.info("특정 음식점 리뷰 조회");
 
-        Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
+        restaurantRepository.findByIdAndIsDeletedFalse(restaurantId)
+            .orElseThrow(ResourceNotFoundException::new);
 
-        List<Order> orders = orderRepository.findAllByRestaurantId(restaurantId).orElseThrow(
-            () -> new IllegalArgumentException("해당 레스토랑의 리뷰가 존재하지 않습니다.")
-        );
+        Page<Review> reviews = reviewRepository.searchReviews(restaurantId, pageable);
 
-        List<UUID> orderIds = orders.stream().map(Order::getId).collect(Collectors.toList());
-
-        Page<Review> reviewList = reviewRepository.findByOrderIdInAndIsDeletedFalse(orderIds,
-            pageable);
-
-        return reviewList.map(ReviewResponseDto::new);
+        return reviews.map(ReviewResponseDto::new);
     }
 
     // 리뷰 조회
     @Transactional(readOnly = true)
     public ReviewResponseDto getReview(UUID reviewId) {
+        log.info("리뷰 조회");
+
         Review review = reviewRepository.findByIdAndIsDeletedFalse(reviewId);
-        if (review == null) {
-            throw new EntityExistsException("review is not found");
+
+        Order order = review.getOrder();
+        if (order.getIsDeleted()) {
+            throw new DeletedDataAccessException();
         }
 
         return new ReviewResponseDto(review);
@@ -89,16 +79,16 @@ public class ReviewService {
     // 리뷰 수정
     @Transactional
     public ReviewResponseDto updateReview(UUID reviewId, String comment, int rating, User user) {
-        Review review = reviewRepository.findById(reviewId)
-            .orElseThrow(() -> new EntityExistsException("review not found"));
+        log.info("리뷰 수정");
 
-        if (!review.getUser().getUsername().equals(user.getUsername())) {
-            throw new AccessDeniedException("Unauthorized access to update review");
+        Review review = reviewRepository.findByIdAndIsDeletedFalse(reviewId);
+
+        if (review == null) {
+            log.error("존재하지 않는 리뷰");
+            throw new ResourceNotFoundException();
         }
 
-        if (review.getIsDeleted()) {
-            throw new EntityExistsException("review is deleted");
-        }
+        ownerCheck(user, review.getUser());
 
         review.updateReview(comment, rating, user);
 
@@ -108,16 +98,17 @@ public class ReviewService {
     // 리뷰 삭제
     @Transactional
     public ResponseEntity<String> deleteReview(UUID reviewId, User user) {
-        Review review = reviewRepository.findById(reviewId)
-            .orElseThrow(() -> new EntityExistsException("review not found"));
+        log.info("리뷰 삭제");
 
-        if (!review.getUser().getUsername().equals(user.getUsername())) {
-            throw new AccessDeniedException("Unauthorized access to delete review");
+        Review review = reviewRepository.findByIdAndIsDeletedFalse(reviewId);
+
+        if (review == null) {
+            log.error("존재하지 않는 리뷰");
+            throw new ResourceNotFoundException();
         }
 
-        if (review.getDeletedBy() != null) {
-            throw new EntityExistsException("review already deleted");
-        }
+        ownerCheck(user, review.getUser());
+
         review.delete(user.getUsername());
 
         return ResponseEntity.ok("Success deleted");

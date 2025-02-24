@@ -11,13 +11,13 @@ public class AddressResponseDto {
 
     private UUID id;
     private String username;
-    private String address_name;
+    private String addressName;
     private String address;
 
     public AddressResponseDto(Address address) {
         this.id = address.getId();
         this.username = address.getUser().getUsername();
-        this.address_name = address.getAddress_name();
+        this.addressName = address.getAddressName();
         this.address = address.getAddress();
     }
 

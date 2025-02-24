@@ -9,11 +9,11 @@ import com.sparta.spring_deep._delivery.domain.user.entity.IsPublic;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
+import com.sparta.spring_deep._delivery.exception.DuplicateResourceException;
 import com.sparta.spring_deep._delivery.util.JwtUtil;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,30 +25,25 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "UserService")
 public class UserService {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
     private final AuthenticationManager authenticationManager;
-
     @Autowired
     private final JwtUtil jwtUtil;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Transactional
     public User registerUser(UserDto userDto) {
         if (userRepository.existsByUsername(userDto.getUsername())) {
-            User user = userRepository.findByUsername(userDto.getUsername()).get();
-            if(!user.getIsDeleted()){
-                throw new RuntimeException("Username is already taken!");
-            }
+            throw new DuplicateResourceException();
         }
         if (userRepository.existsByEmail(userDto.getEmail())) {
-            throw new RuntimeException("Email is already in use!");
+            throw new DuplicateResourceException("이미 사용중인 Email 입니다.");
         }
 
         // Encrypting the password
@@ -74,9 +69,10 @@ public class UserService {
         return user;
     }
 
-    public LoginResponseDto login(LoginRequestDto loginRequestDto){
+    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(), loginRequestDto.getPassword())
+            new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(),
+                loginRequestDto.getPassword())
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -94,10 +90,12 @@ public class UserService {
     }
 
     public User updateUser(String userName, UserDto userDto) {
-        User user = userRepository.findByUsername(userName).orElseThrow(() -> new RuntimeException("User not found!"));
+        User user = userRepository.findByUsernameAndIsDeletedFalse(userName)
+            .orElseThrow(() -> new RuntimeException("User not found!"));
 
         // Check if the email was updated to a new one that already exists
-        if (!user.getEmail().equals(userDto.getEmail()) && userRepository.existsByEmail(userDto.getEmail())) {
+        if (!user.getEmail().equals(userDto.getEmail()) && userRepository.existsByEmail(
+            userDto.getEmail())) {
             throw new RuntimeException("Email is already in use!");
         }
 
@@ -109,14 +107,16 @@ public class UserService {
     }
 
     public void deleteUser(String userName) {
-        User user = userRepository.findByUsername(userName).orElseThrow(() -> new RuntimeException("User not found!"));
+        User user = userRepository.findByUsernameAndIsDeletedFalse(userName)
+            .orElseThrow(() -> new RuntimeException("User not found!"));
         user.setIsDeleted(true); // Assuming there's an isActive flag for soft delete
         user.delete(userName);
         userRepository.save(user);
     }
 
     public void changePassword(String userName, PasswordChangeDto passwordChangeDto) {
-        User user = userRepository.findByUsername(userName).orElseThrow(() -> new RuntimeException("User not found!"));
+        User user = userRepository.findByUsernameAndIsDeletedFalse(userName)
+            .orElseThrow(() -> new RuntimeException("User not found!"));
         user.setPassword(passwordEncoder.encode(passwordChangeDto.getNewPassword()));
         user.update(userName);
         userRepository.save(user);

@@ -2,7 +2,9 @@ package com.sparta.spring_deep._delivery.util;
 
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
+import com.sparta.spring_deep._delivery.exception.OwnershipMismatchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -29,6 +31,16 @@ public class AuthTools {
                     + ") 등록된 Owner : (" + restaurant.getOwner().getUsername() + ")");
         }
 
+    }
+
+    public static void ownerCheck(User loggedInUser, User owner) {
+        // ROLE이 ADMIN이 아니라면
+        if (!loggedInUser.getRole().equals(UserRole.ADMIN)) {
+            // LoggedInUser와 Owner가 같지 않다면
+            if (!loggedInUser.getUsername().equals(owner.getUsername())) {
+                throw new OwnershipMismatchException();
+            }
+        }
     }
 
     // 매니저 이름 일치 검사.

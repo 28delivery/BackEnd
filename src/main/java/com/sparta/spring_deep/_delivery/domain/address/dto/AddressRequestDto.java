@@ -6,7 +6,7 @@ import lombok.Getter;
 public class AddressRequestDto {
 
     private String addressId;
-    private String address_name;
+    private String addressName;
     private String address;
 
 }

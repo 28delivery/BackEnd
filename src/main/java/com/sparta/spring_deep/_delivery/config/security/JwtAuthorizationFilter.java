@@ -62,6 +62,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         Authentication authentication = createAuthentication(username);
         context.setAuthentication(authentication);
 
+        log.info("User Name : {}", authentication.getName());
+        log.info("User Role : {}", authentication.getAuthorities());
+
         SecurityContextHolder.setContext(context);
     }
 

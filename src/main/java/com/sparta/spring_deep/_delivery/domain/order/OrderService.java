@@ -1,5 +1,7 @@
 package com.sparta.spring_deep._delivery.domain.order;
 
+import static com.sparta.spring_deep._delivery.util.AuthTools.ownerCheck;
+
 import com.sparta.spring_deep._delivery.domain.address.entity.Address;
 import com.sparta.spring_deep._delivery.domain.address.repository.AddressRepository;
 import com.sparta.spring_deep._delivery.domain.menu.Menu;
@@ -10,11 +12,13 @@ import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItem;
 import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItemRepository;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
+import com.sparta.spring_deep._delivery.domain.review.Review;
+import com.sparta.spring_deep._delivery.domain.review.ReviewRepository;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
-import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
+import com.sparta.spring_deep._delivery.exception.OperationNotAllowedException;
+import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -28,16 +32,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j(topic = "Order Service")
+@Slf4j(topic = "OrderService")
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -46,30 +47,25 @@ public class OrderService {
     private final RestaurantRepository restaurantRepository;
     private final AddressRepository addressRepository;
     private final MenuRepository menuRepository;
+    private final ReviewRepository reviewRepository;
     private LocalDateTime lastCheckedTime = LocalDateTime.now().minusMinutes(5);
 
 
     // 주문 생성
     @Transactional
     public OrderDetailsResponseDto createOrder(OrderDetailsRequestDto requestDto, User user) {
+        log.info("주문 생성");
 
-        if (!user.getRole().equals(UserRole.CUSTOMER)) {
-            throw new IllegalStateException("Only customer can create order");
-        }
-
-        Restaurant restaurant = restaurantRepository.findById(requestDto.getRestaurantId())
-            .orElseThrow(() -> new IllegalArgumentException("음식점을 찾을 수 없습니다."));
+        Restaurant restaurant = restaurantRepository.findByIdAndIsDeletedFalse(
+                requestDto.getRestaurantId())
+            .orElseThrow(ResourceNotFoundException::new);
 
         // ID로 주소 찾기
-        Address address = addressRepository.findById(requestDto.getAddressId())
-            .orElseThrow(() -> new IllegalArgumentException("주소를 찾을 수 없습니다."));
+        Address address = addressRepository.findByIdAndIsDeletedFalse(requestDto.getAddressId())
+            .orElseThrow(ResourceNotFoundException::new);
 
-        // 유저 정보와 주소 정보 일치하는지 검사하는 로직 추가
-        if (!user.getUsername().equals(address.getUser().getUsername())) {
-            log.error("주문 생성 검증 로직 내부 : 현재 유저 ID : " + user.getUsername());
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                "주문 생성 : 본인의 주소가 아닙니다. 현재 유저 ID : " + user.getUsername());
-        }
+        // 유저 정보와 주소 정보 일치하는지 검사
+        ownerCheck(user, address.getUser());
 
         Order order = orderRepository.save(new Order(user, restaurant, address,
             BigDecimal.ZERO, requestDto.getRequest()));
@@ -80,7 +76,7 @@ public class OrderService {
 
         requestDto.getOrderItemDtos().forEach(orderItemDto -> {
             Menu menu = menuRepository.findById(orderItemDto.getMenuId())
-                .orElseThrow(() -> new EntityExistsException("메뉴를 찾을 수 없습니다."));
+                .orElseThrow(ResourceNotFoundException::new);
 
             BigDecimal itemPrice = menu.getPrice();
             log.info("item price : " + itemPrice);
@@ -104,15 +100,18 @@ public class OrderService {
     // 주문 상태 변경 - OWNER & MANAGER
     @Transactional
     public OrderResponseDto updateOrderStatus(UUID orderId, OrderStatusEnum status, User owner) {
-        Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> new EntityExistsException("order not found"));
+        log.info("주문 상태 변경");
 
-        if (!(owner.getRole().equals(UserRole.OWNER) || owner.getRole().equals(UserRole.MANAGER))) {
-            throw new IllegalStateException("Only owner can update order status");
+        Order order = orderRepository.findByIdAndIsDeletedFalse(orderId)
+            .orElseThrow(ResourceNotFoundException::new);
+
+        if (owner.getRole().equals(UserRole.OWNER)) {
+            ownerCheck(owner, order.getRestaurant().getOwner());
         }
 
         if (order.getStatus().equals(OrderStatusEnum.CANCELLED)) {
-            throw new IllegalStateException("Already cancelled order");
+            log.error("취소된 주문 : orderId : " + orderId);
+            throw new OperationNotAllowedException();
         }
 
         order.updateOrderStatus(owner, status);
@@ -124,17 +123,16 @@ public class OrderService {
     // 주문 상세 조회
     @Transactional(readOnly = true)
     public OrderDetailsResponseDto getOrderDetails(User user, UUID orderId) {
-        if (!(user.getRole().equals(UserRole.CUSTOMER)
-            || user.getRole().equals(UserRole.OWNER)
-            || user.getRole().equals(UserRole.MANAGER))) {
-            throw new IllegalStateException("Only customer & owner can get order");
-        }
-        Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> new EntityExistsException("order not found"));
+        log.info("주문 상세 조회");
 
-        if (user.getRole().equals(UserRole.CUSTOMER)
-            && !order.getCustomer().getUsername().equals(user.getUsername())) {
-            throw new AccessDeniedException("Unauthorized access to order");
+        Order order = orderRepository.findByIdAndIsDeletedFalse(orderId)
+            .orElseThrow(ResourceNotFoundException::new);
+
+        if (user.getRole().equals(UserRole.CUSTOMER)) {
+            ownerCheck(user, order.getCustomer());
+        }
+        if (user.getRole().equals(UserRole.OWNER)) {
+            ownerCheck(user, order.getRestaurant().getOwner());
         }
 
         List<OrderItem> orderItemList = orderItemRepository.findAllByOrderId(order.getId());
@@ -144,48 +142,48 @@ public class OrderService {
 
     // 나의 주문 내역 조회
     @Transactional(readOnly = true)
-    public Page<OrderResponseDto> getMyOrders(User user,
-        int page, int size,
-        String sortBy, boolean isAsc) {
+    public Page<OrderResponseDto> searchMyOrders(User user, OrderSearchDto searchDto,
+        Pageable pageable) {
+        log.info("나의 주문 내역 조회");
 
-        if (!user.getRole().equals(UserRole.CUSTOMER)) {
-            throw new IllegalStateException("Only customer can read order");
+        // 내 주문 내역만 조회
+        Page<OrderResponseDto> myOrderResponseDto = orderRepository.searchMyOrdersByOptionAndIsDeletedFalse(
+            user.getUsername(), searchDto, pageable);
+
+        // 주문 내역이 비어있다면, Exception 발생
+        if (myOrderResponseDto.isEmpty()) {
+            throw new ResourceNotFoundException();
         }
 
-        Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        Page<Order> myOrderList = orderRepository.findAllByCustomerUsernameAndIsDeletedFalse(
-            user.getUsername(),
-            pageable);
-
-        return myOrderList.map(OrderResponseDto::new);
+        return myOrderResponseDto;
     }
 
     // 주문 취소 (5분 이내)
     @Transactional
     public ResponseEntity<String> canceledOrder(User user, UUID orderId) {
-        if (!(user.getRole().equals(UserRole.CUSTOMER)
-            || user.getRole().equals(UserRole.OWNER)
-            || user.getRole().equals(UserRole.MANAGER))) {
-            throw new AccessDeniedException("Unauthorized access to canceled order");
-        }
-        Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> new EntityExistsException("order not found"));
+        log.info("주문 취소 (5분 이내)");
 
-        if (user.getRole().equals(UserRole.CUSTOMER)
-            && !order.getCustomer().getUsername().equals(user.getUsername())) {
-            throw new AccessDeniedException("Unauthorized access to canceled order");
+        Order order = orderRepository.findByIdAndIsDeletedFalse(orderId)
+            .orElseThrow(ResourceNotFoundException::new);
+
+        if (user.getRole().equals(UserRole.CUSTOMER)) {
+            ownerCheck(user, order.getCustomer());
+        }
+
+        if (user.getRole().equals(UserRole.OWNER)) {
+            ownerCheck(user, order.getRestaurant().getOwner());
         }
 
         if (order.getStatus().equals(OrderStatusEnum.CANCELLED)) {
-            throw new IllegalStateException("Already cancelled order");
+            log.info("취소된 주문입니다.");
+            throw new OperationNotAllowedException();
         }
 
         if (order.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(5))) {
             order.updateOrderStatus(user, OrderStatusEnum.CANCELLED);
         } else {
-            throw new IllegalStateException("주문 취소 가능 시간이 초과하였습니다.");
+            log.info("주문 취소 가능 시간이 초과하였습니다.");
+            throw new OperationNotAllowedException();
         }
         return ResponseEntity.ok("Success canceled");
     }
@@ -193,20 +191,20 @@ public class OrderService {
 
     // 실시간 주문 확인
     @Transactional(readOnly = true)
-    public Page<OrderResponseDto> getUpdatedOrdersSince(User user, int page, int size,
-        String sortBy, boolean isAsc) {
+    public Page<OrderResponseDto> getUpdatedOrdersSince(User user, int page, int size) {
+        log.info("실시간 주문 확인");
 
-        Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
+        Sort sort = Sort.by(Direction.DESC, "createdAt");
         Pageable pageable = PageRequest.of(page, size, sort);
 
         // 진행 중인 주문 중에서 최근 변경된 주문만 조회
-        Page<Order> updatedOrders = orderRepository.findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(
+        Page<Order> updatedOrders = orderRepository.findByCustomerUsernameAndIsDeletedFalseAndUpdatedAtAfterAndStatusIn(
             user.getUsername(), lastCheckedTime,
             List.of(OrderStatusEnum.PENDING, OrderStatusEnum.CONFIRMED),
             pageable);
 
         if (updatedOrders.isEmpty()) {
-            throw new EntityExistsException("현재 진행중인 주문이 없습니다.");
+            throw new ResourceNotFoundException();
         }
 
         lastCheckedTime = LocalDateTime.now(); // 마지막 조회 시간 갱신
@@ -217,27 +215,27 @@ public class OrderService {
     // 주문 내역 삭제
     @Transactional
     public ResponseEntity<String> deletedOrder(User user, UUID orderId) {
+        log.info("주문 내역 삭제");
 
-        if (!user.getRole().equals(UserRole.CUSTOMER)) {
-            throw new IllegalStateException("Only customer can delete order");
+        Order order = orderRepository.findByIdAndIsDeletedFalse(orderId)
+            .orElseThrow(ResourceNotFoundException::new);
+
+        if (!user.getRole().equals(UserRole.ADMIN)) {
+            ownerCheck(user, order.getCustomer());
         }
 
-        Order order = orderRepository.findById(orderId)
-            .orElseThrow(() -> new EntityNotFoundException("Order not found"));
-
-        if (!order.getCustomer().getUsername().equals(user.getUsername())) {
-            throw new AccessDeniedException("Unauthorized access to deleted order");
-        }
-
-        if (order.getIsDeleted()) {
-            throw new IllegalStateException("Already deleted order");
-        }
         order.delete(user.getUsername());
 
         List<OrderItem> orderItemList = orderItemRepository.findAllByOrderId(order.getId());
         for (OrderItem orderItem : orderItemList) {
             orderItem.delete(user.getUsername());
         }
+
+        List<Review> reviews = reviewRepository.findAllByOrderId(order.getId());
+        for (Review review : reviews) {
+            review.delete(user.getUsername());
+        }
+
         return ResponseEntity.ok("Success deleted");
     }
 }

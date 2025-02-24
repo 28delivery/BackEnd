@@ -50,7 +50,7 @@ public class Order extends BaseEntity {
     private Address address;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, columnDefinition = "p_order_status_enum")
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private OrderStatusEnum status = OrderStatusEnum.PENDING;
 

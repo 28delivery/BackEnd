@@ -1,15 +1,16 @@
 package com.sparta.spring_deep._delivery.domain.user.controller;
 
+import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.dto.LoginRequestDto;
 import com.sparta.spring_deep._delivery.domain.user.dto.LoginResponseDto;
 import com.sparta.spring_deep._delivery.domain.user.dto.PasswordChangeDto;
-import com.sparta.spring_deep._delivery.domain.user.entity.User;
-import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.dto.UserDto;
+import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.service.UserService;
 import com.sparta.spring_deep._delivery.util.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -30,14 +31,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Slf4j(topic = "User Controller")
 public class UserController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
     private final JwtUtil jwtUtil;
-    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody UserDto userDto, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()){
+        if (bindingResult.hasErrors()) {
             String errorMsg = bindingResult.getFieldError("email") != null ?
                 bindingResult.getFieldError("email").getDefaultMessage() :
                 "Invalid input";
@@ -51,8 +54,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto loginRequestDto, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()){
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto loginRequestDto,
+        BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             String errorMsg = bindingResult.getFieldError("username") != null ?
                 bindingResult.getFieldError("username").getDefaultMessage() : "Invalid input";
             logger.error("Login validation failed: {}", errorMsg);
@@ -65,9 +69,9 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader(value="Authorization") String token) {
+    public ResponseEntity<?> logout(@RequestHeader(value = "Authorization") String token) {
         // 클라이언트쪽에서 JWT 토큰 무효화해야 함!
-        if (token != null && token.startsWith("Bearer ")){
+        if (token != null && token.startsWith("Bearer ")) {
             String jwtToken = token.substring(7);
             jwtUtil.blacklist(jwtToken);
             logger.info("User logout with token: {}", jwtToken);
@@ -78,7 +82,8 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<User> getCurrentUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<User> getCurrentUser(
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
         logger.info("Looking user info for: {}", user.getUsername());
         return ResponseEntity.ok(user);
@@ -87,8 +92,8 @@ public class UserController {
     @PreAuthorize("authentication.name == #username")
     @PutMapping("/{username}")
     public ResponseEntity<?> updateUser(@PathVariable String username,
-            @Valid @RequestBody UserDto userDto, BindingResult bindingResult) {
-        if(bindingResult.hasErrors()){
+        @Valid @RequestBody UserDto userDto, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             String errorMsg = bindingResult.getFieldError("email") != null ?
                 bindingResult.getFieldError("email").getDefaultMessage() : "Invalid input";
             logger.error("Update user validation failed for {}: {}", username, errorMsg);
