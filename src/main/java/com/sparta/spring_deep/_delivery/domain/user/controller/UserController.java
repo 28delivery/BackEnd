@@ -1,13 +1,11 @@
 package com.sparta.spring_deep._delivery.domain.user.controller;
 
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
-import com.sparta.spring_deep._delivery.domain.user.dto.LoginRequestDto;
-import com.sparta.spring_deep._delivery.domain.user.dto.LoginResponseDto;
 import com.sparta.spring_deep._delivery.domain.user.dto.PasswordChangeDto;
 import com.sparta.spring_deep._delivery.domain.user.dto.UserDto;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
-import com.sparta.spring_deep._delivery.domain.user.service.UserService;
 import com.sparta.spring_deep._delivery.domain.user.jwt.JwtUtil;
+import com.sparta.spring_deep._delivery.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,16 +28,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api")
 @RequiredArgsConstructor
-@Slf4j(topic = "User Controller")
+@Slf4j(topic = "UserController")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
-    @PostMapping("/signup")
+    @PostMapping("/users/signup")
     public ResponseEntity<?> signup(@Valid @RequestBody UserDto userDto,
         BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -54,7 +52,7 @@ public class UserController {
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
-    @PostMapping("/logout")
+    @PostMapping("/users/logout")
     public ResponseEntity<?> logout(@RequestHeader(value = "Authorization") String token) {
         // 클라이언트쪽에서 JWT 토큰 무효화해야 함!
         if (token != null && token.startsWith("Bearer ")) {
@@ -67,7 +65,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Token");
     }
 
-    @GetMapping("/me")
+    @GetMapping("/users/me")
     public ResponseEntity<User> getCurrentUser(
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         User user = userDetails.getUser();
@@ -76,7 +74,7 @@ public class UserController {
     }
 
     @PreAuthorize("authentication.name == #username")
-    @PutMapping("/{username}")
+    @PutMapping("/users/{username}")
     public ResponseEntity<?> updateUser(@PathVariable String username,
         @Valid @RequestBody UserDto userDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -91,7 +89,7 @@ public class UserController {
     }
 
     @PreAuthorize("authentication.name == #username")
-    @PutMapping("/{username}/password")
+    @PutMapping("/users/{username}/password")
     public ResponseEntity<?> changePassword(@PathVariable String username,
         @RequestBody PasswordChangeDto passwordChangeDto) {
         userService.changePassword(username, passwordChangeDto);
@@ -99,7 +97,7 @@ public class UserController {
     }
 
     @PreAuthorize("authentication.name == #username")
-    @DeleteMapping("/{username}")
+    @DeleteMapping("/users/{username}")
     public ResponseEntity<?> deleteUser(@PathVariable String username) {
         userService.deleteUser(username);  // Soft delete
         logger.info("User soft deleted successfully: {}", username);

@@ -10,6 +10,9 @@ import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsRe
 import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsResponseDto;
 import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItem;
 import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItemRepository;
+import com.sparta.spring_deep._delivery.domain.payment.Payment.PaymentStatusEnum;
+import com.sparta.spring_deep._delivery.domain.payment.PaymentResponseDto;
+import com.sparta.spring_deep._delivery.domain.payment.PaymentService;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.review.Review;
@@ -48,6 +51,7 @@ public class OrderService {
     private final AddressRepository addressRepository;
     private final MenuRepository menuRepository;
     private final ReviewRepository reviewRepository;
+    private final PaymentService paymentService;
     private LocalDateTime lastCheckedTime = LocalDateTime.now().minusMinutes(5);
 
 
@@ -90,8 +94,19 @@ public class OrderService {
 
             orderItemList.add(orderItem);
         });
+        order.updateTotalPrice(sumPrice.get());
 
-        order.setTotalPrice(sumPrice.get());
+        // 결제 요청
+        PaymentResponseDto paymentResponseDto = paymentService.createPayment(user.getUsername(),
+            order.getId(), sumPrice.get());
+
+        if (paymentResponseDto.getPaymentStatus() == PaymentStatusEnum.COMPLETED) {
+            order.updateOrderStatus(user, OrderStatusEnum.CONFIRMED);
+            
+        } else if (paymentResponseDto.getPaymentStatus() == PaymentStatusEnum.FAILED) {
+            order.updateOrderStatus(user, OrderStatusEnum.FAILED);
+            order.delete(user.getUsername());
+        }
 
         return new OrderDetailsResponseDto(order, orderItemList);
     }

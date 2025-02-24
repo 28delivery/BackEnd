@@ -22,13 +22,11 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter
-@Setter
 @RequiredArgsConstructor
 @Table(name = "p_order")
 public class Order extends BaseEntity {
@@ -73,9 +71,13 @@ public class Order extends BaseEntity {
         this.request = request;
     }
 
+    public void updateTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
+    }
 
     public void updateOrderStatus(User user, OrderStatusEnum status) {
         super.update(user.getUsername()); // user -> username으로 변경 예정 (*baseEntity)
         this.status = status;
     }
+
 }

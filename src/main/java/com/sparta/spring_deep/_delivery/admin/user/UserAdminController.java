@@ -22,13 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @Slf4j(topic = "UserAdminService")
-@RequestMapping("/admin/users")
+@RequestMapping("/admin")
 public class UserAdminController {
 
     private final UserAdminService userAdminService;
 
     // 사용자 전체 조회 + 페이징 기능
-    @GetMapping("/search") // search?page=0&size=2로 요청하면 2개만 조회
+    @GetMapping("/users/search") // search?page=0&size=2로 요청하면 2개만 조회
     public ResponseEntity<Page<UserAdminResponseDto>> searchUsers(
         @ModelAttribute UserAdminSearchDto searchDto,
         @PageableDefault(sort = "username", direction = Sort.Direction.ASC) Pageable pageable) {
@@ -40,7 +40,7 @@ public class UserAdminController {
     }
 
     // 사용자 상세 조회
-    @GetMapping("/{userId}")
+    @GetMapping("/users/{userId}")
     public ResponseEntity<UserAdminResponseDto> getUser(
         @PathVariable String userId) {
         log.info("getUser");
@@ -51,7 +51,7 @@ public class UserAdminController {
     }
 
     // 사용자 등록
-    @PostMapping
+    @PostMapping("/users")
     public ResponseEntity<UserAdminResponseDto> createUser(
         @RequestBody UserCreateRequestDto userCreateRequestDto,
         @AuthenticationPrincipal UserDetails userDetails) {
@@ -64,7 +64,7 @@ public class UserAdminController {
     }
 
     // 사용자 수정
-    @PutMapping("/{userId}")
+    @PutMapping("/users/{userId}")
     public ResponseEntity<UserAdminResponseDto> updateUser(
         @PathVariable String userId,
         @RequestBody UserUpdateRequestDto userUpdateRequestDto,
@@ -78,7 +78,7 @@ public class UserAdminController {
     }
 
     // 사용자 삭제
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/users/{userId}")
     public ResponseEntity<String> deleteUser(
         @PathVariable String userId,
         @AuthenticationPrincipal UserDetails userDetails) {

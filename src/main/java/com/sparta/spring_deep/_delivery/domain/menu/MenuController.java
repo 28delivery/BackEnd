@@ -41,21 +41,7 @@ public class MenuController {
         MenuResponseDto responseDto = menuService.addMenu(restaurantId, requestDto, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
-
-//    // restaurant_id 기반 모든 메뉴 조회
-//    @GetMapping("/menus/{restaurantId}")
-//    public ResponseEntity<Page<MenuResponseDto>> getRestaurantAllMenus(
-//        @PathVariable(name = "restaurantId") Restaurant restaurantId,
-//        @RequestParam(required = false) String name,
-//        @RequestParam(defaultValue = "createdAt") String sortBy,
-//        @RequestParam(defaultValue = "0") int page,
-//        @RequestParam(defaultValue = "10") int size
-//    ) {
-//        Page<MenuResponseDto> responseDtoPage = menuService.getAllMenus(restaurantId, name, sortBy,
-//            page, size);
-//        return ResponseEntity.status(HttpStatus.OK).body(responseDtoPage);
-//    }
-
+    
     // restaurant_id 기반 메뉴 검색 및 조회
     @GetMapping("/menus/{restaurantId}/search")
     public ResponseEntity<Page<MenuResponseDto>> searchMenus(
@@ -102,7 +88,7 @@ public class MenuController {
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
         log.info("aiDescription");
-        
+
         MenuAiResponseDto responseDto = menuService.aiDescription(menuId, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }

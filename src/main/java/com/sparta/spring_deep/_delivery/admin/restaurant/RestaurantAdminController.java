@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/restaurants")
+@RequestMapping("/admin")
 @Slf4j(topic = "RestaurantAdminController")
 public class RestaurantAdminController {
 
@@ -31,7 +31,7 @@ public class RestaurantAdminController {
     private final RestaurantAdminService restaurantAdminService;
 
     // 음식점 상세 조회
-    @GetMapping("/{restaurantId}")
+    @GetMapping("/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantAdminResponseDto> getRestaurant(
         @PathVariable UUID restaurantId) {
         log.info("음식점 상세 조회");
@@ -43,7 +43,7 @@ public class RestaurantAdminController {
     }
 
     // 음식점 생성
-    @PostMapping
+    @PostMapping("/restaurants")
     public ResponseEntity<RestaurantAdminResponseDto> addRestaurant(
         @RequestBody RestaurantAdminCreateRequestDto restaurantAdminCreateRequestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -55,7 +55,7 @@ public class RestaurantAdminController {
     }
 
     // 음식점 정보 수정
-    @PutMapping("/{restaurantId}")
+    @PutMapping("/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantAdminResponseDto> updateRestaurant(
         @RequestBody RestaurantAdminRequestDto restaurantAdminRequestDto,
         @PathVariable UUID restaurantId,
@@ -68,7 +68,7 @@ public class RestaurantAdminController {
     }
 
     // 음식점 삭제
-    @DeleteMapping("/{restaurantId}")
+    @DeleteMapping("/restaurants/{restaurantId}")
     public ResponseEntity<?> deleteRestaurant(
         @PathVariable UUID restaurantId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -78,7 +78,7 @@ public class RestaurantAdminController {
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
-    @GetMapping("/search")
+    @GetMapping("/restaurants/search")
     public ResponseEntity<Page<RestaurantAdminResponseDto>> searchRestaurant(
         @ModelAttribute RestaurantAdminSearchDto restaurantAdminSearchDto,
         @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {

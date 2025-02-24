@@ -1,24 +1,18 @@
 package com.sparta.spring_deep._delivery.domain.user.service;
 
-import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
-import com.sparta.spring_deep._delivery.domain.user.dto.LoginRequestDto;
-import com.sparta.spring_deep._delivery.domain.user.dto.LoginResponseDto;
 import com.sparta.spring_deep._delivery.domain.user.dto.PasswordChangeDto;
 import com.sparta.spring_deep._delivery.domain.user.dto.UserDto;
-import com.sparta.spring_deep._delivery.domain.user.entity.IsPublic;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
-import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
+import com.sparta.spring_deep._delivery.domain.user.jwt.JwtUtil;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import com.sparta.spring_deep._delivery.exception.DuplicateResourceException;
-import com.sparta.spring_deep._delivery.domain.user.jwt.JwtUtil;
+import com.sparta.spring_deep._delivery.exception.OwnershipMismatchException;
+import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +33,7 @@ public class UserService {
 
     @Transactional
     public User registerUser(UserDto userDto) {
+
         if (userRepository.existsByUsername(userDto.getUsername())) {
             throw new DuplicateResourceException();
         }
@@ -70,13 +65,15 @@ public class UserService {
     }
 
     public User updateUser(String userName, UserDto userDto) {
+
         User user = userRepository.findByUsernameAndIsDeletedFalse(userName)
-            .orElseThrow(() -> new RuntimeException("User not found!"));
+            .orElseThrow(ResourceNotFoundException::new);
 
         // Check if the email was updated to a new one that already exists
         if (!user.getEmail().equals(userDto.getEmail()) && userRepository.existsByEmail(
             userDto.getEmail())) {
-            throw new RuntimeException("Email is already in use!");
+            log.info("Check if the email was updated to a new one that already exists");
+            throw new OwnershipMismatchException();
         }
 
         user.setEmail(userDto.getEmail());
@@ -87,16 +84,20 @@ public class UserService {
     }
 
     public void deleteUser(String userName) {
+        log.info("delete user " + userName);
+
         User user = userRepository.findByUsernameAndIsDeletedFalse(userName)
-            .orElseThrow(() -> new RuntimeException("User not found!"));
+            .orElseThrow(ResourceNotFoundException::new);
         user.setIsDeleted(true); // Assuming there's an isActive flag for soft delete
         user.delete(userName);
         userRepository.save(user);
     }
 
     public void changePassword(String userName, PasswordChangeDto passwordChangeDto) {
+        log.info("change password " + userName);
+
         User user = userRepository.findByUsernameAndIsDeletedFalse(userName)
-            .orElseThrow(() -> new RuntimeException("User not found!"));
+            .orElseThrow(ResourceNotFoundException::new);
         user.setPassword(passwordEncoder.encode(passwordChangeDto.getNewPassword()));
         user.update(userName);
         userRepository.save(user);
