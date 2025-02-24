@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,11 +40,11 @@ public class UserController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody UserDto userDto, BindingResult bindingResult) {
+    public ResponseEntity<?> signup(@Valid @RequestBody UserDto userDto,
+        BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            String errorMsg = bindingResult.getFieldError("email") != null ?
-                bindingResult.getFieldError("email").getDefaultMessage() :
-                "Invalid input";
+            FieldError fieldError = bindingResult.getFieldError();
+            String errorMsg = fieldError != null ? fieldError.getDefaultMessage() : "Invalid input";
             logger.error("Sign up error: {}", errorMsg);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMsg);
         }
