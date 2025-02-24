@@ -2,6 +2,7 @@ package com.sparta.spring_deep._delivery.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.cdimascio.dotenv.Dotenv;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -18,8 +19,9 @@ public class RestaurantAddressTools {
 
     private static final RestTemplate restTemplate = new RestTemplate();
 
-    public static String restaurantAddressUrl;
-    public static String restaurantAddressKey;
+    private static final Dotenv dotenv = Dotenv.load();
+    private static final String restaurantAddressUrl = dotenv.get("RESTAURANT_URL");
+    private static final String restaurantAddressKey = dotenv.get("RESTAURANT_KEY");
 
     /**
      * keyword로 주소 검색 후 Json(Map) 형태로 검색 결과를 반환합니다.
@@ -92,16 +94,6 @@ public class RestaurantAddressTools {
         }
 
         return ((List<Map<String, Object>>) results.get("juso")).get(0);
-    }
-
-    @Value("${restaurantAddress.url}")
-    public void setRestaurantAddressUrl(String restaurantAddressUrl) {
-        RestaurantAddressTools.restaurantAddressUrl = restaurantAddressUrl;
-    }
-
-    @Value("${restaurantAddress.url}")
-    public void setRestaurantAddressKey(String restaurantAddressKey) {
-        RestaurantAddressTools.restaurantAddressKey = restaurantAddressKey;
     }
 
 }
