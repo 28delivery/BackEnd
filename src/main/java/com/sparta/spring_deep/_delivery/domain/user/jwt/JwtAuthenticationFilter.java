@@ -1,10 +1,9 @@
-package com.sparta.spring_deep._delivery.config.security;
+package com.sparta.spring_deep._delivery.domain.user.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.dto.LoginRequestDto;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
-import com.sparta.spring_deep._delivery.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

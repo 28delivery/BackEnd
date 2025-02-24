@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.util;
+package com.sparta.spring_deep._delivery.domain.user.jwt;
 
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import io.jsonwebtoken.Claims;

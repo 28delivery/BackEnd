@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.util;
+package com.sparta.spring_deep._delivery.domain.user.jwt;
 
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;

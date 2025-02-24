@@ -10,7 +10,7 @@ import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import com.sparta.spring_deep._delivery.exception.DuplicateResourceException;
-import com.sparta.spring_deep._delivery.util.JwtUtil;
+import com.sparta.spring_deep._delivery.domain.user.jwt.JwtUtil;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,26 +67,6 @@ public class UserService {
         user = userRepository.save(user);// 첫 번째 저장 (createdBy = null)
 
         return user;
-    }
-
-    public LoginResponseDto login(LoginRequestDto loginRequestDto) {
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(loginRequestDto.getUsername(),
-                loginRequestDto.getPassword())
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        User user = userDetails.getUser();
-        String username = userDetails.getUsername();
-        String email = user.getEmail();
-        IsPublic isPublic = user.getIsPublic();
-        UserRole userRole = user.getRole();
-
-        String jwt = jwtUtil.createJwt(username, userRole);
-
-        return new LoginResponseDto(jwt, username, email, userRole, isPublic);
     }
 
     public User updateUser(String userName, UserDto userDto) {

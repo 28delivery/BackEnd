@@ -1,9 +1,9 @@
 package com.sparta.spring_deep._delivery.config;
 
-import com.sparta.spring_deep._delivery.config.security.JwtAuthenticationFilter;
-import com.sparta.spring_deep._delivery.config.security.JwtAuthorizationFilter;
+import com.sparta.spring_deep._delivery.domain.user.jwt.JwtAuthenticationFilter;
+import com.sparta.spring_deep._delivery.domain.user.jwt.JwtAuthorizationFilter;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsServiceImpl;
-import com.sparta.spring_deep._delivery.util.JwtUtil;
+import com.sparta.spring_deep._delivery.domain.user.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
