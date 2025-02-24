@@ -26,52 +26,54 @@ public class PaymentController {
 
     // 결제 생성
     @PostMapping("/payment")
-    public ResponseEntity<Payment> createPayment(@RequestBody PaymentRequestDto requestDto
+    public ResponseEntity<PaymentResponseDto> createPayment(
+        @RequestBody PaymentRequestDto requestDto
         , @AuthenticationPrincipal UserDetailsImpl userDetails) {
         log.info("createPayment");
 
-        Payment payment = paymentService.createPayment(userDetails.getUsername(),
+        PaymentResponseDto responseDto = paymentService.createPayment(userDetails.getUsername(),
             UUID.fromString(requestDto.orderId),
             requestDto.amount);
-        return ResponseEntity.status(HttpStatus.OK).body(payment);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 결제 완료 처리
     @PutMapping("/payment/complete")
-    public ResponseEntity<Payment> completePayment(@RequestParam String paymentId) {
+    public ResponseEntity<PaymentResponseDto> completePayment(@RequestParam String paymentId) {
         log.info("completePayment");
 
-        Payment payment = paymentService.completePayment(UUID.fromString(paymentId));
-        return ResponseEntity.status(HttpStatus.OK).body(payment);
+        PaymentResponseDto responseDto = paymentService.completePayment(UUID.fromString(paymentId));
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 결제 취소 처리
     @PutMapping("/payment/cancel")
-    public ResponseEntity<Payment> cancelPayment(@RequestParam String paymentId) {
+    public ResponseEntity<PaymentResponseDto> cancelPayment(@RequestParam String paymentId) {
         log.info("cancelPayment");
 
-        Payment payment = paymentService.cancelPayment(UUID.fromString(paymentId));
-        return ResponseEntity.status(HttpStatus.OK).body(payment);
+        PaymentResponseDto responseDto = paymentService.cancelPayment(UUID.fromString(paymentId));
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 결제 실패 처리
     @PutMapping("/payment/fail")
-    public ResponseEntity<Payment> failPayment(@RequestParam String paymentId) {
+    public ResponseEntity<PaymentResponseDto> failPayment(@RequestParam String paymentId) {
         log.info("failPayment");
 
-        Payment payment = paymentService.failPayment(UUID.fromString(paymentId));
-        return ResponseEntity.status(HttpStatus.OK).body(payment);
+        PaymentResponseDto responseDto = paymentService.failPayment(UUID.fromString(paymentId));
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 결제 조회
     @GetMapping("/payment")
-    public ResponseEntity<Payment> getPayment(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<PaymentResponseDto> getPayment(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestParam String paymentId) {
         log.info("getPayment");
 
-        Payment payment = paymentService.getPayment(userDetails.getUser(),
+        PaymentResponseDto responseDto = paymentService.getPayment(userDetails.getUser(),
             UUID.fromString(paymentId));
-        return ResponseEntity.status(HttpStatus.OK).body(payment);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 결제 내역 삭제

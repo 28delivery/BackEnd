@@ -26,14 +26,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/addresses")
+@RequestMapping("/api")
 @Slf4j(topic = "Address Controller")
 public class AddressController {
 
     private final AddressService addressService;
 
     // 배송지 추가
-    @PostMapping
+    @PostMapping("/addresses")
     public ResponseEntity<AddressResponseDto> createAddress(
         @RequestBody AddressRequestDto requestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -45,7 +45,7 @@ public class AddressController {
     }
 
     // 배송지 조회
-    @GetMapping("/search")
+    @GetMapping("/addresses/search")
     public ResponseEntity<Page<AddressResponseDto>> searchMyAddresses(
         @ModelAttribute AddressSearchDto searchDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -60,7 +60,7 @@ public class AddressController {
 
 
     // 개별 배송지 조회
-    @GetMapping("/{addressId}")
+    @GetMapping("/addresses/{addressId}")
     public ResponseEntity<AddressResponseDto> getAddress(
         @PathVariable UUID addressId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -72,7 +72,7 @@ public class AddressController {
     }
 
     // 배송지 수정
-    @PutMapping("/{addressId}")
+    @PutMapping("/addresses/{addressId}")
     public ResponseEntity<AddressResponseDto> updateAddress(
         @PathVariable UUID addressId,
         @RequestBody AddressRequestDto requestDto,
@@ -86,7 +86,7 @@ public class AddressController {
     }
 
     // 배송지 삭제
-    @DeleteMapping("/{addressId}")
+    @DeleteMapping("/addresses/{addressId}")
     public ResponseEntity<String> deleteAddress(
         @PathVariable UUID addressId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {

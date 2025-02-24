@@ -11,19 +11,19 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
 import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 @Entity
 @Getter
-@Setter
 @RequiredArgsConstructor
+@Table(name = "p_payment")
 public class Payment extends BaseEntity {
 
     @Id
@@ -44,7 +44,7 @@ public class Payment extends BaseEntity {
     private PaymentMethodEnum paymentMethod;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_status", nullable = false, columnDefinition = "p_payment_method_enum")
+    @Column(name = "status", nullable = false, columnDefinition = "p_payment_method_enum")
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private PaymentStatusEnum paymentStatus;
 

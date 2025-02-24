@@ -22,14 +22,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/restaurants")
+@RequestMapping("/api")
 @Slf4j(topic = "Restaurant Controller")
 public class RestaurantController {
 
     private final RestaurantManageService restaurantManageService;
 
     // 음식점 수정
-    @PutMapping("/{restaurantId}")
+    @PutMapping("/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantResponseDto> updateRestaurant(
         @RequestBody RestaurantRequestDto restaurantRequestDto,
         @PathVariable UUID restaurantId,
@@ -42,7 +42,7 @@ public class RestaurantController {
     }
 
     // 음식점 삭제
-    @DeleteMapping("/{restaurantId}")
+    @DeleteMapping("/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantResponseDto> deleteRestaurant(
         @PathVariable UUID restaurantId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -54,7 +54,7 @@ public class RestaurantController {
     }
 
     // 음식점 조회
-    @GetMapping(value = "/{restaurantId}")
+    @GetMapping(value = "/restaurants/{restaurantId}")
     public ResponseEntity<RestaurantResponseDto> getRestaurant(@PathVariable UUID restaurantId) {
         log.info("음식점 조회");
 
@@ -63,7 +63,7 @@ public class RestaurantController {
     }
 
     // 음식점 검색
-    @GetMapping("/search")
+    @GetMapping("/restaurants/search")
     public ResponseEntity<Page<RestaurantResponseDto>> searchRestaurant(
         @ModelAttribute RestaurantSearchDto searchDto,
         @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
