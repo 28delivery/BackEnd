@@ -20,7 +20,7 @@ public class AiController {
     @GetMapping("/admin/logs/ai/search")
     public ResponseEntity<Page<AiLogResponseDto>> searchAiLogs(
         @ModelAttribute AiLogSearchDto aiLogSearchDto,
-        @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         Page<AiLogResponseDto> logs = aiLogService.searchAiLogs(aiLogSearchDto, pageable);
 

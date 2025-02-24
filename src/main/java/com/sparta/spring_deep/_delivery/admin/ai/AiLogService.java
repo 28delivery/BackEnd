@@ -4,12 +4,14 @@ import com.sparta.spring_deep._delivery.domain.ai.Ai;
 import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "")
 public class AiLogService {
 
     private final AiRepository aiRepository;

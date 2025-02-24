@@ -8,13 +8,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -70,18 +71,17 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
-    // 나의 주문 내역 조회
-    @GetMapping("/orders/me")
-    public ResponseEntity<Page<OrderResponseDto>> getMyOrders(
+    // 나의 주문 내역 검색
+    @GetMapping("/orders/me/search")
+    public ResponseEntity<Page<OrderResponseDto>> searchMyOrders(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
-        @PageableDefault(size = 10, page = 0, direction = Direction.DESC, sort = "createdAt") Pageable pageable,
-        @RequestParam(required = false, defaultValue = "null") String menu,
-        @RequestParam(required = false, defaultValue = "null") String restaurant
+        @ModelAttribute OrderSearchDto orderSearchDto,
+        @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         log.info("나의 주문 내역 조회 요청 ");
 
-        Page<OrderResponseDto> responseDtos = orderService.getMyOrders(userDetails.getUser(),
-            pageable, menu, restaurant);
+        Page<OrderResponseDto> responseDtos = orderService.searchMyOrders(userDetails.getUser(),
+            orderSearchDto, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDtos);
     }

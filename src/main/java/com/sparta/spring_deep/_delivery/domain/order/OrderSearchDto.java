@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public class OrderSearchDto {
 
     private String restaurantName;
+    private String menuName;
     private OrderStatusEnum status;
 
 }
