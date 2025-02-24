@@ -1,9 +1,11 @@
 package com.sparta.spring_deep._delivery.domain.address.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class AddressRequestDto {
 
