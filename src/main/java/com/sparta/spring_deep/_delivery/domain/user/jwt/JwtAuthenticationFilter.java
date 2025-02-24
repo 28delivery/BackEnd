@@ -1,10 +1,9 @@
-package com.sparta.spring_deep._delivery.config.security;
+package com.sparta.spring_deep._delivery.domain.user.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.dto.LoginRequestDto;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
-import com.sparta.spring_deep._delivery.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,6 +34,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             LoginRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(),
                 LoginRequestDto.class);
 
+
             return getAuthenticationManager().authenticate(
                 new UsernamePasswordAuthenticationToken(
                     requestDto.getUsername(),
@@ -50,15 +50,16 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request,
-        HttpServletResponse response, FilterChain chain, Authentication authResult) {
+        HttpServletResponse response, FilterChain chain, Authentication authResult)
+        throws IOException {
 
-        String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
-        UserRole role = ((UserDetailsImpl) authResult.getPrincipal()).getUser().getRole();
+        UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
+        String username = userDetails.getUsername();
+        UserRole role = userDetails.getUser().getRole();
 
         String token = jwtUtil.createJwt(username, role);
-        System.out.println(token);
-        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
 
+        response.addHeader(JwtUtil.AUTHORIZATION_HEADER, token);
     }
 
     @Override

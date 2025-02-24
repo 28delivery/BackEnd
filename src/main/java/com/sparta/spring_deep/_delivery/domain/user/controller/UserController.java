@@ -7,7 +7,7 @@ import com.sparta.spring_deep._delivery.domain.user.dto.PasswordChangeDto;
 import com.sparta.spring_deep._delivery.domain.user.dto.UserDto;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.service.UserService;
-import com.sparta.spring_deep._delivery.util.JwtUtil;
+import com.sparta.spring_deep._delivery.domain.user.jwt.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,21 +51,6 @@ public class UserController {
         User newUser = userService.registerUser(userDto);
         logger.info("User Sign up: {}", newUser.getUsername());
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDto loginRequestDto,
-        BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            String errorMsg = bindingResult.getFieldError("username") != null ?
-                bindingResult.getFieldError("username").getDefaultMessage() : "Invalid input";
-            logger.error("Login validation failed: {}", errorMsg);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMsg);
-        }
-
-        LoginResponseDto loginResponseDto = userService.login(loginRequestDto);
-        logger.info("User logged in successfully: {}", loginResponseDto.getUsername());
-        return ResponseEntity.ok(loginResponseDto);
     }
 
     @PostMapping("/logout")
