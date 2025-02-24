@@ -71,7 +71,6 @@ public class UserRepositoryCustomImpl implements UserRepositoryCustom {
             .select(Projections.constructor(
                 UserAdminResponseDto.class,
                 user.username,
-                user.password,
                 user.email,
                 user.role,
                 user.isPublic,

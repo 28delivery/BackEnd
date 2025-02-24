@@ -4,11 +4,13 @@ import com.sparta.spring_deep._delivery.domain.user.entity.IsPublic;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
+@AllArgsConstructor
 public class UserAdminResponseDto {
 
     private String username;
@@ -19,7 +21,7 @@ public class UserAdminResponseDto {
     private String createdBy;
     private LocalDateTime updatedAt;
     private String updatedBy;
-    private boolean isDeleted;
+    private Boolean isDeleted;
     private LocalDateTime deletedAt;
     private String deletedBy;
 

@@ -1,5 +1,9 @@
 package com.sparta.spring_deep._delivery.domain.restaurant;
 
+import static com.sparta.spring_deep._delivery.testutil.TestEntityCreateTools.createRestaurant;
+import static com.sparta.spring_deep._delivery.testutil.TestEntityCreateTools.createRestaurantAddress;
+import static com.sparta.spring_deep._delivery.testutil.TestEntityCreateTools.createUser;
+import static com.sparta.spring_deep._delivery.testutil.TestEntityCreateTools.getAuth;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
@@ -14,8 +18,8 @@ import com.sparta.spring_deep._delivery.admin.restaurant.RestaurantAdminCreateRe
 import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
 import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddressRepository;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
-import java.util.Collections;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,29 +58,17 @@ public class RestaurantIntegrationTest {
     @BeforeEach
     void setUp() {
         // 테스트용 소유자 생성
-        owner = new User();
-        ReflectionTestUtils.setField(owner, "username", "owner1");
+        owner = createUser("owner1", UserRole.OWNER);
         owner = userRepository.save(owner);
 
         // 소유자가 아닌 사용자 생성
-        nonOwner = new User();
-        ReflectionTestUtils.setField(nonOwner, "username", "user2");
+        nonOwner = createUser("user2", UserRole.CUSTOMER);
         nonOwner = userRepository.save(nonOwner);
 
         // 테스트용 주소 생성
-        address = new RestaurantAddress();
-        ReflectionTestUtils.setField(address, "roadAddr", "Test Road");
-        ReflectionTestUtils.setField(address, "jibunAddr", "Test Jibun");
-        ReflectionTestUtils.setField(address, "detailAddr", "Test Detail");
-        ReflectionTestUtils.setField(address, "engAddr", "Test Eng");
+        address = createRestaurantAddress("owner1");
         address = restaurantAddressRepository.save(address);
 
-
-    }
-
-    // 인증 객체 생성 (소유자/비소유자 구분)
-    private UsernamePasswordAuthenticationToken getAuth(User user) {
-        return new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
     }
 
     // ===== GET /api/restaurants/{restaurantId} =====
@@ -85,34 +76,16 @@ public class RestaurantIntegrationTest {
     // 성공 케이스: 존재하는 음식점 조회
     @Test
     void testGetRestaurantSuccess() throws Exception {
-        // 테스트 음식점 생성 (생성 시 ReflectionTestUtils로 DTO 필드 주입)
-        RestaurantAdminCreateRequestDto createDto = new RestaurantAdminCreateRequestDto();
-        ReflectionTestUtils.setField(createDto, "ownerId", owner.getUsername());
-        ReflectionTestUtils.setField(createDto, "name", "Test Restaurant");
-        ReflectionTestUtils.setField(createDto, "category", Restaurant.CategoryEnum.HANSIK);
-        ReflectionTestUtils.setField(createDto, "roadAddr", address.getRoadAddr());
-        ReflectionTestUtils.setField(createDto, "detailAddr", address.getDetailAddr());
-        ReflectionTestUtils.setField(createDto, "phone", "010-1111-2222");
 
-        Restaurant restaurant = new Restaurant(createDto, owner, address, owner.getUsername());
+        Restaurant restaurant = createRestaurant(owner, address, "꿀맛짬뽕", "010-2222-2222");
         restaurant = restaurantRepository.save(restaurant);
-
-        RestaurantAdminCreateRequestDto createRequestDto = new RestaurantAdminCreateRequestDto();
-        createRequestDto.setOwnerId(owner.getUsername()); // 굿
-        createRequestDto.setName("Test Restaurant");
-        createRequestDto.setCategory(Restaurant.CategoryEnum.HANSIK);
-        createRequestDto.setRoadAddr(address.getRoadAddr());
-        createRequestDto.setDetailAddr(address.getDetailAddr());
-        createRequestDto.setPhone("010-1111-2222");
-
-        Restaurant restaurant1 = new Restaurant(createDto, owner, address, owner.getUsername());
 
         mockMvc.perform(get("/api/restaurants/{restaurantId}", restaurant.getId())
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(restaurant.getId().toString()))
-            .andExpect(jsonPath("$.name").value("Test Restaurant"))
-            .andExpect(jsonPath("$.phone").value("010-1111-2222"))
+            .andExpect(jsonPath("$.name").value("꿀맛짬뽕"))
+            .andExpect(jsonPath("$.phone").value("010-2222-2222"))
             .andExpect(jsonPath("$.roadAddr").value(address.getRoadAddr()));
     }
 
@@ -131,23 +104,15 @@ public class RestaurantIntegrationTest {
     @Test
     void testUpdateRestaurantSuccess() throws Exception {
         // 초기 음식점 생성
-        RestaurantAdminCreateRequestDto createDto = new RestaurantAdminCreateRequestDto();
-        ReflectionTestUtils.setField(createDto, "ownerId", owner.getUsername());
-        ReflectionTestUtils.setField(createDto, "name", "Original Restaurant");
-        ReflectionTestUtils.setField(createDto, "category", Restaurant.CategoryEnum.HANSIK);
-        ReflectionTestUtils.setField(createDto, "roadAddr", address.getRoadAddr());
-        ReflectionTestUtils.setField(createDto, "detailAddr", address.getDetailAddr());
-        ReflectionTestUtils.setField(createDto, "phone", "010-1111-2222");
-
-        Restaurant restaurant = new Restaurant(createDto, owner, address, owner.getUsername());
+        Restaurant restaurant = createRestaurant(owner, address, "꿀맛짬뽕", "010-2222-2222");
         restaurant = restaurantRepository.save(restaurant);
 
         // 수정할 내용 (RestaurantRequestDto는 setter 제공)
         RestaurantRequestDto updateDto = new RestaurantRequestDto();
         updateDto.setName("Updated Restaurant");
         updateDto.setCategory(Restaurant.CategoryEnum.YANGSIK);
-        updateDto.setRoadAddr("Updated Road");
-        updateDto.setDetailAddr("Updated Detail");
+        updateDto.setRoadAddr("논현로 111길 21");
+        updateDto.setDetailAddr("강남빌딩 200호");
         updateDto.setPhone("010-2222-3333");
 
         String updateJson = objectMapper.writeValueAsString(updateDto);
@@ -166,22 +131,14 @@ public class RestaurantIntegrationTest {
     @Test
     void testUpdateRestaurantNotOwner() throws Exception {
         // 음식점 생성 (소유자는 owner)
-        RestaurantAdminCreateRequestDto createDto = new RestaurantAdminCreateRequestDto();
-        ReflectionTestUtils.setField(createDto, "ownerId", owner.getUsername());
-        ReflectionTestUtils.setField(createDto, "name", "Original Restaurant");
-        ReflectionTestUtils.setField(createDto, "category", Restaurant.CategoryEnum.HANSIK);
-        ReflectionTestUtils.setField(createDto, "roadAddr", address.getRoadAddr());
-        ReflectionTestUtils.setField(createDto, "detailAddr", address.getDetailAddr());
-        ReflectionTestUtils.setField(createDto, "phone", "010-1111-2222");
-
-        Restaurant restaurant = new Restaurant(createDto, owner, address, owner.getUsername());
+        Restaurant restaurant = createRestaurant(owner, address, "꿀맛짬뽕", "010-2222-2222");
         restaurant = restaurantRepository.save(restaurant);
 
         RestaurantRequestDto updateDto = new RestaurantRequestDto();
         updateDto.setName("Updated Restaurant");
         updateDto.setCategory(Restaurant.CategoryEnum.YANGSIK);
-        updateDto.setRoadAddr("Updated Road");
-        updateDto.setDetailAddr("Updated Detail");
+        updateDto.setRoadAddr("논현로 111길 21");
+        updateDto.setDetailAddr("강남빌딩 200호");
         updateDto.setPhone("010-2222-3333");
 
         String updateJson = objectMapper.writeValueAsString(updateDto);
@@ -200,7 +157,7 @@ public class RestaurantIntegrationTest {
         RestaurantRequestDto updateDto = new RestaurantRequestDto();
         updateDto.setName("Updated Restaurant");
         updateDto.setCategory(Restaurant.CategoryEnum.YANGSIK);
-        updateDto.setRoadAddr("Updated Road");
+        updateDto.setRoadAddr("논현로 111길 21");
         updateDto.setDetailAddr("Updated Detail");
         updateDto.setPhone("010-2222-3333");
 
@@ -219,15 +176,8 @@ public class RestaurantIntegrationTest {
     // 성공 케이스: 소유자에 의한 삭제
     @Test
     void testDeleteRestaurantSuccess() throws Exception {
-        RestaurantAdminCreateRequestDto createDto = new RestaurantAdminCreateRequestDto();
-        ReflectionTestUtils.setField(createDto, "ownerId", owner.getUsername());
-        ReflectionTestUtils.setField(createDto, "name", "Restaurant to Delete");
-        ReflectionTestUtils.setField(createDto, "category", Restaurant.CategoryEnum.HANSIK);
-        ReflectionTestUtils.setField(createDto, "roadAddr", address.getRoadAddr());
-        ReflectionTestUtils.setField(createDto, "detailAddr", address.getDetailAddr());
-        ReflectionTestUtils.setField(createDto, "phone", "010-1111-2222");
-
-        Restaurant restaurant = new Restaurant(createDto, owner, address, owner.getUsername());
+        // 음식점 생성 (소유자는 owner)
+        Restaurant restaurant = createRestaurant(owner, address, "꿀맛짬뽕", "010-2222-2222");
         restaurant = restaurantRepository.save(restaurant);
 
         mockMvc.perform(delete("/api/restaurants/{restaurantId}", restaurant.getId())
@@ -269,29 +219,17 @@ public class RestaurantIntegrationTest {
     @Test
     void testSearchRestaurantSuccess() throws Exception {
         // 두 개의 음식점 생성
-        RestaurantAdminCreateRequestDto createDto1 = new RestaurantAdminCreateRequestDto();
-        ReflectionTestUtils.setField(createDto1, "ownerId", owner.getUsername());
-        ReflectionTestUtils.setField(createDto1, "name", "Alpha Restaurant");
-        ReflectionTestUtils.setField(createDto1, "category", Restaurant.CategoryEnum.HANSIK);
-        ReflectionTestUtils.setField(createDto1, "roadAddr", "Road A");
-        ReflectionTestUtils.setField(createDto1, "detailAddr", "Detail A");
-        ReflectionTestUtils.setField(createDto1, "phone", "010-0000-0001");
-        Restaurant restaurant1 = new Restaurant(createDto1, owner, address, owner.getUsername());
-        restaurantRepository.save(restaurant1);
+        // 음식점 생성 (소유자는 owner)
+        Restaurant restaurant1 = createRestaurant(owner, address, "진짜짬뽕", "010-2222-2222");
+        restaurant1 = restaurantRepository.save(restaurant1);
 
-        RestaurantAdminCreateRequestDto createDto2 = new RestaurantAdminCreateRequestDto();
-        ReflectionTestUtils.setField(createDto2, "ownerId", owner.getUsername());
-        ReflectionTestUtils.setField(createDto2, "name", "Beta Restaurant");
-        ReflectionTestUtils.setField(createDto2, "category", Restaurant.CategoryEnum.YANGSIK);
-        ReflectionTestUtils.setField(createDto2, "roadAddr", "Road B");
-        ReflectionTestUtils.setField(createDto2, "detailAddr", "Detail B");
-        ReflectionTestUtils.setField(createDto2, "phone", "010-0000-0002");
-        Restaurant restaurant2 = new Restaurant(createDto2, owner, address, owner.getUsername());
-        restaurantRepository.save(restaurant2);
+        // 음식점 생성 (소유자는 owner)
+        Restaurant restaurant2 = createRestaurant(owner, address, "짜장진짜", "010-2222-2222");
+        restaurant2 = restaurantRepository.save(restaurant2);
 
-        // name 파라미터에 "Restaurant"가 포함된 경우 검색 (검색 결과가 2건 이상이어야 함)
+        // name 파라미터에 "진짜"가 포함된 경우 검색 (검색 결과가 2건 이상이어야 함)
         mockMvc.perform(get("/api/restaurants/search")
-                .param("name", "Restaurant")
+                .param("name", "진짜")
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.content", hasSize(greaterThanOrEqualTo(2))));
