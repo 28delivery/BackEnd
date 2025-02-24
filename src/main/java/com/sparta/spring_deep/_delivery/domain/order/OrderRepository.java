@@ -9,15 +9,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface OrderRepository extends JpaRepository<Order, UUID> {
+public interface OrderRepository extends JpaRepository<Order, UUID>, OrderRepositoryCustom {
 
     Optional<List<Order>> findAllByRestaurantId(UUID restaurantId);
 
-    Page<Order> findAllByCustomerUsernameAndIsDeletedFalse(String username, Pageable pageable);
+//    Page<Order> findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(String customerId,
+//        String restaurantName, String menuName, String status,
+//        Pageable pageable);
 
-    Page<Order> findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(String customerId,
+    List<Order> findAllByRestaurantIdAndIsDeletedFalse(UUID restaurantId);
+
+    Optional<Order> findByIdAndIsDeletedFalse(UUID orderId);
+
+    Page<Order> findByCustomerUsernameAndIsDeletedFalseAndUpdatedAtAfterAndStatusIn(String username,
         LocalDateTime lastCheckedTime,
-        List<OrderStatusEnum> statusEnumList,
-        Pageable pageable);
-
+        List<OrderStatusEnum> pending, Pageable pageable);
 }

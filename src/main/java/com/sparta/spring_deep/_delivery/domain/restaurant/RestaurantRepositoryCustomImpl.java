@@ -1,76 +1,76 @@
 package com.sparta.spring_deep._delivery.domain.restaurant;
 
-import static com.sparta.spring_deep._delivery.domain.restaurant.QRestaurant.restaurant;
-
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.spring_deep._delivery.domain.category.Category;
 import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.support.PageableExecutionUtils;
 
 @RequiredArgsConstructor
+@Slf4j(topic = "RestaurantRepositoryQueryDSL")
 public class RestaurantRepositoryCustomImpl implements RestaurantRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<Restaurant> searchByOption(Pageable pageable, UUID id,
-        String restaurantName, Category category) {
-//        List<RestaurantResponseDto> restaurants = queryFactory
-//            .select(Projections.constructor(RestaurantResponseDto.class,
-//                restaurant.id,
-//                restaurant.owner.username,
-//                restaurant.category.name,
-//                restaurant.name,
-//                restaurant.address,
-//                restaurant.phone))
-//            .from(restaurant)
-//            .leftJoin(restaurant.category)
-//            .leftJoin(restaurant.owner)
-//            .where(eqId(id),
-//                eqRestaurantName(restaurantName),
-//                eqCategory(category),
-//                restaurant.isDeleted.eq(false))
-//            .offset(pageable.getOffset()) // 몇 번째 페이지부터 시작할 것인지.
-//            .limit(pageable.getPageSize()) // 페이지당 몇개의 데이터를 보여줄건지.
-//            .fetch();
-        List<Restaurant> restaurants = queryFactory
-            .select(restaurant)
+    public Page<RestaurantResponseDto> searchByOptionAndIsDeletedFalse(
+        RestaurantSearchDto restaurantSearchDto, Pageable pageable) {
+        log.info("searchByOptionAndIsDeletedFalse");
+
+        QRestaurant restaurant = QRestaurant.restaurant;
+
+        // 동적 조건 생성
+        BooleanBuilder builder = new BooleanBuilder();
+        // 삭제되지 않은 음식점만 조회
+        builder.and(restaurant.isDeleted.eq(false));
+
+        // 이름 조건 (부분 일치, 대소문자 무시)
+        if (restaurantSearchDto.getName() != null && !restaurantSearchDto.getName().isEmpty()) {
+            builder.and(restaurant.name.containsIgnoreCase(restaurantSearchDto.getName()));
+        }
+
+        // 카테고리 조건
+        if (restaurantSearchDto.getCategory() != null) {
+            builder.and(restaurant.category.eq(restaurantSearchDto.getCategory()));
+        }
+
+        // 전화번호 조건 (부분 일치)
+        if (restaurantSearchDto.getPhone() != null && !restaurantSearchDto.getPhone().isEmpty()) {
+            builder.and(restaurant.phone.contains(restaurantSearchDto.getPhone()));
+        }
+
+        // 음식점 정보 DTO로 매핑해서 페이징 처리된 결과 조회
+        List<RestaurantResponseDto> content = queryFactory
+            .select(Projections.constructor(
+                RestaurantResponseDto.class,
+                restaurant.id,
+                restaurant.owner.username,
+                restaurant.category,
+                restaurant.name,
+                restaurant.phone,
+                restaurant.restaurantAddress.roadAddr,
+                restaurant.restaurantAddress.jibunAddr,
+                restaurant.restaurantAddress.detailAddr,
+                restaurant.restaurantAddress.engAddr
+                // 필요한 다른 필드 추가 가능
+            ))
             .from(restaurant)
-            .leftJoin(restaurant.category)
-            .leftJoin(restaurant.owner)
-            .where(eqId(id),
-                eqRestaurantName(restaurantName),
-                restaurant.isDeleted.eq(false))
-            .offset(pageable.getOffset()) // 몇 번째 페이지부터 시작할 것인지.
-            .limit(pageable.getPageSize()) // 페이지당 몇개의 데이터를 보여줄건지.
+            .where(builder)
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
             .fetch();
 
-        JPAQuery<Long> countQuery = queryFactory
-            .select(restaurant.count())
+        // 총 결과 수 조회
+        long total = queryFactory
+            .select(restaurant.id)
             .from(restaurant)
-            .where(eqId(id),
-                eqRestaurantName(restaurantName),
-                eqCategory(category),
-                restaurant.isDeleted.eq(false));
+            .where(builder)
+            .fetchCount();
 
-        return PageableExecutionUtils.getPage(restaurants, pageable, countQuery::fetchOne);
-    }
-
-    private BooleanExpression eqId(UUID id) {
-        return id == null ? null : restaurant.id.eq(id);
-    }
-
-    private BooleanExpression eqRestaurantName(String restaurantName) {
-        return restaurantName == null ? null : restaurant.name.containsIgnoreCase(restaurantName);
-    }
-
-    private BooleanExpression eqCategory(Category category) {
-        return category == null ? null : restaurant.category.id.eq(category.getId());
+        return new PageImpl<>(content, pageable, total);
     }
 }

@@ -1,6 +1,8 @@
 package com.sparta.spring_deep._delivery.domain.menu;
 
-import com.sparta.spring_deep._delivery.admin.repository.AiRepository;
+import static com.sparta.spring_deep._delivery.util.AuthTools.ownerCheck;
+
+import com.sparta.spring_deep._delivery.admin.ai.AiRepository;
 import com.sparta.spring_deep._delivery.domain.ai.Ai;
 import com.sparta.spring_deep._delivery.domain.ai.GoogleAiService;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
@@ -8,16 +10,13 @@ import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
+import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import com.sparta.spring_deep._delivery.util.AuthTools;
-import jakarta.persistence.EntityNotFoundException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,18 +38,20 @@ public class MenuService {
         MenuRequestDto requestDto,
         UserDetailsImpl userDetails
     ) {
-        User user = userRepository.findById(userDetails.getUser().getUsername())
-            .orElseThrow(() -> new EntityNotFoundException(
-                "메뉴 추가 : 해당 유저를 찾을 수 없습니다. username : " + userDetails.getUser().getUsername()));
+        log.info("메뉴 추가");
 
-        Restaurant restaurant = restaurantRepository.findById(restaurantId)
-            .orElseThrow(() -> new EntityNotFoundException(
-                "메뉴 추가 : 해당하는 레스토랑이 없습니다. restaurantId= " + restaurantId));
+        User user = userDetails.getUser();
+
+        Restaurant restaurant = restaurantRepository.findByIdAndIsDeletedFalse(restaurantId)
+            .orElseThrow(ResourceNotFoundException::new);
+
+        // 음식점 오너로 로그인 되어 있는지 확인
+        ownerCheck(user, restaurant.getOwner());
 
         AuthTools.roleCheck(userDetails, restaurant, "메뉴 추가");
 
         Menu menu = Menu.builder()
-            .restaurantId(restaurant)
+            .restaurant(restaurant)
             .name(requestDto.getName())
             .description(requestDto.getDescription())
             .price(requestDto.getPrice())
@@ -62,20 +63,38 @@ public class MenuService {
         return new MenuResponseDto(menu);
     }
 
-    // restaurant_id 기반 모든 메뉴 조회
-    public Page<MenuResponseDto> getAllMenus(
-        Restaurant restaurantId,
-        String name,
-        String sortBy,
-        int page, int size
-    ) {
-        int pageSize = (size == 10 || size == 30 || size == 50) ? size : 10;
+//    // restaurant_id 기반 모든 메뉴 조회
+//    public Page<MenuResponseDto> getAllMenus(
+//        Restaurant restaurantId,
+//        String name,
+//        String sortBy,
+//        int page, int size
+//    ) {
+//        log.info("restaurant_id 기반 모든 메뉴 조회");
+//
+//        int pageSize = (size == 10 || size == 30 || size == 50) ? size : 10;
+//
+//        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Direction.DESC, sortBy));
+//
+//        Page<Menu> menus = menuRepository.findAllByRestaurantIdAndIsDeletedFalse(restaurantId,
+//            pageable);
+//
+//        return menus.map(MenuResponseDto::new);
+//    }
 
-        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Direction.DESC, sortBy));
+    public Page<MenuResponseDto> searchMenus(UUID restaurantId, MenuSearchDto searchDto,
+        Pageable pageable) {
+        log.info("restaurant_id 기반 모든 메뉴 검색 및 조회");
 
-        Page<Menu> menus = menuRepository.findAllByRestaurantId(restaurantId, pageable);
+        Page<MenuResponseDto> responseDto = menuRepository.searchByOptionAndIsDeletedFalse(
+            restaurantId, searchDto, pageable);
 
-        return menus.map(MenuResponseDto::new);
+        // 검색 및 조회 결과가 비어있다면 Exception 발생
+        if (responseDto.isEmpty()) {
+            throw new ResourceNotFoundException();
+        }
+
+        return responseDto;
     }
 
     // 메뉴 수정
@@ -85,16 +104,19 @@ public class MenuService {
         MenuRequestDto requestDto,
         UserDetailsImpl userDetails
     ) {
-        Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(() -> new EntityNotFoundException("메뉴 수정 : 해당 메뉴를 찾을 수 없습니다."));
+        log.info("메뉴 수정");
 
-        User user = userRepository.findById(userDetails.getUser().getUsername())
-            .orElseThrow(() -> new EntityNotFoundException(
-                "메뉴 수정 : 해당 유저를 찾을 수 없습니다. username : " + userDetails.getUser().getUsername()));
+        Menu menu = menuRepository.findByIdAndIsDeletedFalse(menuId)
+            .orElseThrow(ResourceNotFoundException::new);
 
-        Restaurant restaurant = restaurantRepository.findById(menu.getRestaurantId().getId())
-            .orElseThrow(() -> new EntityNotFoundException(
-                "메뉴 수정 : 해당하는 레스토랑이 없습니다. restaurantId : " + menu.getRestaurantId()));
+        User user = userDetails.getUser();
+
+        Restaurant restaurant = restaurantRepository.findByIdAndIsDeletedFalse(
+                menu.getRestaurant().getId())
+            .orElseThrow(ResourceNotFoundException::new);
+
+        // 사장님으로 로그인 했는지 확인
+        ownerCheck(user, restaurant.getOwner());
 
         AuthTools.roleCheck(userDetails, restaurant, "메뉴 수정");
 
@@ -115,16 +137,19 @@ public class MenuService {
         UUID menuId,
         UserDetailsImpl userDetails
     ) {
-        Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(() -> new EntityNotFoundException("해당 메뉴를 찾을 수 없습니다. 메뉴 id : " + menuId));
+        log.info("메뉴 삭제");
 
-        Restaurant restaurant = restaurantRepository.findById(menu.getRestaurantId().getId())
-            .orElseThrow(() -> new EntityNotFoundException(
-                "메뉴 삭제 : 해당하는 레스토랑이 없습니다. restaurantId= " + menu.getRestaurantId()));
+        Menu menu = menuRepository.findByIdAndIsDeletedFalse(menuId)
+            .orElseThrow(ResourceNotFoundException::new);
 
-        User user = userRepository.findById(userDetails.getUser().getUsername())
-            .orElseThrow(() -> new EntityNotFoundException(
-                "메뉴 삭제 : 해당 유저를 찾을 수 없습니다. username : " + userDetails.getUser().getUsername()));
+        Restaurant restaurant = restaurantRepository.findByIdAndIsDeletedFalse(
+                menu.getRestaurant().getId())
+            .orElseThrow(ResourceNotFoundException::new);
+
+        User user = userDetails.getUser();
+
+        // 사장님으로 로그인 했는지 확인
+        ownerCheck(user, restaurant.getOwner());
 
         AuthTools.roleCheck(userDetails, restaurant, "메뉴 삭제");
 
@@ -139,16 +164,19 @@ public class MenuService {
         UUID menuId,
         UserDetailsImpl userDetails
     ) {
-        Menu menu = menuRepository.findById(menuId)
-            .orElseThrow(() -> new EntityNotFoundException("AI 설명 생성 : 해당 메뉴를 찾을 수 없습니다."));
+        log.info("ai 설명 생성");
 
-        User user = userRepository.findById(userDetails.getUser().getUsername())
-            .orElseThrow(() -> new EntityNotFoundException(
-                "AI 설명 생성 : 해당 유저를 찾을 수 없습니다. username : " + userDetails.getUser().getUsername()));
+        Menu menu = menuRepository.findByIdAndIsDeletedFalse(menuId)
+            .orElseThrow(ResourceNotFoundException::new);
 
-        Restaurant restaurant = restaurantRepository.findById(menu.getRestaurantId().getId())
-            .orElseThrow(() -> new EntityNotFoundException(
-                "AI 설명 생성 : 해당하는 레스토랑이 없습니다. restaurantId= " + menu.getRestaurantId()));
+        User user = userDetails.getUser();
+
+        Restaurant restaurant = restaurantRepository.findByIdAndIsDeletedFalse(
+                menu.getRestaurant().getId())
+            .orElseThrow(ResourceNotFoundException::new);
+
+        // 사장님으로 로그인 했는지 확인
+        ownerCheck(user, restaurant.getOwner());
 
         AuthTools.roleCheck(userDetails, restaurant, "Ai 설명 생성");
 

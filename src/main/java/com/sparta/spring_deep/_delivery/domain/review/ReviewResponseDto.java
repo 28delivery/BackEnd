@@ -1,37 +1,30 @@
 package com.sparta.spring_deep._delivery.domain.review;
 
 import java.time.LocalDateTime;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@Getter
-@NoArgsConstructor
+@Data
+@AllArgsConstructor
 public class ReviewResponseDto {
 
-    private String id;
-    private String orderId;
+    private UUID id;
+    private UUID orderId;
     private String userId;
     private String comment;
-    private int rating;
-    private LocalDateTime createdAt;
+    private Integer rating;
     private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
-    private String createdBy;
     private String updatedBy;
-    private String deletedBy;
 
     public ReviewResponseDto(Review review) {
-        this.id = review.getId().toString();
-        this.orderId = review.getOrder().getId().toString();
+        this.id = review.getId();
+        this.orderId = review.getOrder().getId();
         this.userId = review.getUser().getUsername();
         this.comment = review.getComment();
         this.rating = review.getRating();
-        this.createdAt = review.getCreatedAt();
         this.updatedAt = review.getUpdatedAt();
-        this.deletedAt = review.getDeletedAt();
-        this.createdBy = review.getCreatedBy();
         this.updatedBy = review.getUpdatedBy();
-        this.deletedBy = review.getDeletedBy();
     }
 
 }

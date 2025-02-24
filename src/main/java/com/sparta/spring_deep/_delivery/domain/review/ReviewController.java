@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +18,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@Slf4j
+@Slf4j(topic = "ReviewController")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -34,7 +34,7 @@ public class ReviewController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody ReviewRequestDto requestDto) {
 
-        log.info("Create Review : {}", requestDto);
+        log.info("리뷰 작성 : {}", requestDto);
 
         ReviewResponseDto responseDto = reviewService.createReview(requestDto,
             userDetails.getUser());
@@ -45,16 +45,13 @@ public class ReviewController {
     @GetMapping("/reviews/{restaurantId}/search")
     public ResponseEntity<Page<ReviewResponseDto>> searchReview(
         @PathVariable String restaurantId,
-        @PageableDefault(size = 10, page = 0) Pageable pageable,
-        @RequestParam(defaultValue = "createdAt") String sortBy,
-        @RequestParam(defaultValue = "false") boolean isAsc) {
+        @PageableDefault(sort = "createdAt", size = 10, page = 0, direction = Direction.DESC) Pageable pageable
+    ) {
 
         log.info("특정 음식점 리뷰 조회 - restaurantId :{}", restaurantId);
 
         Page<ReviewResponseDto> responseDtos = reviewService.getReviews(
-            UUID.fromString(restaurantId), pageable.getPageNumber(),
-            pageable.getPageSize(), sortBy,
-            isAsc);
+            UUID.fromString(restaurantId), pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDtos);
     }
@@ -75,7 +72,7 @@ public class ReviewController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable String reviewId,
         @RequestBody ReviewRequestDto requestDto) {
-        log.info("Update Review - reviewId :{}", reviewId);
+        log.info("리뷰 수정 :{}", reviewId);
 
         ReviewResponseDto responseDto = reviewService.updateReview(UUID.fromString(reviewId),
             requestDto.getComment(), requestDto.getRating(), userDetails.getUser());
@@ -88,7 +85,7 @@ public class ReviewController {
     public ResponseEntity<String> deleteReview(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable String reviewId) {
-        log.info("Delete Review - reviewId :{}", reviewId);
+        log.info("리뷰 삭제 - reviewId :{}", reviewId);
 
         return reviewService.deleteReview(UUID.fromString(reviewId), userDetails.getUser());
     }
