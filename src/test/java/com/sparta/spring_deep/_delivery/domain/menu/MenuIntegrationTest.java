@@ -105,7 +105,6 @@ public class MenuIntegrationTest {
             "010-1111-1111");
         restaurantRepository.save(testRestaurant);
 
-
     }
 
     private Authentication getAuth(User user) {
@@ -139,8 +138,8 @@ public class MenuIntegrationTest {
             .orElseThrow(() -> new RuntimeException("DB에 저장된 메뉴를 찾을 수 없습니다."));
 
         assertEquals("왕감자", savedMenu.getName());
-        assertEquals("진짜 큰 감자", savedMenu.getDescription());
-        assertEquals(BigDecimal.valueOf(20000), savedMenu.getPrice());
+        assertEquals("진짜 큰 왕감자", savedMenu.getDescription());
+        assertEquals(BigDecimal.valueOf(15000), savedMenu.getPrice());
         assertFalse(savedMenu.getIsHidden());
         assertEquals(testRestaurant.getId(), savedMenu.getRestaurant().getId());
     }
