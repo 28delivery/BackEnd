@@ -1,6 +1,7 @@
 package com.sparta.spring_deep._delivery.domain.address.repository;
 
 import com.sparta.spring_deep._delivery.domain.address.entity.Address;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,4 +21,7 @@ public interface AddressRepository extends JpaRepository<Address, UUID>, Address
     Optional<Address> findByIdAndIsDeletedFalse(UUID addressId);
 
     List<Address> findAllByUserUsernameAndIsDeletedFalse(String username);
+
+
+    boolean existsByAddressName(@NotNull String addressName);
 }

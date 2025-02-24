@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-public class UserAdminApiTest {
+public class UserAdminIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
