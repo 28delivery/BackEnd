@@ -5,23 +5,23 @@ import com.sparta.spring_deep._delivery.domain.order.OrderRepository;
 import com.sparta.spring_deep._delivery.domain.review.Review;
 import com.sparta.spring_deep._delivery.domain.review.ReviewResponseDto;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
-import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "ReviewAdminService")
 public class ReviewAdminService {
 
     private final ReviewAdminRepository reviewAdminRepository;
@@ -33,16 +33,13 @@ public class ReviewAdminService {
         User admin,
         UUID restaurantId, int page, int size,
         String sortBy, boolean isAsc) {
-
-        if (admin.getRole().equals(UserRole.ADMIN)) {
-            throw new AccessDeniedException("Only Admin can access");
-        }
+        log.info("getReviews");
 
         Pageable pageable = PageRequest.of(page, size,
             Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy));
 
         List<Order> orders = orderRepository.findAllByRestaurantId(restaurantId).orElseThrow(
-            () -> new IllegalArgumentException("해당 레스토랑의 리뷰가 존재하지 않습니다.")
+            () -> new ResourceNotFoundException("해당 레스토랑의 리뷰가 존재하지 않습니다.")
         );
 
         List<UUID> orderIds = orders.stream().map(Order::getId).collect(Collectors.toList());
@@ -55,6 +52,8 @@ public class ReviewAdminService {
 
     public Page<ReviewAdminResponseDto> searchReviews(ReviewAdminSearchDto searchDto,
         Pageable pageable) {
+        log.info("searchReviews");
+
         Page<ReviewAdminResponseDto> responseDtos = reviewAdminRepository.searchByOption(searchDto,
             pageable);
 

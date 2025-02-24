@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/restaurants")
-@Slf4j(topic = "Admin Restaurant Controller")
+@Slf4j(topic = "RestaurantAdminController")
 public class RestaurantAdminController {
 
     private final RestaurantManageAdminService restaurantManageAdminService;
@@ -82,6 +82,7 @@ public class RestaurantAdminController {
     public ResponseEntity<Page<RestaurantAdminResponseDto>> searchRestaurant(
         @ModelAttribute RestaurantAdminSearchDto restaurantAdminSearchDto,
         @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
+        log.info("searchRestaurant");
 
         Page<RestaurantAdminResponseDto> responseDtos = restaurantAdminService.searchRestaurant(
             restaurantAdminSearchDto, pageable);

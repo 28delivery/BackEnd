@@ -19,7 +19,6 @@ import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import com.sparta.spring_deep._delivery.exception.OperationNotAllowedException;
 import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
-import com.sparta.spring_deep._delivery.exception.UnauthorizedAccessException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,7 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j(topic = "Order Service")
+@Slf4j(topic = "OrderService")
 public class OrderService {
 
     private final OrderRepository orderRepository;
@@ -57,10 +56,6 @@ public class OrderService {
     public OrderDetailsResponseDto createOrder(OrderDetailsRequestDto requestDto, User user) {
         log.info("주문 생성");
 
-        if (!(user.getRole().equals(UserRole.CUSTOMER) || user.getRole().equals(UserRole.ADMIN))) {
-            throw new UnauthorizedAccessException();
-        }
-
         Restaurant restaurant = restaurantRepository.findByIdAndIsDeletedFalse(
                 requestDto.getRestaurantId())
             .orElseThrow(ResourceNotFoundException::new);
@@ -69,8 +64,7 @@ public class OrderService {
         Address address = addressRepository.findByIdAndIsDeletedFalse(requestDto.getAddressId())
             .orElseThrow(ResourceNotFoundException::new);
 
-        // 유저 정보와 주소 정보 일치하는지 검사하는 로직 추가
-        log.info("유저 정보와 주소 정보 일치하는지 검사");
+        // 유저 정보와 주소 정보 일치하는지 검사
         ownerCheck(user, address.getUser());
 
         Order order = orderRepository.save(new Order(user, restaurant, address,
@@ -111,16 +105,13 @@ public class OrderService {
         Order order = orderRepository.findByIdAndIsDeletedFalse(orderId)
             .orElseThrow(ResourceNotFoundException::new);
 
-        if (owner.getRole().equals(UserRole.CUSTOMER)) {
-            throw new UnauthorizedAccessException();
-        }
-
         if (owner.getRole().equals(UserRole.OWNER)) {
             ownerCheck(owner, order.getRestaurant().getOwner());
         }
 
         if (order.getStatus().equals(OrderStatusEnum.CANCELLED)) {
-            throw new OperationNotAllowedException("취소된 주문입니다.");
+            log.error("취소된 주문 : orderId : " + orderId);
+            throw new OperationNotAllowedException();
         }
 
         order.updateOrderStatus(owner, status);

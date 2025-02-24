@@ -5,6 +5,7 @@ import static com.sparta.spring_deep._delivery.util.AuthTools.ownerCheck;
 import com.sparta.spring_deep._delivery.domain.order.Order;
 import com.sparta.spring_deep._delivery.domain.order.OrderRepository;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -17,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j(topic = "Payment Service")
+@Slf4j(topic = "PaymentService")
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
@@ -80,7 +81,9 @@ public class PaymentService {
             .orElseThrow(ResourceNotFoundException::new);
 
         // 결제자만 결제 조회 가능
-        ownerCheck(user, payment.getOrder().getCustomer());
+        if (!user.getRole().equals(UserRole.ADMIN)) {
+            ownerCheck(user, payment.getOrder().getCustomer());
+        }
 
         return payment;
     }
@@ -94,7 +97,9 @@ public class PaymentService {
             .orElseThrow(ResourceNotFoundException::new);
 
         // 결제자만 결제 내역 삭제 가능
-        ownerCheck(user, payment.getOrder().getCustomer());
+        if (!user.getRole().equals(UserRole.ADMIN)) {
+            ownerCheck(user, payment.getOrder().getCustomer());
+        }
 
         payment.delete(user.getUsername());
         return ResponseEntity.status(HttpStatus.OK)

@@ -58,7 +58,7 @@ public class RestaurantAddressAdminService {
         // id로 주소 객체 검색
         RestaurantAddress restaurantAddress = repository.findById(id)
             .orElseThrow(
-                () -> new IllegalArgumentException("해당 Id와 일치하는 가게 주소가 존재하지 않습니다. : " + id));
+                () -> new ResourceNotFoundException("해당 Id와 일치하는 가게 주소가 존재하지 않습니다. : " + id));
 
         // 주소 검색
         Map<String, Object> searchResultJson = searchAddress(dto.getRoadAddr());
@@ -79,7 +79,7 @@ public class RestaurantAddressAdminService {
         // id로 가게 주소 검색
         RestaurantAddress restaurantAddress = repository.findById(id)
             .orElseThrow(
-                () -> new IllegalArgumentException("해당 Id와 일치하는 가게 주소가 존재하지 않습니다. : " + id));
+                () -> new ResourceNotFoundException("해당 Id와 일치하는 가게 주소가 존재하지 않습니다. : " + id));
 
         return new RestaurantAddressAdminResponseDto(restaurantAddress);
     }

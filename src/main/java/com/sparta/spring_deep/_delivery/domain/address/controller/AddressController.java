@@ -7,6 +7,7 @@ import com.sparta.spring_deep._delivery.domain.address.service.AddressService;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/addresses")
+@Slf4j(topic = "Address Controller")
 public class AddressController {
 
     private final AddressService addressService;
@@ -35,6 +37,7 @@ public class AddressController {
     public ResponseEntity<AddressResponseDto> createAddress(
         @RequestBody AddressRequestDto requestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        log.info("배송지 추가");
 
         AddressResponseDto responseDto = addressService.createAddress(requestDto, userDetails);
 
@@ -47,6 +50,7 @@ public class AddressController {
         @ModelAttribute AddressSearchDto searchDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PageableDefault(page = 0, size = 10, sort = "addressName", direction = Sort.Direction.ASC) Pageable pageable) {
+        log.info("배송지 조회");
 
         Page<AddressResponseDto> responseDto = addressService.searchMyAddresses(searchDto,
             userDetails, pageable);
@@ -60,6 +64,7 @@ public class AddressController {
     public ResponseEntity<AddressResponseDto> getAddress(
         @PathVariable UUID addressId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        log.info("개별 배송지 조회");
 
         AddressResponseDto responseDto = addressService.getAddress(addressId, userDetails);
 
@@ -72,6 +77,7 @@ public class AddressController {
         @PathVariable UUID addressId,
         @RequestBody AddressRequestDto requestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        log.info("배송지 수정");
 
         AddressResponseDto responseDto = addressService.updateAddress(addressId, requestDto,
             userDetails);
@@ -84,6 +90,7 @@ public class AddressController {
     public ResponseEntity<String> deleteAddress(
         @PathVariable UUID addressId,
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        log.info("배송지 삭제");
 
         addressService.deleteAddress(addressId, userDetails);
 

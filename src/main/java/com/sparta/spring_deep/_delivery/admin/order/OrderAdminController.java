@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
-@Slf4j
+@Slf4j(topic = "OrderAdminController")
 public class OrderAdminController {
 
     private final OrderAdminService orderAdminService;

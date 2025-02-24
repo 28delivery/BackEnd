@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j(topic = "Restaurant Service")
+@Slf4j(topic = "RestaurantAdminService")
 public class RestaurantAdminService {
 
     private final RestaurantAdminRepository restaurantAdminRepository;

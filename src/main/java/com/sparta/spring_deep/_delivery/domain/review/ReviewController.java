@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-@Slf4j
+@Slf4j(topic = "ReviewController")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -34,7 +34,7 @@ public class ReviewController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody ReviewRequestDto requestDto) {
 
-        log.info("Create Review : {}", requestDto);
+        log.info("리뷰 작성 : {}", requestDto);
 
         ReviewResponseDto responseDto = reviewService.createReview(requestDto,
             userDetails.getUser());
@@ -72,7 +72,7 @@ public class ReviewController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable String reviewId,
         @RequestBody ReviewRequestDto requestDto) {
-        log.info("Update Review - reviewId :{}", reviewId);
+        log.info("리뷰 수정 :{}", reviewId);
 
         ReviewResponseDto responseDto = reviewService.updateReview(UUID.fromString(reviewId),
             requestDto.getComment(), requestDto.getRating(), userDetails.getUser());
@@ -85,7 +85,7 @@ public class ReviewController {
     public ResponseEntity<String> deleteReview(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable String reviewId) {
-        log.info("Delete Review - reviewId :{}", reviewId);
+        log.info("리뷰 삭제 - reviewId :{}", reviewId);
 
         return reviewService.deleteReview(UUID.fromString(reviewId), userDetails.getUser());
     }

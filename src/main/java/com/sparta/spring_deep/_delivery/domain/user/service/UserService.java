@@ -13,6 +13,7 @@ import com.sparta.spring_deep._delivery.exception.DuplicateResourceException;
 import com.sparta.spring_deep._delivery.util.JwtUtil;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-
+@Slf4j(topic = "UserService")
 public class UserService {
 
     @Autowired

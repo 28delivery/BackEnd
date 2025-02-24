@@ -59,6 +59,7 @@ public class AddressService {
 //            .collect(Collectors.toList());
 //    }
 
+    // 배송지 검색 및 조회
     public Page<AddressResponseDto> searchMyAddresses(AddressSearchDto searchDto,
         UserDetailsImpl userDetails, Pageable pageable) {
         log.info("배송지 검색 및 조회");
@@ -69,7 +70,7 @@ public class AddressService {
 
         Page<AddressResponseDto> responseDtos = addressRepository.searchByOptionAndIsDeletedFalse(
             searchDto, loggedInUser, pageable);
-        
+
         if (responseDtos.getContent().isEmpty()) {
             throw new ResourceNotFoundException();
         }

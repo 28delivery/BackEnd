@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 public class UserAdminResponseDto {
 
     private String username;
-    private String password;
     private String email;
     private UserRole role;
     private IsPublic isPublic;
@@ -26,7 +25,6 @@ public class UserAdminResponseDto {
 
     public UserAdminResponseDto(User user) {
         this.username = user.getUsername();
-        this.password = user.getPassword();
         this.email = user.getEmail();
         this.role = user.getRole();
         this.isPublic = user.getIsPublic();

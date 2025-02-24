@@ -3,6 +3,7 @@ package com.sparta.spring_deep._delivery.domain.menu;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Slf4j(topic = "Menu Controller")
 public class MenuController {
 
     private final MenuService menuService;
@@ -34,6 +36,8 @@ public class MenuController {
         @RequestBody MenuRequestDto requestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
+        log.info("메뉴 추가");
+
         MenuResponseDto responseDto = menuService.addMenu(restaurantId, requestDto, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
@@ -59,6 +63,8 @@ public class MenuController {
         @ModelAttribute MenuSearchDto searchDto,
         @PageableDefault(page = 0, size = 10, sort = "name", direction = Sort.Direction.ASC) Pageable pageable
     ) {
+        log.info("restaurantId 기반 메뉴 검색 및 조회 : restaurantId = {}", restaurantId);
+
         Page<MenuResponseDto> responseDtoPage = menuService.searchMenus(restaurantId, searchDto,
             pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responseDtoPage);
@@ -71,6 +77,8 @@ public class MenuController {
         @RequestBody MenuRequestDto requestDto,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
+        log.info("updateMenu");
+
         MenuResponseDto responseDto = menuService.updateMenu(menuId, requestDto, userDetails);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
@@ -81,6 +89,8 @@ public class MenuController {
         @PathVariable(name = "menuId") UUID menuId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
+        log.info("deleteMenu");
+
         menuService.deleteMenu(menuId, userDetails);
         return ResponseEntity.ok("success");
     }
@@ -91,6 +101,8 @@ public class MenuController {
         @PathVariable(name = "menuId") UUID menuId,
         @AuthenticationPrincipal UserDetailsImpl userDetails
     ) {
+        log.info("aiDescription");
+        
         MenuAiResponseDto responseDto = menuService.aiDescription(menuId, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }

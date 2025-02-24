@@ -10,10 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+@Slf4j(topic = "ReviewRepositoryQueryDSL")
 @RequiredArgsConstructor
 public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 
@@ -21,6 +23,8 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
 
     @Override
     public Page<Review> searchReviews(UUID restaurantId, Pageable pageable) {
+        log.info("searchReviews");
+        
         // pageable의 정렬 조건 처리 (기본은 createdAt 내림차순)
         List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
         pageable.getSort().forEach(sort -> {

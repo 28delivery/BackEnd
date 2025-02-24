@@ -5,7 +5,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.spring_deep._delivery.domain.ai.QAi;
-import com.sparta.spring_deep._delivery.domain.menu.QMenu;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,6 @@ public class AiRepositoryCustomImpl implements AiRepositoryCustom {
         log.info("searchByOption");
 
         QAi ai = QAi.ai;
-        QMenu menu = QMenu.menu;
 
         // 동적 조건 생성
         BooleanBuilder builder = new BooleanBuilder();

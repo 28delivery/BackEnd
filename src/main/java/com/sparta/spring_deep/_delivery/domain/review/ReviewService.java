@@ -7,11 +7,9 @@ import com.sparta.spring_deep._delivery.domain.order.OrderRepository;
 import com.sparta.spring_deep._delivery.domain.order.OrderStatusEnum;
 import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
-import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.exception.DeletedDataAccessException;
 import com.sparta.spring_deep._delivery.exception.OperationNotAllowedException;
 import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
-import com.sparta.spring_deep._delivery.exception.UnauthorizedAccessException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j(topic = "Review Service")
+@Slf4j(topic = "ReviewService")
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -33,10 +31,6 @@ public class ReviewService {
     // 리뷰 작성
     public ReviewResponseDto createReview(ReviewRequestDto requestDto, User user) {
         log.info("리뷰 작성");
-
-        if (!user.getRole().equals(UserRole.CUSTOMER)) {
-            throw new UnauthorizedAccessException();
-        }
 
         Order order = orderRepository.findByIdAndIsDeletedFalse(requestDto.getOrderId())
             .orElseThrow(ResourceNotFoundException::new);
@@ -60,8 +54,7 @@ public class ReviewService {
         log.info("특정 음식점 리뷰 조회");
 
         restaurantRepository.findByIdAndIsDeletedFalse(restaurantId)
-            .orElseThrow(() -> new ResourceNotFoundException(
-                "음식점 리뷰 조회 : 해당 음식점 존재하지 않음. restaurant_id=" + restaurantId));
+            .orElseThrow(ResourceNotFoundException::new);
 
         Page<Review> reviews = reviewRepository.searchReviews(restaurantId, pageable);
 

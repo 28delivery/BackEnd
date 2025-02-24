@@ -3,6 +3,7 @@ package com.sparta.spring_deep._delivery.domain.payment;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Slf4j(topic = "PaymentController")
 public class PaymentController {
 
     private final PaymentService paymentService;
@@ -26,6 +28,7 @@ public class PaymentController {
     @PostMapping("/payment")
     public ResponseEntity<Payment> createPayment(@RequestBody PaymentRequestDto requestDto
         , @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        log.info("createPayment");
 
         Payment payment = paymentService.createPayment(userDetails.getUsername(),
             UUID.fromString(requestDto.orderId),
@@ -36,7 +39,8 @@ public class PaymentController {
     // 결제 완료 처리
     @PutMapping("/payment/complete")
     public ResponseEntity<Payment> completePayment(@RequestParam String paymentId) {
-        
+        log.info("completePayment");
+
         Payment payment = paymentService.completePayment(UUID.fromString(paymentId));
         return ResponseEntity.status(HttpStatus.OK).body(payment);
     }
@@ -44,6 +48,7 @@ public class PaymentController {
     // 결제 취소 처리
     @PutMapping("/payment/cancel")
     public ResponseEntity<Payment> cancelPayment(@RequestParam String paymentId) {
+        log.info("cancelPayment");
 
         Payment payment = paymentService.cancelPayment(UUID.fromString(paymentId));
         return ResponseEntity.status(HttpStatus.OK).body(payment);
@@ -52,6 +57,7 @@ public class PaymentController {
     // 결제 실패 처리
     @PutMapping("/payment/fail")
     public ResponseEntity<Payment> failPayment(@RequestParam String paymentId) {
+        log.info("failPayment");
 
         Payment payment = paymentService.failPayment(UUID.fromString(paymentId));
         return ResponseEntity.status(HttpStatus.OK).body(payment);
@@ -61,6 +67,7 @@ public class PaymentController {
     @GetMapping("/payment")
     public ResponseEntity<Payment> getPayment(@AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestParam String paymentId) {
+        log.info("getPayment");
 
         Payment payment = paymentService.getPayment(userDetails.getUser(),
             UUID.fromString(paymentId));
@@ -72,6 +79,7 @@ public class PaymentController {
     public ResponseEntity<String> deletePayment(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestParam String paymentId) {
+        log.info("deletePayment");
 
         return paymentService.deletPayment(userDetails.getUser(), UUID.fromString(paymentId));
     }

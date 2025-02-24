@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j(topic = "Menu Service")
+@Slf4j(topic = "MenuService")
 public class MenuService {
 
     private final MenuRepository menuRepository;

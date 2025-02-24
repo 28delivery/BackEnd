@@ -6,12 +6,11 @@ import com.sparta.spring_deep._delivery.domain.order.OrderResponseDto;
 import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsResponseDto;
 import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItem;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
-import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
-import jakarta.persistence.EntityExistsException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "OrderAdminService")
 public class OrderAdminService {
 
     private final OrderAdminRepository orderAdminRepository;
@@ -31,10 +31,7 @@ public class OrderAdminService {
     @Transactional(readOnly = true)
     public OrderResponseDto getOrders(User user, int page, int size, String sortBy,
         boolean isAsc) {
-
-        if (!user.getRole().equals(UserRole.ADMIN)) {
-            throw new IllegalStateException("Only admin can get orders");
-        }
+        log.info("getOrders");
 
         Sort sort = Sort.by(isAsc ? Direction.ASC : Direction.DESC, sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
@@ -50,11 +47,10 @@ public class OrderAdminService {
     // 주문 상세 조회
     @Transactional(readOnly = true)
     public OrderDetailsResponseDto getOrderDetails(User user, UUID orderId) {
-        if (!(user.getRole().equals(UserRole.ADMIN))) {
-            throw new IllegalStateException("Only admin can get order details");
-        }
+        log.info("getOrderDetails");
+
         Order order = orderAdminRepository.findById(orderId)
-            .orElseThrow(() -> new EntityExistsException("order not found"));
+            .orElseThrow(ResourceNotFoundException::new);
 
         List<OrderItem> orderItemList = orderItemAdminRepository.findAllByOrderId(
             order.getId());
@@ -63,6 +59,8 @@ public class OrderAdminService {
     }
 
     public Page<OrderResponseDto> searchOrders(OrderAdminSearchDto searchDto, Pageable pageable) {
+        log.info("searchOrders");
+
         Page<OrderResponseDto> responseDtos = orderAdminRepository.searchByOption(searchDto,
             pageable);
 

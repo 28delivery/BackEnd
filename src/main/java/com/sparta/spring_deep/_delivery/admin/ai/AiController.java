@@ -1,6 +1,7 @@
 package com.sparta.spring_deep._delivery.admin.ai;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j(topic = "AiController")
 public class AiController {
 
     private final AiLogService aiLogService;

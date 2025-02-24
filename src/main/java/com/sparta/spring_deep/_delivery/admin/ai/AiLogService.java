@@ -1,8 +1,6 @@
 package com.sparta.spring_deep._delivery.admin.ai;
 
-import com.sparta.spring_deep._delivery.domain.ai.Ai;
 import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -11,28 +9,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j(topic = "")
+@Slf4j(topic = "AiLogService")
 public class AiLogService {
 
     private final AiRepository aiRepository;
 
-    public Page<AiLogResponseDto> getAiLogsByRestaurant(UUID menuId, UUID restaurantId,
-        Pageable pageable) {
-
-        Page<Ai> aiLogs;
-
-        if (menuId != null) {
-            aiLogs = aiRepository.findByMenuId(menuId, pageable);
-        } else if (restaurantId != null) {
-            aiLogs = aiRepository.findByMenu_RestaurantId_Id(restaurantId, pageable);
-        } else {
-            aiLogs = aiRepository.findAll(pageable);
-        }
-
-        return aiLogs.map(AiLogResponseDto::new);
-    }
-
+    // AI 로그 검색
     public Page<AiLogResponseDto> searchAiLogs(AiLogSearchDto aiLogSearchDto, Pageable pageable) {
+        log.info("searchAiLogs");
 
         Page<AiLogResponseDto> aiLogs = aiRepository.searchByOption(aiLogSearchDto, pageable);
 

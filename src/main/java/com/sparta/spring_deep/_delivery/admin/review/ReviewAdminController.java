@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
-@Slf4j
+@Slf4j(topic = "ReviewAdminController")
 public class ReviewAdminController {
 
     private final ReviewAdminService reviewAdminService;

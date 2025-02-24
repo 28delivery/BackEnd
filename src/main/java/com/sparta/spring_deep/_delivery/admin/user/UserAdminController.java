@@ -1,12 +1,14 @@
 package com.sparta.spring_deep._delivery.admin.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,8 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j(topic = "UserAdminService")
 @RequestMapping("/admin/users")
-@PreAuthorize("hasRole('ADMIN')")
 public class UserAdminController {
 
     private final UserAdminService userAdminService;
@@ -29,7 +31,8 @@ public class UserAdminController {
     @GetMapping("/search") // search?page=0&size=2로 요청하면 2개만 조회
     public ResponseEntity<Page<UserAdminResponseDto>> searchUsers(
         @ModelAttribute UserAdminSearchDto searchDto,
-        @PageableDefault(page = 0, size = 10, sort = "username", direction = Sort.Direction.ASC) Pageable pageable) {
+        @PageableDefault(sort = "username", direction = Sort.Direction.ASC) Pageable pageable) {
+        log.info("searchUsers");
 
         Page<UserAdminResponseDto> users = userAdminService.searchUsers(searchDto, pageable);
 
@@ -40,6 +43,7 @@ public class UserAdminController {
     @GetMapping("/{userId}")
     public ResponseEntity<UserAdminResponseDto> getUser(
         @PathVariable String userId) {
+        log.info("getUser");
 
         UserAdminResponseDto responseDto = userAdminService.getUserDetails(userId);
 
@@ -49,9 +53,12 @@ public class UserAdminController {
     // 사용자 등록
     @PostMapping
     public ResponseEntity<UserAdminResponseDto> createUser(
-        @RequestBody UserCreateRequestDto userCreateRequestDto) {
+        @RequestBody UserCreateRequestDto userCreateRequestDto,
+        @AuthenticationPrincipal UserDetails userDetails) {
+        log.info("createUser");
 
-        UserAdminResponseDto responseDto = userAdminService.createUser(userCreateRequestDto);
+        UserAdminResponseDto responseDto = userAdminService.createUser(userCreateRequestDto,
+            userDetails);
 
         return ResponseEntity.ok(responseDto);
     }
@@ -60,10 +67,12 @@ public class UserAdminController {
     @PutMapping("/{userId}")
     public ResponseEntity<UserAdminResponseDto> updateUser(
         @PathVariable String userId,
-        @RequestBody UserUpdateRequestDto userUpdateRequestDto) {
+        @RequestBody UserUpdateRequestDto userUpdateRequestDto,
+        @AuthenticationPrincipal UserDetails userDetails) {
+        log.info("updateUser");
 
         UserAdminResponseDto responseDto = userAdminService.updateUser(userId,
-            userUpdateRequestDto);
+            userUpdateRequestDto, userDetails);
 
         return ResponseEntity.ok(responseDto);
     }
@@ -71,9 +80,11 @@ public class UserAdminController {
     // 사용자 삭제
     @DeleteMapping("/{userId}")
     public ResponseEntity<String> deleteUser(
-        @PathVariable String userId) {
+        @PathVariable String userId,
+        @AuthenticationPrincipal UserDetails userDetails) {
+        log.info("deleteUser");
 
-        userAdminService.deleteUser(userId);
+        userAdminService.deleteUser(userId, userDetails);
 
         return ResponseEntity.ok("user deleted successfully");
     }
