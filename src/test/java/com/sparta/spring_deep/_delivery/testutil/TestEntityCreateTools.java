@@ -28,6 +28,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 public class TestEntityCreateTools {
 
+    private static final RestTemplate restTemplate = new RestTemplate();
+
+    private static final String restaurantAddressUrl = "https://business.juso.go.kr/addrlink/addrLinkApi.do";
+    private static final String restaurantAddressKey = "devU01TX0FVVEgyMDI1MDIxOTE4MzczNDExNTQ4ODQ=";
+
     // 유저 생성
     public static User createUser(String username, UserRole role) {
         return User.builder()
