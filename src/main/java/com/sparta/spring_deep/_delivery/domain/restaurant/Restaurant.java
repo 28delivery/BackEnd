@@ -8,7 +8,6 @@ import com.sparta.spring_deep._delivery.common.BaseEntity;
 import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -47,7 +46,6 @@ public class Restaurant extends BaseEntity {
     @Size(max = 100)
     private String name;
 
-    @Convert(converter = CategoryEnumConverter.class)
     @Column(name = "category", nullable = false, columnDefinition = "p_restaurant_category_enum")
     private CategoryEnum category;
 
@@ -97,19 +95,9 @@ public class Restaurant extends BaseEntity {
     }
 
     public enum CategoryEnum {
-        HANSIK("한식"),
-        YANGSIK("양식"),
-        JUNGSIK("중식"),
-        ILSIK("일식");
-
-        private final String label;
-
-        CategoryEnum(String label) {
-            this.label = label;
-        }
-
-        public String getLabel() {
-            return label;
-        }
+        HANSIK,
+        YANGSIK,
+        JUNGSIK,
+        ILSIK
     }
 }

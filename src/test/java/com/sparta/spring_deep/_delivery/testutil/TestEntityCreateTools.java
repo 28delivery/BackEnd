@@ -16,12 +16,14 @@ import com.sparta.spring_deep._delivery.domain.review.Review;
 import com.sparta.spring_deep._delivery.domain.user.entity.IsPublic;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
+import com.sparta.spring_deep._delivery.util.RestaurantAddressTools;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.util.InternalException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -30,8 +32,8 @@ public class TestEntityCreateTools {
 
     private static final RestTemplate restTemplate = new RestTemplate();
 
-    private static final String restaurantAddressUrl = "https://business.juso.go.kr/addrlink/addrLinkApi.do";
-    private static final String restaurantAddressKey = "devU01TX0FVVEgyMDI1MDIxOTE4MzczNDExNTQ4ODQ=";
+    public static String restaurantAddressUrl;
+    public static String restaurantAddressKey;
 
     // 유저 생성
     public static User createUser(String username, UserRole role) {
@@ -224,5 +226,16 @@ public class TestEntityCreateTools {
 
         return ((List<Map<String, Object>>) results.get("juso")).get(0);
     }
+
+    @Value("${restaurantAddress.url}")
+    public void setRestaurantAddressUrl(String restaurantAddressUrl) {
+        RestaurantAddressTools.restaurantAddressUrl = restaurantAddressUrl;
+    }
+
+    @Value("${restaurantAddress.url}")
+    public void setRestaurantAddressKey(String restaurantAddressKey) {
+        RestaurantAddressTools.restaurantAddressKey = restaurantAddressKey;
+    }
+
 
 }
