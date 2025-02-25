@@ -1,8 +1,8 @@
 package com.sparta.spring_deep._delivery.config;
 
+import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsServiceImpl;
 import com.sparta.spring_deep._delivery.domain.user.jwt.JwtAuthenticationFilter;
 import com.sparta.spring_deep._delivery.domain.user.jwt.JwtAuthorizationFilter;
-import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsServiceImpl;
 import com.sparta.spring_deep._delivery.domain.user.jwt.JwtUtil;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -69,6 +68,11 @@ public class WebSecurityConfig {
             authorizeHttpRequests
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations())
                 .permitAll() // resources 접근 허용 설정
+                .requestMatchers(
+                    "/swagger-ui/**",
+                    "/swagger-ui.html",
+                    "/v3/api-docs/**"
+                ).permitAll()
                 .requestMatchers("/").permitAll() // 메인 페이지 요청 허가
                 // 사용자 - 회원 가입/로그인 : 요청 모두 접근 허가
                 .requestMatchers(
