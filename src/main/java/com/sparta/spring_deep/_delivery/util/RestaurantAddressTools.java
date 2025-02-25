@@ -2,25 +2,26 @@ package com.sparta.spring_deep._delivery.util;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.cdimascio.dotenv.Dotenv;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.util.InternalException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+@RequiredArgsConstructor
 public class RestaurantAddressTools {
 
     private static final RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${restaurantAddress.url}")
-    private static String restaurantAddressUrl;
-
-    @Value("${restaurantAddress.key}")
-    private static String restaurantAddressKey;
+    private static final Dotenv dotenv = Dotenv.load();
+    private static final String restaurantAddressUrl = dotenv.get("RESTAURANT_URL");
+    private static final String restaurantAddressKey = dotenv.get("RESTAURANT_KEY");
 
     /**
      * keyword로 주소 검색 후 Json(Map) 형태로 검색 결과를 반환합니다.
@@ -29,6 +30,7 @@ public class RestaurantAddressTools {
      */
     public static Map<String, Object> searchAddress(String keyword) {
         try {
+
             // JSON 형식의 결과를 요청하기 위한 설정
             String resultType = "json";
 

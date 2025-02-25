@@ -17,6 +17,7 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -50,6 +51,7 @@ public class OrderItem extends BaseEntity {
     private BigDecimal price;
 
 
+    @Builder
     public OrderItem(Order order, Menu menu, int quantity,
         @NotNull @Digits(integer = 10, fraction = 2) BigDecimal price) {
         super(order.getCustomer().getUsername());

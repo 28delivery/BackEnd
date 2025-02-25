@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
@@ -41,6 +42,13 @@ public class Address extends BaseEntity {
     @NotNull
     @Column(name = "address_name")
     private String addressName;
+
+    @Builder
+    public Address(User user, String address, String addressName) {
+        this.user = user;
+        this.address = address;
+        this.addressName = addressName;
+    }
 
     public Address(AddressRequestDto requestDto, User user) {
         super(user.getUsername());

@@ -9,7 +9,6 @@ import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
-import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import com.sparta.spring_deep._delivery.util.AuthTools;
 import java.util.UUID;
@@ -26,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class MenuService {
 
     private final MenuRepository menuRepository;
-    private final UserRepository userRepository;
     private final GoogleAiService googleAiService;
     private final AiRepository aiRepository;
     private final RestaurantRepository restaurantRepository;
@@ -62,25 +60,6 @@ public class MenuService {
         menuRepository.save(menu);
         return new MenuResponseDto(menu);
     }
-
-//    // restaurant_id 기반 모든 메뉴 조회
-//    public Page<MenuResponseDto> getAllMenus(
-//        Restaurant restaurantId,
-//        String name,
-//        String sortBy,
-//        int page, int size
-//    ) {
-//        log.info("restaurant_id 기반 모든 메뉴 조회");
-//
-//        int pageSize = (size == 10 || size == 30 || size == 50) ? size : 10;
-//
-//        Pageable pageable = PageRequest.of(page, pageSize, Sort.by(Direction.DESC, sortBy));
-//
-//        Page<Menu> menus = menuRepository.findAllByRestaurantIdAndIsDeletedFalse(restaurantId,
-//            pageable);
-//
-//        return menus.map(MenuResponseDto::new);
-//    }
 
     public Page<MenuResponseDto> searchMenus(UUID restaurantId, MenuSearchDto searchDto,
         Pageable pageable) {
