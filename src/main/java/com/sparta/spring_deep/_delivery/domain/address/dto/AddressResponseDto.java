@@ -2,11 +2,13 @@ package com.sparta.spring_deep._delivery.domain.address.dto;
 
 import com.sparta.spring_deep._delivery.domain.address.entity.Address;
 import java.util.UUID;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@RequiredArgsConstructor
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class AddressResponseDto {
 
     private UUID id;

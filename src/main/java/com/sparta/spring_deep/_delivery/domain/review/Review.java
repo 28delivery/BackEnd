@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -40,6 +41,7 @@ public class Review extends BaseEntity {
     @Column
     private String comment;
 
+    @Builder
     public Review(Order order, User user, int rating, String comment) {
         super(user.getUsername());
         this.order = order;

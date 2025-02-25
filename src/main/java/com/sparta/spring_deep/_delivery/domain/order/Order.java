@@ -20,6 +20,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -60,6 +61,7 @@ public class Order extends BaseEntity {
     @Size(max = 50)
     private String request;
 
+    @Builder
     public Order(User customer, Restaurant restaurant, Address address,
         @NotNull @Digits(integer = 10, fraction = 2) BigDecimal totalPrice,
         @Size(max = 50) String request) {
@@ -70,6 +72,7 @@ public class Order extends BaseEntity {
         this.totalPrice = totalPrice;
         this.request = request;
     }
+
 
     public void updateTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;

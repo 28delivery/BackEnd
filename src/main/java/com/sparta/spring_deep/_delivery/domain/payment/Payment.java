@@ -15,6 +15,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -54,6 +55,18 @@ public class Payment extends BaseEntity {
         this.paymentStatus = PaymentStatusEnum.PENDING;
         this.order = order;
         this.amount = amount;
+    }
+
+    @Builder
+    public Payment(String username,
+        Order order,
+        BigDecimal amount,
+        PaymentStatusEnum paymentStatus) {
+        super(username);
+        this.order = order;
+        this.amount = amount;
+        this.paymentMethod = PaymentMethodEnum.CARD;
+        this.paymentStatus = (paymentStatus != null) ? paymentStatus : PaymentStatusEnum.PENDING;
     }
 
     public void completePayment() {

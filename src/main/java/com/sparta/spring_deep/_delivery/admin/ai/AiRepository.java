@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface AiRepository extends JpaRepository<Ai, UUID>, AiRepositoryCustom {
 
+    boolean existsByMenuId(UUID menuId);
 }
