@@ -71,8 +71,7 @@ public class WebSecurityConfig {
                 .requestMatchers(
                     "/swagger-ui/**",
                     "/swagger-ui.html",
-                    "/v3/api-docs/**",
-                    "/v3/api-docs/**/"
+                    "/v3/api-docs/**"
                 ).permitAll()
                 .requestMatchers("/").permitAll() // 메인 페이지 요청 허가
                 // 사용자 - 회원 가입/로그인 : 요청 모두 접근 허가
