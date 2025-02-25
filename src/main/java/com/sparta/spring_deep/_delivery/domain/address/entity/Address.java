@@ -45,6 +45,7 @@ public class Address extends BaseEntity {
 
     @Builder
     public Address(User user, String address, String addressName) {
+        super(user.getUsername());
         this.user = user;
         this.address = address;
         this.addressName = addressName;

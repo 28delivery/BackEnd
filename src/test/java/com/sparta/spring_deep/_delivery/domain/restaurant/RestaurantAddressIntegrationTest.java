@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress;
+package com.sparta.spring_deep._delivery.domain.restaurant;
 
 import static com.sparta.spring_deep._delivery.testutil.TestEntityCreateTools.createRestaurantAddress;
 import static com.sparta.spring_deep._delivery.testutil.TestEntityCreateTools.createUser;
@@ -11,6 +11,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
+import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddressCreateRequestDto;
+import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddressRepository;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
@@ -142,10 +145,10 @@ public class RestaurantAddressIntegrationTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(address.getId().toString()))
-            .andExpect(jsonPath("$.roadAddr").value("Test Road"))
-            .andExpect(jsonPath("$.detailAddr").value("Test Detail"))
-            .andExpect(jsonPath("$.jibunAddr").value("Test Jibun"))
-            .andExpect(jsonPath("$.engAddr").value("Test Eng"));
+            .andExpect(jsonPath("$.roadAddr").value("서울특별시 강남구 논현로111길 21 (논현동)"))
+            .andExpect(jsonPath("$.detailAddr").value("강남빌딩 202호"))
+            .andExpect(jsonPath("$.jibunAddr").value("서울특별시 강남구 논현동 206-4"))
+            .andExpect(jsonPath("$.engAddr").value("21 Nonhyeon-ro 111-gil, Gangnam-gu, Seoul"));
     }
 
     // ----- 수정 API (PUT /api/restaurantAddresses/{id}) -----

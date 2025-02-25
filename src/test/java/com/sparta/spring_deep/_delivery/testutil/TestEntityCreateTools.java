@@ -13,6 +13,7 @@ import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant.CategoryEnum;
 import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
 import com.sparta.spring_deep._delivery.domain.review.Review;
+import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.entity.IsPublic;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
@@ -24,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import org.apache.logging.log4j.util.InternalException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -34,6 +37,12 @@ public class TestEntityCreateTools {
     private static final Dotenv dotenv = Dotenv.load();
     private static final String restaurantAddressUrl = dotenv.get("RESTAURANT_URL");
     private static final String restaurantAddressKey = dotenv.get("RESTAURANT_KEY");
+
+    public static Authentication getAuth(User user) {
+        UserDetailsImpl userDetails = new UserDetailsImpl(user);
+        return new UsernamePasswordAuthenticationToken(userDetails, null,
+            userDetails.getAuthorities());
+    }
 
     // 유저 생성
     public static User createUser(String username, UserRole role) {

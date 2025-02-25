@@ -32,9 +32,10 @@ public class RestaurantResponseDto {
         this.engAddr = restaurant.getRestaurantAddress().getEngAddr();
     }
 
-    public RestaurantResponseDto(UUID id, CategoryEnum category, String name, String phone,
-        String roadAddr, String jibunAddr, String detailAddr, String engAddr) {
+    public RestaurantResponseDto(UUID id, String ownerId, CategoryEnum category, String name,
+        String phone, String roadAddr, String jibunAddr, String detailAddr, String engAddr) {
         this.id = id;
+        this.ownerId = ownerId;
         this.category = category;
         this.name = name;
         this.phone = phone;
