@@ -53,7 +53,7 @@ public class UserController {
     }
 
     @PostMapping("/users/logout")
-    public ResponseEntity<?> logout(@RequestHeader(value = "Authorization") String token) {
+    public ResponseEntity<?> logout(@RequestHeader(value = "Authorization", required = false) String token) {
         // 클라이언트쪽에서 JWT 토큰 무효화해야 함!
         if (token != null && token.startsWith("Bearer ")) {
             String jwtToken = token.substring(7);
@@ -62,7 +62,7 @@ public class UserController {
             return ResponseEntity.ok().body("You've been logged out successfully.");
         }
         logger.error("Invalid token for logout attempt: {}", token);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Token");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid Token");
     }
 
     @GetMapping("/users/me")
@@ -91,7 +91,15 @@ public class UserController {
     @PreAuthorize("authentication.name == #username")
     @PutMapping("/users/{username}/password")
     public ResponseEntity<?> changePassword(@PathVariable String username,
-        @RequestBody PasswordChangeDto passwordChangeDto) {
+        @Valid @RequestBody PasswordChangeDto passwordChangeDto, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            FieldError fieldError = bindingResult.getFieldError();
+            String errorMsg = fieldError != null ? fieldError.getDefaultMessage() : "Invalid input";
+            logger.error("Sign up error: {}", errorMsg);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMsg);
+        }
+
         userService.changePassword(username, passwordChangeDto);
         return ResponseEntity.ok("Password updated successfully");
     }

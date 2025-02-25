@@ -6,12 +6,14 @@ import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.jwt.JwtUtil;
 import com.sparta.spring_deep._delivery.domain.user.repository.UserRepository;
 import com.sparta.spring_deep._delivery.exception.DuplicateResourceException;
+import com.sparta.spring_deep._delivery.exception.GlobalExceptionHandler;
 import com.sparta.spring_deep._delivery.exception.OwnershipMismatchException;
 import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -93,14 +95,18 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void changePassword(String userName, PasswordChangeDto passwordChangeDto) {
+    public User changePassword(String userName, PasswordChangeDto passwordChangeDto) {
+        if (passwordChangeDto.getOldPassword().equals(passwordChangeDto.getNewPassword())) {
+            throw new DuplicateResourceException("새 비밀번호는 이전 비밀번호와 달라야 합니다.");
+        }
+
         log.info("change password " + userName);
 
         User user = userRepository.findByUsernameAndIsDeletedFalse(userName)
             .orElseThrow(ResourceNotFoundException::new);
         user.setPassword(passwordEncoder.encode(passwordChangeDto.getNewPassword()));
         user.update(userName);
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
 }
