@@ -8,7 +8,7 @@
 | 조규성 |  <ul><li>DB 설계</li><li>Menu API 개발 및 테스트</li><li>AI API 적용</li><li>CI/CD 배포</li><li>Swagger API 문서화</li></ul> |
 | 강 민 |   <ul><li>DB 설계</li><li>User API 개발 및 테스트</li><li>보안 및 인증</li><li>CI/CD 배포</li></ul> |
 | 엄은진 |  <ul><li>DB 설계</li><li>Address API 개발 및 테스트</li><li>Admin User API 개발 및 테스트</li><li>CI/CD 배포</li></ul>  |
-| 이소연 |  <ul><li>API 설계</li><li>Order/Review/Payment API 개발 및 테스트</li><li>Admin Order/Review API 개발 및 테스트</li><li>리팩토링</li></ul>    |
+| 이소현 |  <ul><li>API 설계</li><li>Order/Review/Payment API 개발 및 테스트</li><li>Admin Order/Review API 개발 및 테스트</li><li>리팩토링</li></ul>    |
 
 ## 프로젝트 개요 및 목표
 
