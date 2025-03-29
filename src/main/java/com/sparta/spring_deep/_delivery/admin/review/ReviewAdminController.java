@@ -1,7 +1,7 @@
 package com.sparta.spring_deep._delivery.admin.review;
 
 
-import com.sparta.spring_deep._delivery.domain.review.ReviewResponseDto;
+import com.sparta.spring_deep._delivery.domain.review.dto.ReviewResponseDto;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

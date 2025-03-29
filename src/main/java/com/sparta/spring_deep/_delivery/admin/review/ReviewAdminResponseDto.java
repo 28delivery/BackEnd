@@ -1,6 +1,6 @@
 package com.sparta.spring_deep._delivery.admin.review;
 
-import com.sparta.spring_deep._delivery.domain.review.Review;
+import com.sparta.spring_deep._delivery.domain.review.model.Review;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
