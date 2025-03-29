@@ -1,11 +1,13 @@
-package com.sparta.spring_deep._delivery.domain.review;
+package com.sparta.spring_deep._delivery.domain.review.dto;
 
+import com.sparta.spring_deep._delivery.domain.review.model.Review;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
-@Data
+@Getter
 @AllArgsConstructor
 public class ReviewResponseDto {
 

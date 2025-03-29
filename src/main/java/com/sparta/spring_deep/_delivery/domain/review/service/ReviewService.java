@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.review;
+package com.sparta.spring_deep._delivery.domain.review.service;
 
 import static com.sparta.spring_deep._delivery.util.AuthTools.ownerCheck;
 
@@ -6,10 +6,16 @@ import com.sparta.spring_deep._delivery.domain.order.Order;
 import com.sparta.spring_deep._delivery.domain.order.OrderRepository;
 import com.sparta.spring_deep._delivery.domain.order.OrderStatusEnum;
 import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
+import com.sparta.spring_deep._delivery.domain.review.dto.ReviewRequestDto;
+import com.sparta.spring_deep._delivery.domain.review.dto.ReviewResponseDto;
+import com.sparta.spring_deep._delivery.domain.review.dto.ReviewRestaurantResponseDto;
+import com.sparta.spring_deep._delivery.domain.review.model.Review;
+import com.sparta.spring_deep._delivery.domain.review.repository.ReviewRepository;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.exception.DeletedDataAccessException;
 import com.sparta.spring_deep._delivery.exception.OperationNotAllowedException;
 import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +36,7 @@ public class ReviewService {
 
     // 리뷰 작성
     public ReviewResponseDto createReview(ReviewRequestDto requestDto, User user) {
-        log.info("리뷰 작성");
+        log.info("createReview");
 
         Order order = orderRepository.findByIdAndIsDeletedFalse(requestDto.getOrderId())
             .orElseThrow(ResourceNotFoundException::new);
@@ -38,27 +44,31 @@ public class ReviewService {
         ownerCheck(order.getCustomer(), user);
 
         if (!order.getStatus().equals(OrderStatusEnum.DELIVERED)) {
-            log.error("배송 완료만 리뷰작성 가능");
+            log.error("배송 완료만 리뷰작성 가능합니다.");
             throw new OperationNotAllowedException();
         }
 
-        Review review = reviewRepository.save(
-            new Review(order, user, requestDto.getRating(), requestDto.getComment()));
+        Review review = new Review(order, user, requestDto.getRating(), requestDto.getComment());
+        reviewRepository.save(review);
 
         return new ReviewResponseDto(review);
     }
 
     // 특정 음식점 리뷰 조회
     @Transactional(readOnly = true)
-    public Page<ReviewResponseDto> getReviews(UUID restaurantId, Pageable pageable) {
-        log.info("특정 음식점 리뷰 조회");
+    public ReviewRestaurantResponseDto getReviews(UUID restaurantId, Pageable pageable) {
+        log.info("getReviews");
 
         restaurantRepository.findByIdAndIsDeletedFalse(restaurantId)
             .orElseThrow(ResourceNotFoundException::new);
 
-        Page<Review> reviews = reviewRepository.searchReviews(restaurantId, pageable);
+        List<ReviewResponseDto> reviews = reviewRepository.searchReviews(restaurantId, pageable)
+            .map(ReviewResponseDto::new)
+            .stream().toList();
+        // 리뷰 평점 조회
+        double rating = reviewRepository.findAverageRating();
 
-        return reviews.map(ReviewResponseDto::new);
+        return new ReviewRestaurantResponseDto(reviews, rating, restaurantId);
     }
 
     // 리뷰 조회
@@ -66,10 +76,10 @@ public class ReviewService {
     public ReviewResponseDto getReview(UUID reviewId) {
         log.info("리뷰 조회");
 
-        Review review = reviewRepository.findByIdAndIsDeletedFalse(reviewId);
+        Review review = reviewRepository.findByIdAndIsDeletedFalse(reviewId)
+            .orElseThrow(ResourceNotFoundException::new);
 
-        Order order = review.getOrder();
-        if (order.getIsDeleted()) {
+        if(review.getOrder().getIsDeleted()){
             throw new DeletedDataAccessException();
         }
 
@@ -81,12 +91,8 @@ public class ReviewService {
     public ReviewResponseDto updateReview(UUID reviewId, String comment, int rating, User user) {
         log.info("리뷰 수정");
 
-        Review review = reviewRepository.findByIdAndIsDeletedFalse(reviewId);
-
-        if (review == null) {
-            log.error("존재하지 않는 리뷰");
-            throw new ResourceNotFoundException();
-        }
+        Review review = reviewRepository.findByIdAndIsDeletedFalse(reviewId)
+            .orElseThrow(ResourceNotFoundException::new);
 
         ownerCheck(user, review.getUser());
 
@@ -100,12 +106,8 @@ public class ReviewService {
     public ResponseEntity<String> deleteReview(UUID reviewId, User user) {
         log.info("리뷰 삭제");
 
-        Review review = reviewRepository.findByIdAndIsDeletedFalse(reviewId);
-
-        if (review == null) {
-            log.error("존재하지 않는 리뷰");
-            throw new ResourceNotFoundException();
-        }
+        Review review = reviewRepository.findByIdAndIsDeletedFalse(reviewId)
+            .orElseThrow(ResourceNotFoundException::new);
 
         ownerCheck(user, review.getUser());
 
