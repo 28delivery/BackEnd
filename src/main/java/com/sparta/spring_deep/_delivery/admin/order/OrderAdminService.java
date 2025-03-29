@@ -1,10 +1,10 @@
 package com.sparta.spring_deep._delivery.admin.order;
 
 import com.sparta.spring_deep._delivery.admin.order.orderItem.OrderItemAdminRepository;
-import com.sparta.spring_deep._delivery.domain.order.Order;
-import com.sparta.spring_deep._delivery.domain.order.OrderResponseDto;
-import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsResponseDto;
-import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItem;
+import com.sparta.spring_deep._delivery.domain.order.model.Order;
+import com.sparta.spring_deep._delivery.domain.order.dto.response.OrderResponseDto;
+import com.sparta.spring_deep._delivery.domain.order.dto.response.OrderDetailsResponseDto;
+import com.sparta.spring_deep._delivery.domain.order.model.OrderItem;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.exception.ResourceNotFoundException;
 import java.util.List;

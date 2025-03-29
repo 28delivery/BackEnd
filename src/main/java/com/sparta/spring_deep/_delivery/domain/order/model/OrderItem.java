@@ -1,9 +1,8 @@
-package com.sparta.spring_deep._delivery.domain.order.orderItem;
+package com.sparta.spring_deep._delivery.domain.order.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sparta.spring_deep._delivery.common.BaseEntity;
 import com.sparta.spring_deep._delivery.domain.menu.Menu;
-import com.sparta.spring_deep._delivery.domain.order.Order;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

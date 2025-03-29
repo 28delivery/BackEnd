@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.order;
+package com.sparta.spring_deep._delivery.domain.order.model;
 
 import com.sparta.spring_deep._delivery.common.BaseEntity;
 import com.sparta.spring_deep._delivery.domain.address.entity.Address;
@@ -81,6 +81,14 @@ public class Order extends BaseEntity {
     public void updateOrderStatus(User user, OrderStatusEnum status) {
         super.update(user.getUsername()); // user -> username으로 변경 예정 (*baseEntity)
         this.status = status;
+    }
+
+    public enum OrderStatusEnum {
+        PENDING,
+        CONFIRMED,
+        DELIVERED,
+        FAILED,
+        CANCELLED
     }
 
 }

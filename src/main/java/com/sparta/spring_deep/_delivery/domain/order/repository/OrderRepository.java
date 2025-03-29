@@ -1,6 +1,8 @@
-package com.sparta.spring_deep._delivery.domain.order;
+package com.sparta.spring_deep._delivery.domain.order.repository;
 
 
+import com.sparta.spring_deep._delivery.domain.order.model.Order;
+import com.sparta.spring_deep._delivery.domain.order.model.Order.OrderStatusEnum;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -12,12 +14,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface OrderRepository extends JpaRepository<Order, UUID>, OrderRepositoryCustom {
 
     Optional<List<Order>> findAllByRestaurantId(UUID restaurantId);
-
-//    Page<Order> findByCustomerUsernameAndUpdatedAtAfterAndStatusIn(String customerId,
-//        String restaurantName, String menuName, String status,
-//        Pageable pageable);
-
-    List<Order> findAllByRestaurantIdAndIsDeletedFalse(UUID restaurantId);
 
     Optional<Order> findByIdAndIsDeletedFalse(UUID orderId);
 

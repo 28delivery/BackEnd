@@ -17,9 +17,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sparta.spring_deep._delivery.domain.address.entity.Address;
 import com.sparta.spring_deep._delivery.domain.address.repository.AddressRepository;
-import com.sparta.spring_deep._delivery.domain.order.Order;
-import com.sparta.spring_deep._delivery.domain.order.OrderRepository;
-import com.sparta.spring_deep._delivery.domain.order.OrderStatusEnum;
+import com.sparta.spring_deep._delivery.domain.order.model.Order;
+import com.sparta.spring_deep._delivery.domain.order.model.Order.OrderStatusEnum;
+import com.sparta.spring_deep._delivery.domain.order.repository.OrderRepository;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;

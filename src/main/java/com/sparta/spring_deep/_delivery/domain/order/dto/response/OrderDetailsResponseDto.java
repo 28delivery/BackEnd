@@ -1,8 +1,8 @@
-package com.sparta.spring_deep._delivery.domain.order.orderDetails;
+package com.sparta.spring_deep._delivery.domain.order.dto.response;
 
-import com.sparta.spring_deep._delivery.domain.order.Order;
+import com.sparta.spring_deep._delivery.domain.order.model.Order;
 import com.sparta.spring_deep._delivery.domain.order.OrderStatusEnum;
-import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItem;
+import com.sparta.spring_deep._delivery.domain.order.model.OrderItem;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.AllArgsConstructor;

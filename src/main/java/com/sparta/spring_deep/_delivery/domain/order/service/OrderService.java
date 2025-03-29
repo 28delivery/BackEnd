@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.order;
+package com.sparta.spring_deep._delivery.domain.order.service;
 
 import static com.sparta.spring_deep._delivery.util.AuthTools.ownerCheck;
 
@@ -6,10 +6,15 @@ import com.sparta.spring_deep._delivery.domain.address.entity.Address;
 import com.sparta.spring_deep._delivery.domain.address.repository.AddressRepository;
 import com.sparta.spring_deep._delivery.domain.menu.Menu;
 import com.sparta.spring_deep._delivery.domain.menu.MenuRepository;
-import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsRequestDto;
-import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsResponseDto;
-import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItem;
-import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItemRepository;
+import com.sparta.spring_deep._delivery.domain.order.dto.OrderSearchDto;
+import com.sparta.spring_deep._delivery.domain.order.dto.request.OrderDetailsRequestDto;
+import com.sparta.spring_deep._delivery.domain.order.dto.response.OrderDetailsResponseDto;
+import com.sparta.spring_deep._delivery.domain.order.dto.response.OrderResponseDto;
+import com.sparta.spring_deep._delivery.domain.order.model.Order;
+import com.sparta.spring_deep._delivery.domain.order.model.Order.OrderStatusEnum;
+import com.sparta.spring_deep._delivery.domain.order.model.OrderItem;
+import com.sparta.spring_deep._delivery.domain.order.repository.OrderItemRepository;
+import com.sparta.spring_deep._delivery.domain.order.repository.OrderRepository;
 import com.sparta.spring_deep._delivery.domain.payment.Payment.PaymentStatusEnum;
 import com.sparta.spring_deep._delivery.domain.payment.PaymentResponseDto;
 import com.sparta.spring_deep._delivery.domain.payment.PaymentService;
@@ -215,7 +220,7 @@ public class OrderService {
         // 진행 중인 주문 중에서 최근 변경된 주문만 조회
         Page<Order> updatedOrders = orderRepository.findByCustomerUsernameAndIsDeletedFalseAndUpdatedAtAfterAndStatusIn(
             user.getUsername(), lastCheckedTime,
-            List.of(OrderStatusEnum.PENDING, OrderStatusEnum.CONFIRMED),
+            List.of(OrderStatusEnum.CONFIRMED, OrderStatusEnum.PENDING),
             pageable);
 
         if (updatedOrders.isEmpty()) {

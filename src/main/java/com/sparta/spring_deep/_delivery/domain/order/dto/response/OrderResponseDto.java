@@ -1,5 +1,7 @@
-package com.sparta.spring_deep._delivery.domain.order;
+package com.sparta.spring_deep._delivery.domain.order.dto.response;
 
+import com.sparta.spring_deep._delivery.domain.order.OrderStatusEnum;
+import com.sparta.spring_deep._delivery.domain.order.model.Order;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
