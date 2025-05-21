@@ -23,6 +23,7 @@ import com.sparta.spring_deep._delivery.domain.order.dto.request.OrderDetailsReq
 import com.sparta.spring_deep._delivery.domain.order.dto.response.OrderDetailsResponseDto;
 import com.sparta.spring_deep._delivery.domain.order.dto.OrderItemDto;
 import com.sparta.spring_deep._delivery.domain.order.model.Order;
+import com.sparta.spring_deep._delivery.domain.order.model.Order.OrderStatusEnum;
 import com.sparta.spring_deep._delivery.domain.order.repository.OrderRepository;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
@@ -164,8 +165,7 @@ public class OrderIntegrationTest {
     // 주문 취소 테스트
     @Test
     void testCancelOrder() throws Exception {
-        Order createOrder = TestEntityCreateTools.createOrder(customer, restaurant, address,
-            20000.0, "testRequest");
+        Order createOrder = TestEntityCreateTools.createOrder(customer, restaurant, address, "testRequest");
         orderRepository.save(createOrder); // 왐마 슈우우웃 와우우우우 아래도 똑같이 save 복붙 성공! ㅋㅋㅋㅋㅋㅋㅋㅋ아싸 최고십니다...
         String orderId = createOrder.getId().toString();
 
@@ -177,8 +177,7 @@ public class OrderIntegrationTest {
     // 주문 삭제 테스트
     @Test
     void testDeleteOrder() throws Exception {
-        Order createOrder = TestEntityCreateTools.createOrder(customer, restaurant, address,
-            20000.0, "testRequest");
+        Order createOrder = TestEntityCreateTools.createOrder(customer, restaurant, address, "testRequest");
         orderRepository.save(createOrder);
         String orderId = createOrder.getId().toString();
 
@@ -191,10 +190,8 @@ public class OrderIntegrationTest {
     @Test
     void testSearchMyOrders() throws Exception {
         // 고객 주문 2건 생성
-        Order createOrder1 = TestEntityCreateTools.createOrder(customer, restaurant, address,
-            20000.0, "testRequest");
-        Order createOrder2 = TestEntityCreateTools.createOrder(customer, restaurant, address,
-            10000.0, "testRequest");
+        Order createOrder1 = TestEntityCreateTools.createOrder(customer, restaurant, address, "testRequest");
+        Order createOrder2 = TestEntityCreateTools.createOrder(customer, restaurant, address, "testRequest");
         orderRepository.save(createOrder1);
         orderRepository.save(createOrder2);
 
@@ -208,8 +205,7 @@ public class OrderIntegrationTest {
     @Test
     void testPollingOrders() throws Exception {
         // 주문이 존재하도록 하나 생성
-        Order createOrder = TestEntityCreateTools.createOrder(customer, restaurant, address,
-            10000.0, "testRequest");
+        Order createOrder = TestEntityCreateTools.createOrder(customer, restaurant, address, "testRequest");
         orderRepository.save(createOrder);
 
         mockMvc.perform(get("/api/orders/polling")

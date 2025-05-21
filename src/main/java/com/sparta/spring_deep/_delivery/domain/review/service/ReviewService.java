@@ -3,8 +3,8 @@ package com.sparta.spring_deep._delivery.domain.review.service;
 import static com.sparta.spring_deep._delivery.util.AuthTools.ownerCheck;
 
 import com.sparta.spring_deep._delivery.domain.order.model.Order;
+import com.sparta.spring_deep._delivery.domain.order.model.Order.OrderStatusEnum;
 import com.sparta.spring_deep._delivery.domain.order.repository.OrderRepository;
-import com.sparta.spring_deep._delivery.domain.order.OrderStatusEnum;
 import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.review.dto.ReviewRequestDto;
 import com.sparta.spring_deep._delivery.domain.review.dto.ReviewResponseDto;

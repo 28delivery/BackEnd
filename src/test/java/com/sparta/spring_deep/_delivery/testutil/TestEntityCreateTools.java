@@ -7,8 +7,8 @@ import com.sparta.spring_deep._delivery.domain.ai.Ai;
 import com.sparta.spring_deep._delivery.domain.menu.Menu;
 import com.sparta.spring_deep._delivery.domain.order.model.Order;
 import com.sparta.spring_deep._delivery.domain.order.model.OrderItem;
-import com.sparta.spring_deep._delivery.domain.payment.Payment;
-import com.sparta.spring_deep._delivery.domain.payment.Payment.PaymentStatusEnum;
+import com.sparta.spring_deep._delivery.domain.payment.model.Payment;
+import com.sparta.spring_deep._delivery.domain.payment.model.Payment.PaymentStatusEnum;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant.CategoryEnum;
 import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
@@ -133,12 +133,11 @@ public class TestEntityCreateTools {
 
     // 주문
     public static Order createOrder(User customer, Restaurant restaurant, Address address,
-        Double totalPrice, String request) {
+        String request) {
         return Order.builder()
             .customer(customer)
             .restaurant(restaurant)
             .address(address)
-            .totalPrice(BigDecimal.valueOf(totalPrice))
             .request(request)
             .build();
     }
@@ -147,7 +146,6 @@ public class TestEntityCreateTools {
     public static OrderItem createOrderItem(Order order, Menu menu, int quantity,
         Double price) {
         return OrderItem.builder()
-            .order(order)
             .menu(menu)
             .quantity(quantity)
             .price(BigDecimal.valueOf(price))
