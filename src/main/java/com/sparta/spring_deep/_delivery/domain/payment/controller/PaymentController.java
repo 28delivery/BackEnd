@@ -35,8 +35,8 @@ public class PaymentController {
         log.info("createPayment");
 
         PaymentResponseDto responseDto = paymentService.createPayment(userDetails.getUsername(),
-            UUID.fromString(requestDto.orderId),
-            requestDto.amount);
+            UUID.fromString(requestDto.getOrderId()),
+            requestDto.getAmount());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
