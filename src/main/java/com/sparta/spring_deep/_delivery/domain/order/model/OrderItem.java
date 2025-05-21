@@ -1,9 +1,8 @@
-package com.sparta.spring_deep._delivery.domain.order.orderItem;
+package com.sparta.spring_deep._delivery.domain.order.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sparta.spring_deep._delivery.common.BaseEntity;
 import com.sparta.spring_deep._delivery.domain.menu.Menu;
-import com.sparta.spring_deep._delivery.domain.order.Order;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,7 +34,7 @@ public class OrderItem extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
-    @JsonIgnore // OrderItem을 응답할 때 order 정보 제외
+    @JsonIgnore
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -52,13 +51,15 @@ public class OrderItem extends BaseEntity {
 
 
     @Builder
-    public OrderItem(Order order, Menu menu, int quantity,
-        @NotNull @Digits(integer = 10, fraction = 2) BigDecimal price) {
-        super(order.getCustomer().getUsername());
-        this.order = order;
+    public OrderItem( Menu menu,
+        @NotNull @Digits(integer = 10, fraction = 2) BigDecimal price,
+        int quantity) {
+
         this.menu = menu;
         this.quantity = quantity;
         this.price = price;
     }
 
+
 }
+

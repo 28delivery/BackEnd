@@ -1,9 +1,12 @@
-package com.sparta.spring_deep._delivery.domain.payment;
+package com.sparta.spring_deep._delivery.domain.payment.service;
 
 import static com.sparta.spring_deep._delivery.util.AuthTools.ownerCheck;
 
-import com.sparta.spring_deep._delivery.domain.order.Order;
-import com.sparta.spring_deep._delivery.domain.order.OrderRepository;
+import com.sparta.spring_deep._delivery.domain.order.model.Order;
+import com.sparta.spring_deep._delivery.domain.order.repository.OrderRepository;
+import com.sparta.spring_deep._delivery.domain.payment.dto.PaymentResponseDto;
+import com.sparta.spring_deep._delivery.domain.payment.model.Payment;
+import com.sparta.spring_deep._delivery.domain.payment.repository.PaymentRepository;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
 import com.sparta.spring_deep._delivery.domain.user.entity.UserRole;
 import com.sparta.spring_deep._delivery.exception.InternalServerException;

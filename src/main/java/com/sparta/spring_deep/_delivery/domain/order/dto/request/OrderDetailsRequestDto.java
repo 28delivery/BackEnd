@@ -1,19 +1,20 @@
-package com.sparta.spring_deep._delivery.domain.order;
+package com.sparta.spring_deep._delivery.domain.order.dto.request;
 
-import jakarta.validation.constraints.Digits;
+import com.sparta.spring_deep._delivery.domain.order.dto.OrderItemDto;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class OrderRequestDto {
-
-    @NotNull
-    private String customerId;
+@RequiredArgsConstructor
+@AllArgsConstructor
+public class OrderDetailsRequestDto {
 
     @NotNull
     private String restaurantId;
@@ -21,12 +22,11 @@ public class OrderRequestDto {
     @NotNull
     private String addressId;
 
-    @NotNull
-    @Digits(integer = 10, fraction = 2)
-    private BigDecimal totalPrice;
-
     @Size(max = 50)
     private String request;
+
+    @NotNull
+    private List<OrderItemDto> orderItemDtos;
 
     public UUID getRestaurantId() {
         return UUID.fromString(restaurantId);
@@ -35,6 +35,4 @@ public class OrderRequestDto {
     public UUID getAddressId() {
         return UUID.fromString(addressId);
     }
-
-
 }

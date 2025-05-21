@@ -46,8 +46,8 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
         // review → order → restaurant 조인을 통해 단일 restaurantId 조건과 isDeleted=false 필터 적용
         List<Review> reviews = queryFactory
             .selectFrom(review)
-            .join(review.order, order)
-            .join(order.restaurant, restaurant)
+            .join(review.order, order).fetchJoin()
+            .join(order.restaurant, restaurant).fetchJoin()
             .where(
                 restaurant.id.eq(restaurantId)
                     .and(review.isDeleted.eq(false))

@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.order;
+package com.sparta.spring_deep._delivery.domain.order.service;
 
 import static com.sparta.spring_deep._delivery.util.AuthTools.ownerCheck;
 
@@ -6,13 +6,18 @@ import com.sparta.spring_deep._delivery.domain.address.entity.Address;
 import com.sparta.spring_deep._delivery.domain.address.repository.AddressRepository;
 import com.sparta.spring_deep._delivery.domain.menu.Menu;
 import com.sparta.spring_deep._delivery.domain.menu.MenuRepository;
-import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsRequestDto;
-import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsResponseDto;
-import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItem;
-import com.sparta.spring_deep._delivery.domain.order.orderItem.OrderItemRepository;
-import com.sparta.spring_deep._delivery.domain.payment.Payment.PaymentStatusEnum;
-import com.sparta.spring_deep._delivery.domain.payment.PaymentResponseDto;
-import com.sparta.spring_deep._delivery.domain.payment.PaymentService;
+import com.sparta.spring_deep._delivery.domain.order.dto.OrderSearchDto;
+import com.sparta.spring_deep._delivery.domain.order.dto.request.OrderDetailsRequestDto;
+import com.sparta.spring_deep._delivery.domain.order.dto.response.OrderDetailsResponseDto;
+import com.sparta.spring_deep._delivery.domain.order.dto.response.OrderResponseDto;
+import com.sparta.spring_deep._delivery.domain.order.model.Order;
+import com.sparta.spring_deep._delivery.domain.order.model.Order.OrderStatusEnum;
+import com.sparta.spring_deep._delivery.domain.order.model.OrderItem;
+import com.sparta.spring_deep._delivery.domain.order.repository.OrderItemRepository;
+import com.sparta.spring_deep._delivery.domain.order.repository.OrderRepository;
+import com.sparta.spring_deep._delivery.domain.payment.model.Payment.PaymentStatusEnum;
+import com.sparta.spring_deep._delivery.domain.payment.dto.PaymentResponseDto;
+import com.sparta.spring_deep._delivery.domain.payment.service.PaymentService;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.review.model.Review;
@@ -46,7 +51,6 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
-    private final UserRepository userRepository;
     private final RestaurantRepository restaurantRepository;
     private final AddressRepository addressRepository;
     private final MenuRepository menuRepository;
@@ -71,38 +75,26 @@ public class OrderService {
         // 유저 정보와 주소 정보 일치하는지 검사
         ownerCheck(user, address.getUser());
 
-        Order order = orderRepository.save(new Order(user, restaurant, address,
-            BigDecimal.ZERO, requestDto.getRequest()));
-
-        AtomicReference<BigDecimal> sumPrice = new AtomicReference<>(BigDecimal.ZERO);
+        Order order = orderRepository.save(new Order(user, restaurant, address, requestDto.getRequest()));
 
         List<OrderItem> orderItemList = new ArrayList<>();
-
         requestDto.getOrderItemDtos().forEach(orderItemDto -> {
             Menu menu = menuRepository.findById(orderItemDto.getMenuId())
                 .orElseThrow(ResourceNotFoundException::new);
 
-            BigDecimal itemPrice = menu.getPrice();
-            log.info("item price : " + itemPrice);
-            sumPrice.updateAndGet(current ->
-                current.add(itemPrice.multiply(BigDecimal.valueOf(orderItemDto.getQuantity())))
-            );
-
-            log.info("sum Price : " + sumPrice.get());
-            OrderItem orderItem = orderItemRepository.save(
-                new OrderItem(order, menu, orderItemDto.getQuantity(), itemPrice));
-
-            orderItemList.add(orderItem);
+            OrderItem orderItem = new OrderItem(menu, menu.getPrice(), orderItemDto.getQuantity());
+            order.addOrderItem(orderItem);
         });
-        order.updateTotalPrice(sumPrice.get());
+
+        order.updateTotalPrice();
 
         // 결제 요청
         PaymentResponseDto paymentResponseDto = paymentService.createPayment(user.getUsername(),
-            order.getId(), sumPrice.get());
+            order.getId(), order.getTotalPrice());
 
         if (paymentResponseDto.getPaymentStatus() == PaymentStatusEnum.COMPLETED) {
             order.updateOrderStatus(user, OrderStatusEnum.CONFIRMED);
-            
+
         } else if (paymentResponseDto.getPaymentStatus() == PaymentStatusEnum.FAILED) {
             order.updateOrderStatus(user, OrderStatusEnum.FAILED);
             order.delete(user.getUsername());
@@ -215,7 +207,7 @@ public class OrderService {
         // 진행 중인 주문 중에서 최근 변경된 주문만 조회
         Page<Order> updatedOrders = orderRepository.findByCustomerUsernameAndIsDeletedFalseAndUpdatedAtAfterAndStatusIn(
             user.getUsername(), lastCheckedTime,
-            List.of(OrderStatusEnum.PENDING, OrderStatusEnum.CONFIRMED),
+            List.of(OrderStatusEnum.CONFIRMED, OrderStatusEnum.PENDING),
             pageable);
 
         if (updatedOrders.isEmpty()) {

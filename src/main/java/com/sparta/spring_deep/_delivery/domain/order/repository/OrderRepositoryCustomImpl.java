@@ -1,8 +1,11 @@
-package com.sparta.spring_deep._delivery.domain.order;
+package com.sparta.spring_deep._delivery.domain.order.repository;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sparta.spring_deep._delivery.domain.order.dto.response.OrderResponseDto;
+import com.sparta.spring_deep._delivery.domain.order.dto.OrderSearchDto;
+import com.sparta.spring_deep._delivery.domain.order.QOrder;
 import com.sparta.spring_deep._delivery.domain.order.orderItem.QOrderItem;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

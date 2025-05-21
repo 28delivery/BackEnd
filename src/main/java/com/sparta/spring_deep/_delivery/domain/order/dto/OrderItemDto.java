@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.order.orderItem;
+package com.sparta.spring_deep._delivery.domain.order.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

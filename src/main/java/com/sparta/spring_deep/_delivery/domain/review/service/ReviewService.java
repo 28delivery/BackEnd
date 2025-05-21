@@ -2,9 +2,9 @@ package com.sparta.spring_deep._delivery.domain.review.service;
 
 import static com.sparta.spring_deep._delivery.util.AuthTools.ownerCheck;
 
-import com.sparta.spring_deep._delivery.domain.order.Order;
-import com.sparta.spring_deep._delivery.domain.order.OrderRepository;
-import com.sparta.spring_deep._delivery.domain.order.OrderStatusEnum;
+import com.sparta.spring_deep._delivery.domain.order.model.Order;
+import com.sparta.spring_deep._delivery.domain.order.model.Order.OrderStatusEnum;
+import com.sparta.spring_deep._delivery.domain.order.repository.OrderRepository;
 import com.sparta.spring_deep._delivery.domain.restaurant.RestaurantRepository;
 import com.sparta.spring_deep._delivery.domain.review.dto.ReviewRequestDto;
 import com.sparta.spring_deep._delivery.domain.review.dto.ReviewResponseDto;
@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;

@@ -1,7 +1,7 @@
 package com.sparta.spring_deep._delivery.admin.review;
 
-import com.sparta.spring_deep._delivery.domain.order.Order;
-import com.sparta.spring_deep._delivery.domain.order.OrderRepository;
+import com.sparta.spring_deep._delivery.domain.order.model.Order;
+import com.sparta.spring_deep._delivery.domain.order.repository.OrderRepository;
 import com.sparta.spring_deep._delivery.domain.review.model.Review;
 import com.sparta.spring_deep._delivery.domain.review.dto.ReviewResponseDto;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;

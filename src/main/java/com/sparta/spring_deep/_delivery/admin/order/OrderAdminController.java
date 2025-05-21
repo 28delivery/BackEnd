@@ -1,7 +1,7 @@
 package com.sparta.spring_deep._delivery.admin.order;
 
-import com.sparta.spring_deep._delivery.domain.order.OrderResponseDto;
-import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsResponseDto;
+import com.sparta.spring_deep._delivery.domain.order.dto.response.OrderResponseDto;
+import com.sparta.spring_deep._delivery.domain.order.dto.response.OrderDetailsResponseDto;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,11 @@
-package com.sparta.spring_deep._delivery.domain.order;
+package com.sparta.spring_deep._delivery.domain.order.controller;
 
-import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsRequestDto;
-import com.sparta.spring_deep._delivery.domain.order.orderDetails.OrderDetailsResponseDto;
+import com.sparta.spring_deep._delivery.domain.order.dto.response.OrderResponseDto;
+import com.sparta.spring_deep._delivery.domain.order.dto.OrderSearchDto;
+import com.sparta.spring_deep._delivery.domain.order.model.Order.OrderStatusEnum;
+import com.sparta.spring_deep._delivery.domain.order.service.OrderService;
+import com.sparta.spring_deep._delivery.domain.order.dto.request.OrderDetailsRequestDto;
+import com.sparta.spring_deep._delivery.domain.order.dto.response.OrderDetailsResponseDto;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;

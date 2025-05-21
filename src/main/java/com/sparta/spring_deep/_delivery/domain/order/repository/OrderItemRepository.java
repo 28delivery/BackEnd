@@ -1,6 +1,7 @@
-package com.sparta.spring_deep._delivery.domain.order.orderItem;
+package com.sparta.spring_deep._delivery.domain.order.repository;
 
 
+import com.sparta.spring_deep._delivery.domain.order.model.OrderItem;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;

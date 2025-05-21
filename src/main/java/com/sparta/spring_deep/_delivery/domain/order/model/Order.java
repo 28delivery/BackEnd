@@ -1,9 +1,10 @@
-package com.sparta.spring_deep._delivery.domain.order;
+package com.sparta.spring_deep._delivery.domain.order.model;
 
 import com.sparta.spring_deep._delivery.common.BaseEntity;
 import com.sparta.spring_deep._delivery.domain.address.entity.Address;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,11 +15,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
@@ -35,6 +38,9 @@ public class Order extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
+    private List<OrderItem> orderItems = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
@@ -55,7 +61,7 @@ public class Order extends BaseEntity {
 
     @Column(name = "total_price", nullable = false)
     @Digits(integer = 10, fraction = 2)
-    private BigDecimal totalPrice;
+    private BigDecimal totalPrice = BigDecimal.ZERO;
 
     @Column(length = 50)
     @Size(max = 50)
@@ -63,24 +69,36 @@ public class Order extends BaseEntity {
 
     @Builder
     public Order(User customer, Restaurant restaurant, Address address,
-        @NotNull @Digits(integer = 10, fraction = 2) BigDecimal totalPrice,
         @Size(max = 50) String request) {
         super(customer.getUsername());
         this.customer = customer;
         this.restaurant = restaurant;
         this.address = address;
-        this.totalPrice = totalPrice;
         this.request = request;
     }
 
+    public void addOrderItem(OrderItem orderItem) {
+        orderItems.add(orderItem);
+        orderItem.setOrder(this);
+    }
 
-    public void updateTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
+    public void updateTotalPrice() {
+        this.totalPrice = orderItems.stream()
+            .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public void updateOrderStatus(User user, OrderStatusEnum status) {
         super.update(user.getUsername()); // user -> username으로 변경 예정 (*baseEntity)
         this.status = status;
+    }
+
+    public enum OrderStatusEnum {
+        PENDING,
+        CONFIRMED,
+        DELIVERED,
+        FAILED,
+        CANCELLED
     }
 
 }
