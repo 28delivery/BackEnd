@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.payment;
+package com.sparta.spring_deep._delivery.domain.payment.model;
 
 import com.sparta.spring_deep._delivery.common.BaseEntity;
 import com.sparta.spring_deep._delivery.domain.order.model.Order;

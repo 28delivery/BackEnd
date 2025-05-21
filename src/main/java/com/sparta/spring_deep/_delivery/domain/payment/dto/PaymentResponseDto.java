@@ -1,7 +1,8 @@
-package com.sparta.spring_deep._delivery.domain.payment;
+package com.sparta.spring_deep._delivery.domain.payment.dto;
 
-import com.sparta.spring_deep._delivery.domain.payment.Payment.PaymentMethodEnum;
-import com.sparta.spring_deep._delivery.domain.payment.Payment.PaymentStatusEnum;
+import com.sparta.spring_deep._delivery.domain.payment.model.Payment;
+import com.sparta.spring_deep._delivery.domain.payment.model.Payment.PaymentMethodEnum;
+import com.sparta.spring_deep._delivery.domain.payment.model.Payment.PaymentStatusEnum;
 import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
