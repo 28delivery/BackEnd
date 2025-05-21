@@ -12,7 +12,7 @@ import com.sparta.spring_deep._delivery.domain.payment.Payment.PaymentStatusEnum
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant;
 import com.sparta.spring_deep._delivery.domain.restaurant.Restaurant.CategoryEnum;
 import com.sparta.spring_deep._delivery.domain.restaurant.restaurantAddress.RestaurantAddress;
-import com.sparta.spring_deep._delivery.domain.review.Review;
+import com.sparta.spring_deep._delivery.domain.review.model.Review;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import com.sparta.spring_deep._delivery.domain.user.entity.IsPublic;
 import com.sparta.spring_deep._delivery.domain.user.entity.User;

@@ -1,5 +1,6 @@
-package com.sparta.spring_deep._delivery.domain.review;
+package com.sparta.spring_deep._delivery.domain.review.repository;
 
+import com.sparta.spring_deep._delivery.domain.review.model.Review;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

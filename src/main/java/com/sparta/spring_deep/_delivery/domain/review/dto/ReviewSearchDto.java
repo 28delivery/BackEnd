@@ -1,4 +1,4 @@
-package com.sparta.spring_deep._delivery.domain.review;
+package com.sparta.spring_deep._delivery.domain.review.dto;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

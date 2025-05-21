@@ -1,5 +1,9 @@
-package com.sparta.spring_deep._delivery.domain.review;
+package com.sparta.spring_deep._delivery.domain.review.controller;
 
+import com.sparta.spring_deep._delivery.domain.review.dto.ReviewRequestDto;
+import com.sparta.spring_deep._delivery.domain.review.dto.ReviewResponseDto;
+import com.sparta.spring_deep._delivery.domain.review.dto.ReviewRestaurantResponseDto;
+import com.sparta.spring_deep._delivery.domain.review.service.ReviewService;
 import com.sparta.spring_deep._delivery.domain.user.details.UserDetailsImpl;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +38,6 @@ public class ReviewController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestBody ReviewRequestDto requestDto) {
 
-        log.info("리뷰 작성 : {}", requestDto);
-
         ReviewResponseDto responseDto = reviewService.createReview(requestDto,
             userDetails.getUser());
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
@@ -43,24 +45,19 @@ public class ReviewController {
 
     // 특정 음식점 리뷰 조회
     @GetMapping("/reviews/{restaurantId}/search")
-    public ResponseEntity<Page<ReviewResponseDto>> searchReview(
+    public ResponseEntity<ReviewRestaurantResponseDto> searchReview(
         @PathVariable String restaurantId,
         @PageableDefault(sort = "createdAt", size = 10, page = 0, direction = Direction.DESC) Pageable pageable
     ) {
-
-        log.info("특정 음식점 리뷰 조회 - restaurantId :{}", restaurantId);
-
-        Page<ReviewResponseDto> responseDtos = reviewService.getReviews(
+        ReviewRestaurantResponseDto responseDto = reviewService.getReviews(
             UUID.fromString(restaurantId), pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseDtos);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     // 리뷰 조회
     @GetMapping("/reviews/{reviewId}")
     public ResponseEntity<ReviewResponseDto> getReview(@PathVariable String reviewId) {
-        log.info("리뷰 조회 - reviewId :{}", reviewId);
-
         ReviewResponseDto responseDto = reviewService.getReview(UUID.fromString(reviewId));
 
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
@@ -72,7 +69,6 @@ public class ReviewController {
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable String reviewId,
         @RequestBody ReviewRequestDto requestDto) {
-        log.info("리뷰 수정 :{}", reviewId);
 
         ReviewResponseDto responseDto = reviewService.updateReview(UUID.fromString(reviewId),
             requestDto.getComment(), requestDto.getRating(), userDetails.getUser());
@@ -85,7 +81,6 @@ public class ReviewController {
     public ResponseEntity<String> deleteReview(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @PathVariable String reviewId) {
-        log.info("리뷰 삭제 - reviewId :{}", reviewId);
 
         return reviewService.deleteReview(UUID.fromString(reviewId), userDetails.getUser());
     }

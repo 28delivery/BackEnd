@@ -1,11 +1,12 @@
-package com.sparta.spring_deep._delivery.domain.review;
+package com.sparta.spring_deep._delivery.domain.review.repository;
 
 import static com.sparta.spring_deep._delivery.domain.order.QOrder.order;
 import static com.sparta.spring_deep._delivery.domain.restaurant.QRestaurant.restaurant;
-import static com.sparta.spring_deep._delivery.domain.review.QReview.review;
+import static com.sparta.spring_deep._delivery.domain.review.model.QReview.review;
 
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sparta.spring_deep._delivery.domain.review.model.Review;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +25,7 @@ public class ReviewRepositoryCustomImpl implements ReviewRepositoryCustom {
     @Override
     public Page<Review> searchReviews(UUID restaurantId, Pageable pageable) {
         log.info("searchReviews");
-        
+
         // pageable의 정렬 조건 처리 (기본은 createdAt 내림차순)
         List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
         pageable.getSort().forEach(sort -> {
